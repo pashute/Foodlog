@@ -1,4 +1,4 @@
-# Foodlog Version 1.10
+# Foodlog Version 1.11
 
 Log your meals easily
 
