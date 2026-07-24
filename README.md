@@ -2,7 +2,7 @@
 
 Log your meals easily
 
-Foodlog is a lightweight, privacy-focused food logging web application that is completely free with no ads, and open source. If you like it, you may voluntarily donate to support development. It is fully open-source, uses your own Foodlog google sheet which only you have access to, and for AI conversation uses your own Gemini API key (which is free to obtain), and processes your information exclusively through the Gemini Flash Lite model, meaning Google Gemini's standard privacy policies apply.
+Foodlog is a lightweight, privacy-focused food logging web application that is completely free with no ads, and is fully open source. If you like it, you may voluntarily donate to support development. It stores information in your own Foodlog Google-sheet, which only you have access to, and for AI conversation uses your own Gemini API key (which is free to obtain), and processes your information exclusively through the Gemini Flash Lite model, meaning Google Gemini's standard privacy policies apply.
 
 If you have any questions, problems, or feature requests, please reach out to the developer by opening an issue on [GitHub Issues](https://github.com/pashute/Foodlog/issues).
 
