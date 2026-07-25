@@ -1,4 +1,39 @@
-# Developer Instructions: OAuth Setup & Lemon Squeezy Integration
+# Developer Instructions
+
+### File: develop.md — Version 1.2.0
+
+Development process, OAuth Setup & Lemon Squeezy Integration and deployment
+
+
+## Development Process
+- Method: BDD, TDD, E2E testing
+- One feature at a time, not all cucumbers upfront
+- Per feature: 
+  - AI discusses, writes cucumber scenario, human approval required, 
+  - AI then write's code, AI proposes test and waits for humans response,  discusses the test, and after human approval AI writes and runs test, 
+  - then discusses result with human before proceeding to next feature. 
+    - On failure: AI proposes cause, no auto-fix, human approves before proceeding
+  
+### Development Order: 
+
+  1. Mock version: mock oAuth, mock AI interaction, mock sheets integration.
+  2. Test version: oAuth, AI interaction, sheets storage and integration, tested on localhost.
+  3. Release version: 3a. deploy, 3b. test deployment, 3c. release notes.
+
+## Technology
+
+### Development Technology
+- Editor: VS Code
+- CI/CD: GitHub Actions, tbd
+- Testing: Cucumber, Playwright, tbd
+- Shell: PowerShell, Windows
+- Versions and proj management:  Github repo and issues
+- url:  http://www.github.com/pashute/Foodlog
+
+### Application Stack
+- Backend: Node.js
+- Frameworks: JavaScript only, no Python
+- Frontend: React
 
 ## 1. Google OAuth 2.0 Setup
 

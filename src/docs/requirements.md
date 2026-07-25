@@ -1,6 +1,7 @@
 #### # Foodlog Requirements
 
-_Version 1.11_
+_Version 1.2.0_
+### File: requirements.md — Version 1.2.0
 
 # App Requirements Specification
 

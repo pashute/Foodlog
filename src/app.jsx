@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
+// File: app.jsx — Version 1.2.0
 const MODEL_NAME = "gemini-1.5-flash-lite"; // Updated to current available model
 const CLIENT_ID = "YOUR_GOOGLE_OAUTH_CLIENT_ID";
 
@@ -35,7 +36,7 @@ export default function App() {
       <header className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-xl font-bold">Foodlog</h1>
-          <p className="text-xs text-zinc-500">Version 1.03</p>
+          <p className="text-xs text-zinc-500">Version 1.2.0</p>
         </div>
         <button onClick={() => setView(view === 'main' ? 'settings' : 'main')} className="text-sm border px-3 py-1 rounded">
           {user ? user.name : "Login"}
