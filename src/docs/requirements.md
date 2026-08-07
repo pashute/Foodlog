@@ -1,42 +1,63 @@
 #### # Foodlog Requirements
 
-_Version 1.2.0_
-### File: requirements.md — Version 1.2.0
+_Version 0.1.1_
+### File: requirements.md — Version 0.1.1
 
 # App Requirements Specification
 
 ## Core Workflow & UI
 
-### Initial setup and login
-- top right corner of mainpage:  Loggin/Username if logged:  leads to oauth login.   
-- clicking on  username leads to Settings page.   
-- after login, if no user api key was set goes to settings page.   
+### App top bar
+
+- App name: top left corner App name from config (Foodlog)
+- Version:  Under app name version from config(beginning with: "Version 0.1.1")
+
+- User & Settings: top right corner 
+  - Login link 
+    - Changes to username with Avatar when logged in
+    - Enables Settings page and Logger page
+  - Settings hamburger 
+    - enabled when logged in
+    - leads to settings page
+
 
 #### Settings page:  
 
+- App info card: App name, Version, and Theme (Dark by default).
 
-- User: and username, or if not logged in - login button  
 - Foodlog sheet  id and direct link.   
-- Created on login if not stored in local chrome.   
-- Before creation searches for an existing foodlog sheet.   
-- Stored in local chrome storage.   
+  - Created in user's Google Sheets on login if not stored in local chrome.   
+  - Before creation searches for an existing Foodlog sheet.   
+  - ID and link stored in local chrome storage.   
+  - Error disables logging
+  - During prototype stage this functionality and the sheet data itself is mocked. 
 
+- Gemini API Key: []  (i)
+  - Clicking or hovering on the i information shows a popup with the following: 
+  
+  For your privacy and security, you'll use your own Gemini access to read your meals and calculate energy and carbs. To do that use your Gemini key. It is stored locally and not shared with anyone. 
 
-- Google flash (lite) api key    
--- textbox for api key. Checks key if entered
--- `?` Instructions hover button: tersely explains with link how to get flash (lite)  gemini api key, and that its free. 
--- checkmark turns green and checked if ok. stays red and with x if not. 
+  - Tap "Get my Gemini key" — this opens Google AI Studio, already signed in as your account.
+  - Tap "Create API key."
+  - Copy the key and paste it here.
+
+(implementation notes:
+1. Launch via Chrome Custom Tabs, not a WebView (WebView won't share the Google session and may get blocked by Google's sign-in policies anyway).
+2. URL: https://aistudio.google.com/apikey?authuser=<the email they signed in with>
+3. If that account has no active Chrome session on the device (uncommon, but possible — e.g. they cleared cookies or use a different browser as default), they'll just see a normal one-tap Google sign-in — not a failure state
+)
+
+- **Timezone:** Current user’s timezone. Click to change. (i) 
+- Hovering over info button says: This changes the timezone in this app. Not the system settings. 
+
 -- `Go to App`  button
--- disabled if api key not there, foodlog sheet missing  or if not logged in. 
---- in those cases warns in Setings instruction section 
--- `How to install` button explains how to make a pwa on your android phone, or just use from web. 
+-- disabled if api key not there, if the Foodlog sheet missing  or if not logged in. 
+--- in those cases explain in the Settings warning row below the button:  Please log in. 
 
-- Instruction section:  Text with instructions for missing info (login/ai api key/ foodlog sheet) or errors that occur (in red text). 
+### Logger page
 
-### Mainpage UI
+Under app header
 
-- Top right corner of mainpage:  Loggin/Username if logged:  leads to oauth login. 
-- **Timezone:** Current user’s timezone.  (? hover help button:  change this in your system settings)
 - **Minutes ago Box:** 
 - Defaults to `[NOW]`. (value 0 minutes ago)
 - Clicking it reveals a numeric minutes offset option. [-] [0] [+]   
@@ -71,6 +92,7 @@ eg  2026/07/26 11:02, Sun
 
 -- Col B: Header: “Carbs”.   Number of carbs. `?`  if not determined. 
 -- Col C:  Header: “Meal”.  Meal text. 
+-- Col D: Header: “Calories”.  Number of calories. `?`  if not determined.
 
 - **Navigation:** 
 	- **Food log** opens the user's Foodlog Google Sheet directly.
@@ -78,9 +100,11 @@ eg  2026/07/26 11:02, Sun
 
 
 ## AI Logic & Clarification (Gemini Flash-Lite)
-- **Carb Estimation:** Parses the input string for time and carbohydrates.
-- **Missing Data Handling:** If ambiguous (e.g., type of bread, portion size), AI prompts for clarification (e.g., "large, medium, or small apple?", "which bread?").
-- **Clarification State:** Displays options to **"Submit Anyway"** (writes row with 0 carbs) or **"Fix"** (returns user to the prompt).
+
+- **Carb & Calorie Estimation:** Parses the input string for time, and estimates carbohydrates and calories per recognized food item, plus a total.
+- **Per-item breakdown:** The AI estimate lists each recognized food (with its estimated weight), its carbs and calories, followed by a total row and a short note on any assumptions made (e.g., bread type, oil vs. water-packed, standard-size produce).
+- **Missing Data Handling:** If ambiguous (e.g., type of bread, portion size), AI proceeds with a stated assumption (e.g., "large, medium, or small apple?", "which bread?") shown in the estimate.
+- **Clarification State:** Displays options to **"Log Anyway"** (writes row with 0 carbs and 0 calories if undetermined) or **"Fix"** (returns user to the prompt).
 
 ## Architecture & Privacy
 - **Database:** None. Uses the user's own Google Sheet via Google OAuth 2.0.
@@ -89,8 +113,8 @@ eg  2026/07/26 11:02, Sun
 
 ## Monetization Model
 
-- **Pricing:** Freemium/Donateware (Free to use, optional "Pay What You Want" donations via Lemon Squeezy).
-- **Merchant:** Lemon Squeezy handles optional voluntary tips/donations and global sales tax compliance.
+- **Pricing:** Freemium/Donateware (Free to use, optional one-time support via GitHub Sponsors tiers).
+- **Merchant:** GitHub Sponsors handles optional one-time tips/donations; the developer files tax/compliance directly (see develop.md).
 - **Ads:** Zero advertisements.
 
 

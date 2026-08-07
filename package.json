@@ -7,17 +7,26 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:bdd": "cucumber-js"
   },
   "dependencies": {
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
+  "cucumber": {
+    "default": {
+      "paths": ["features/**/*.feature"],
+      "import": ["features/support/**/*.js", "features/step_definitions/**/*.js"]
+    }
+  },
   "devDependencies": {
+    "@cucumber/cucumber": "^13.2.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
+    "playwright": "^1.62.0",
     "vite": "^8.1.1"
   }
 }
