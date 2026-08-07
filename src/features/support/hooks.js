@@ -1,22 +1,16 @@
 import { BeforeAll, AfterAll, Before, After } from '@cucumber/cucumber'
 import { chromium } from 'playwright'
-import { createServer } from 'vite'
 
-let viteServer
+const baseUrl = process.env.BASE_URL || 'http://localhost:8081'
+
 let browser
-let baseUrl
 
 BeforeAll(async function () {
-  viteServer = await createServer({ server: { port: 0 }, logLevel: 'error' })
-  await viteServer.listen()
-  const address = viteServer.httpServer.address()
-  baseUrl = `http://localhost:${address.port}`
   browser = await chromium.launch()
 })
 
 AfterAll(async function () {
   await browser.close()
-  await viteServer.close()
 })
 
 Before(async function () {
