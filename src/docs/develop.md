@@ -41,7 +41,7 @@ It instructs the human developer on OAuth Setup & Lemon Squeezy Integration and 
    b. Settings page
    c. Logger page
 
-   See the two screenshot html files (identical to the images) in /docs/screenshots for reference. 
+   See the two screenshot html files (identical to the images) in src/docs/screenshots for reference. 
 
   1.2.3 Production development stage: 
    a. realize config 
