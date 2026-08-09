@@ -4,13 +4,8 @@
   "version": "0.1.1",
   "type": "module",
   "scripts": {
-    "test:bdd": "cucumber-js"
-  },
-  "cucumber": {
-    "default": {
-      "paths": ["src/features/**/*.feature"],
-      "import": ["src/features/support/**/*.js", "src/features/**/step_definitions/**/*.js"]
-    }
+    "test:bdd": "cucumber-js",
+    "test:unit": "node --test dev/testing/units/**/*.test.js"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.0",

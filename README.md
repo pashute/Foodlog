@@ -9,8 +9,8 @@ Foodlog is a free open-source ad-free lightweight, privacy-focused food logging 
 ## Screenshots
 
 <p float="left">
-  <img src="src/docs/screenshots/foodlog-2-settings.png" width="45%" alt="Settings screen" />
-  <img src="src/docs/screenshots/foodlog-3-logger.png" width="45%" alt="Logger screen" />
+  <img src="dev/docs/screenshots/foodlog-settings.png" width="45%" alt="Settings screen" />
+  <img src="dev/docs/screenshots/foodlog-logger.png" width="45%" alt="Logger screen" />
 </p>
 
 ## Donate
