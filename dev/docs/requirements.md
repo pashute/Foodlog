@@ -1,7 +1,7 @@
 #### # Foodlog Requirements
 
-_Version 0.1.1_
-### File: requirements.md — Version 0.1.1
+_Version 0.1.2_
+### File: requirements.md — Version 0.1.2
 
 # App Requirements Specification
 
@@ -223,6 +223,20 @@ API key stored in secure storage:
 - Reads/writes to Foodlog sheet by settings details.
 - Can check if the file exists and 
 Can write to row
+
+## UI behavior / interaction tests
+
+- Test behavior, not appearance (no pixel/visual checks).
+- Assert: correct text/labels/names; correct enabled/disabled and shown/hidden state per
+  app state (e.g. Sync disabled until logged in; key-paste field appears only after browser
+  return; results hidden until a response arrives); correct reactions to interaction
+  (press triggers the right action; errors show a message and don't crash).
+- Tools: React Native Testing Library (Android UI), React Testing Library or Playwright
+  (Tauri web UI).
+- Mock the auth/storage boundary; assert UI reacts correctly to logged-in / logged-out and
+  success / error states. Real Google login + real secure storage are verified manually
+  (or in the live tier), not here.
+- Runs deterministically in CI on every push (no device, no live API).
 
 ## Architecture & Privacy
 

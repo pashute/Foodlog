@@ -1,19 +1,18 @@
 ### Filename instructions.md
-File version 0.1.2
+File version 0.1.3
 
 AI should not touch this file without explicit permission and may change only one section at a time before asking again for permission !!
 
 ## 0. Beeping
 
 - 0.1 Every batch of actions starts with a beep.
-- 0.2 Beep via `[console]::beep(freq,ms)` in PowerShell.
-- 0.3 When done successfully, beep twice.
-- 0.4 If you need the user, beep three times, BEFORE the action that will prompt the user.
+- 0.2 Beep by running a PowerShell **script file** (not an inline command):
+  - `& "dev/testing/beep.ps1"` — a single beep. Use to start a batch and when done successfully.
+  - `& "dev/testing/error.ps1"` — three beeps. Use if you need the user, BEFORE the action that will prompt the user.
+- 0.3 When done successfully, run `beep.ps1`.
+- 0.4 If you need the user, run `error.ps1` BEFORE the action that will prompt the user.
 
-Note: a `PowerShell([console]::beep*)` wildcard allow-rule was tried in `.claude/settings.local.json` and did not work in practice - a new frequency/duration still triggers a permission prompt. Only exact-string commands are silently permitted. Reuse exactly these three, never vary the numbers:
-- Start/test: `[console]::beep(1000,400)`
-- Success (x2): `[console]::beep(880,200); [console]::beep(880,200)`
-- Need-user (x3): `[console]::beep(660,150); [console]::beep(660,150); [console]::beep(660,150)`
+Note: inline commands like `[console]::beep(freq,ms)` kept re-triggering permission prompts, even for previously-approved exact strings, and a wildcard allow-rule didn't help either. Running the same logic from a `.ps1` **file** via `& "path"` does not re-prompt. Root cause not fully confirmed, but file-based invocation is what worked.
 
 ## 1. AI and developer interaction and methodology
 

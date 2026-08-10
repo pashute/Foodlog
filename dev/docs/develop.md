@@ -1,6 +1,6 @@
 # Development steps
 
-### File: develop.md — File version 0.1.2
+### File: develop.md — File version 0.1.3
 
 The AI MAY NOT CHANGE ANYTHING IN THIS FILE. 
 
@@ -95,6 +95,7 @@ features
 - Shell: PowerShell, Windows
 - Versions and proj management:  Github repo and issues
 - url:  http://www.github.com/pashute/Foodlog
+- Mock sheets link (prototype stage): served via a tiny local static server (`npx serve src/prototype`)
   
 - 
 
@@ -115,6 +116,20 @@ AI.lang and AI.carbs are tested in two separate tiers:
 
 The mock tier runs on every commit; the real tier runs separately (not on
 every commit) since it depends on live external API calls.
+
+### 4.1b UI Testing Directory Structure
+
+UI unit tests are split by platform, since each uses a different testing
+library (see requirements.md "UI behavior / interaction tests"):
+
+- `dev/testing/units/screens/tauri/` — React Testing Library tests (Tauri
+  web frontend)
+- `dev/testing/units/screens/android/` — React Native Testing Library
+  tests (Android, on Jest)
+
+Both directories exist from the start. Only `tauri/` is populated for
+now, since Tauri web is priority #1 (see 4.2 Application Stack).
+`android/` stays empty (`.gitkeep`) until Android development begins.
 
 ### 4.2 Application Stack
 - Backend: Node.js
