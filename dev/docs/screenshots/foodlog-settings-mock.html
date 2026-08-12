@@ -210,6 +210,42 @@
     align-items: center;
     gap: 4px;
   }
+  .led {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 7px;
+  }
+  .led.green { background: var(--green-text); box-shadow: 0 0 6px var(--green-text); }
+  .status-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .status-label { color: var(--text-h); font-size: 14.5px; }
+  .go-btn {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 0;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent);
+    color: #1a0f27;
+    margin: 6px 0 10px;
+  }
+  .footer-note {
+    font-size: 12.5px;
+    color: var(--text);
+    text-align: center;
+    min-height: 1.5em;
+  }
+  .key-left {
+    display: flex;
+    align-items: center;
+  }
 </style>
 </head>
 <body>
@@ -229,50 +265,49 @@
         <div class="donate-btn"><span class="heart">&#9825;</span> Donate</div>
       </div>
 
-      <div class="card">
-        <div class="row"><span class="label">App name</span><span class="value">Foodlog</span></div>
-        <div class="row"><span class="label">Version</span><span class="value">v0.1.1</span></div>
+      <div class="card" data-instruction="Look and feel of the app. Dark by default.">
         <div class="row"><span class="label">Theme</span><span class="value">Dark</span></div>
       </div>
 
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Gemini API key</div>
-          <div class="info-icon">i</div>
-        </div>
-        <div class="btn-row">
-          <div class="btn set">&#10003; SET</div>
-          <div class="btn">Change</div>
-          <div class="btn">Fetch key</div>
-        </div>
-        <div class="helper-text">
-          Key configured: <span class="key">AIza&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;7Qk</span><br>
-          Used to safely and privately estimate nutrition from your meal text.
+      <div class="card" data-instruction="Your Gemini API key, used to privately estimate carbs and energy from your meal text.">
+        <div class="tz-row">
+          <div class="key-left"><span class="led green"></span><span class="status-label">Gemini key ok</span></div>
+          <div class="btn">Import</div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Time zone</div>
-          <div class="info-icon">i</div>
-        </div>
+      <div class="card" data-instruction="This app setting only. Does not change your system's timezone.">
         <div class="tz-row">
           <div class="tz-place">Jerusalem, Israel +2.0 hours</div>
           <div class="btn">Change</div>
         </div>
-        <div class="helper-text">This app setting does not change the system settings.</div>
       </div>
 
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Spreadsheet</div>
-        </div>
+      <div class="card" data-instruction="Your Foodlog Google Sheet — created automatically on first login.">
         <div class="tz-row">
           <div class="tz-place">Foodlog</div>
           <a class="link" href="#">Open in Google Sheets &#8599;</a>
         </div>
       </div>
+
+      <button class="go-btn">Go to App</button>
+      <div class="footer-note" id="instruction">All set — logged in as pashute.</div>
     </div>
   </div>
+  <script>
+    // Demo only: the single bottom instruction area updates per hovered
+    // element. Not shown by a static screenshot (no hover state), but
+    // matches how the real Settings screen should behave.
+    var instruction = document.getElementById('instruction')
+    var defaultText = instruction.textContent
+    document.querySelectorAll('[data-instruction]').forEach(function (el) {
+      el.addEventListener('mouseenter', function () {
+        instruction.textContent = el.getAttribute('data-instruction')
+      })
+      el.addEventListener('mouseleave', function () {
+        instruction.textContent = defaultText
+      })
+    })
+  </script>
 </body>
 </html>

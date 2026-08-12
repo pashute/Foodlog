@@ -1,20 +1,121 @@
-// Filename Header.jsx  Version 0.1.0
+// Filename: Header.jsx
+// Version: 0.2.0
+// App header (screens/layout/header): brand + login/avatar + hamburger menu
 
-import { Text, View } from 'react-native'
-import { get } from '../../../infrastructure/config/config.js'
+import { useState } from 'react'
+import { Text, View, Pressable, StyleSheet } from 'react-native'
+import { get as configGet } from '../../../infrastructure/config/config.js'
 
-export default function Header() {
-  const appname = get('app', 'appname')
-  const version = get('app', 'version')
+// Controlled component — App entry owns login/page state and passes it in,
+// so Header stays a pure view (easy to test, easy to reuse).
+export default function Header({
+  loggedIn = false,
+  username = '',
+  currentPage = 'settings',
+  onLoginPress = () => {},
+  onNavigate = () => {},
+  onLogout = () => {},
+}) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const appname = configGet('app', 'app-name')
+  const version = configGet('app', 'app-version')
+
+  const menuItems = [
+    { name: 'settings', label: 'Settings', action: () => onNavigate('settings'), enabled: currentPage !== 'settings' },
+    { name: 'diary', label: 'Enter meal', action: () => onNavigate('diary'), enabled: currentPage !== 'diary' && loggedIn },
+    { name: 'logout', label: 'Log out', action: onLogout, enabled: loggedIn },
+  ]
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text style={{ fontSize: 20 }}>{appname}</Text>
-      <Text style={{ fontSize: 12 }}>v{version}</Text>
-      <Text>Login with Google</Text>
-      <Text accessibilityRole="button" aria-label="hamburger menu">
-        ☰
-      </Text>
+    <View style={styles.header}>
+      <View style={styles.brandRow}>
+        <Text style={styles.brand}>{appname}</Text>
+        <Text style={styles.version}>v{version}</Text>
+      </View>
+      <View style={styles.right}>
+        {loggedIn ? (
+          <View style={styles.userRow}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{username.charAt(0).toUpperCase()}</Text>
+            </View>
+            <Text style={styles.username}>{username}</Text>
+          </View>
+        ) : (
+          <Pressable onPress={onLoginPress}>
+            <Text style={styles.loginText}>Login with Google</Text>
+          </Pressable>
+        )}
+        <Pressable
+          accessibilityRole="button"
+          aria-label="hamburger menu"
+          onPress={() => setMenuOpen((open) => !open)}
+        >
+          <Text style={styles.hamburger}>☰</Text>
+        </Pressable>
+      </View>
+
+      {menuOpen && (
+        <View style={styles.menu}>
+          {menuItems.map((item) => (
+            <Pressable
+              key={item.name}
+              disabled={!item.enabled}
+              onPress={() => {
+                setMenuOpen(false)
+                item.action()
+              }}
+              style={styles.menuItem}
+            >
+              <Text style={[styles.menuItemText, !item.enabled && styles.menuItemDisabled]}>
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2e303a',
+    backgroundColor: '#16171d',
+  },
+  brandRow: { flexDirection: 'row', alignItems: 'baseline' },
+  brand: { fontSize: 20, fontWeight: '700', color: '#f3f4f6' },
+  version: { fontSize: 12, color: '#9ca3af', marginLeft: 6 },
+  right: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  userRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  avatar: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#3b5a8a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  username: { color: '#f3f4f6', fontSize: 14 },
+  loginText: { color: '#f3f4f6', fontSize: 14 },
+  hamburger: { fontSize: 18, color: '#9ca3af', marginLeft: 6 },
+  menu: {
+    position: 'absolute',
+    top: 48,
+    right: 16,
+    backgroundColor: '#1c1d24',
+    borderWidth: 1,
+    borderColor: '#2e303a',
+    borderRadius: 10,
+    paddingVertical: 4,
+    minWidth: 140,
+  },
+  menuItem: { paddingVertical: 10, paddingHorizontal: 14 },
+  menuItemText: { color: '#f3f4f6', fontSize: 14 },
+  menuItemDisabled: { color: '#4b4d58' },
+})

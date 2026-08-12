@@ -1,5 +1,5 @@
 ### Filename instructions.md
-File version 0.1.3
+File version 0.1.4
 
 AI should not touch this file without explicit permission and may change only one section at a time before asking again for permission !!
 
@@ -7,12 +7,11 @@ AI should not touch this file without explicit permission and may change only on
 
 - 0.1 Every batch of actions starts with a beep.
 - 0.2 Beep by running a PowerShell **script file** (not an inline command):
-  - `& "dev/testing/beep.ps1"` — a single beep. Use to start a batch and when done successfully.
-  - `& "dev/testing/error.ps1"` — three beeps. Use if you need the user, BEFORE the action that will prompt the user.
-- 0.3 When done successfully, run `beep.ps1`.
-- 0.4 If you need the user, run `error.ps1` BEFORE the action that will prompt the user.
+  - `& "./dev/testing/beep.ps1"` — a single beep. Use to start a batch.
+  - beep twice when finished successfully.
+  - `& "./dev/testing/callme.ps1"` — three stepped beeps. Use if you need the user, BEFORE the action that will prompt the user for permission.
+- 0.3 Use `callme.ps1` also if an error occurred.
 
-Note: inline commands like `[console]::beep(freq,ms)` kept re-triggering permission prompts, even for previously-approved exact strings, and a wildcard allow-rule didn't help either. Running the same logic from a `.ps1` **file** via `& "path"` does not re-prompt. Root cause not fully confirmed, but file-based invocation is what worked.
 
 ## 1. AI and developer interaction and methodology
 
@@ -113,8 +112,31 @@ Once the new depended-on feature was completed it should be called by the caller
 
 ## 3. Versions
 
-Each file starts with a remarked header:  Filename: {filename}  Version: {version}
+The version number is {major}.{minor}.{iteration}
+
+Each file starts with a remarked header on three lines:  Filename: {filename}  
+Version: {version}
 and a short description of the file's use
+
+The Markdown and yaml files should have: 
+   # Filename: {filename}
+   # Version: {version}
+   # {description}
+
+.js files should have 
+// Filename: {filename}
+// Version: {version}
+// {description}
+
+html files should have under the <html5> tags
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+  Filename: {filename}
+  Version: {version}
+  Description: {description}
+-->
+<head>  etc...
 
 Any change to the file changes the iteration number. 
 

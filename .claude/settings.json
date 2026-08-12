@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell([console]::beep*)",
+      "PowerShell(& \"./dev/testing/beep.ps1\")",
+      "PowerShell(& \"./dev/testing/callme.ps1\")",
+      "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\callme.ps1\")"
+    ]
+  }
+}

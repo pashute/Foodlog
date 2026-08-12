@@ -1,4 +1,4 @@
-// Filename config.test.js  Version 0.2.0
+// Filename config.test.js  Version 0.3.0
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -8,15 +8,15 @@ test('config module', () => {
   assert.strictEqual(typeof get, 'function')
 
   try {
-    get('app', 'appname')
+    get('app', 'app-name')
   } catch (err) {
-    throw new Error(`Not implemented: config base data (src/prototype/config.js) is unavailable - ${err.message}`)
+    throw new Error(`Not implemented: config base data (src/prototype/config.mock.js) is unavailable - ${err.message}`)
   }
 
   const cases = [
-    { section: 'app', key: 'appname', expected: 'success' },
+    { section: 'app', key: 'app-name', expected: 'success' },
     { section: 'app', key: 'nonexistent', expected: 'fail' },
-    { section: 'nonexistent', key: 'appname', expected: 'fail' },
+    { section: 'nonexistent', key: 'app-name', expected: 'fail' },
     { section: 'nonexistent', key: 'nonexistent', expected: 'fail' },
     { section: null, key: undefined, expected: 'fail' }, // corrupted/invalid input
   ]

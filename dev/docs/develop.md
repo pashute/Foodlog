@@ -1,6 +1,7 @@
 # Development steps
 
-### File: develop.md — File version 0.1.3
+  # File: Develop.md
+  # Version 0.1.4
 
 The AI MAY NOT CHANGE ANYTHING IN THIS FILE. 
 
@@ -35,21 +36,23 @@ This file includes the steps the human developer needs to take to set up the  OA
    UI development  - no interaction
    a. App header
    b. Settings page
-   c. Logger page
+   c. Diary page
 
    See the two screenshot html files (identical to the images) in dev/docs/screenshots for reference. 
 
   1.3 Production development stage: 
    a. realize config 
    b. realize local storage
-   b. realize oAuth 
+   b. realize oAuth   see section 
    c. realize AI interaction, 
    d. realize sheets storage and integration
 
 
-  1.4 The first release version: 
+  1.5 Release versions 
+  a. The first release version: 0.1.100 will be with mock
+  b. The next release version: 1.1.100 will be production 1
 
-### 222
+### 2. Features
 1. Gherkin features structure: 
 
 The Gherkin files will be located in the directory  structure as follows: 
@@ -72,11 +75,11 @@ features
     layout
       header
       settings
-      logger
+      diary
     interaction
       entry # initial state enabled components
       setup # settings page functionality
-      logging # logger page functionality
+      diary # diary page interaction functionality
   
 '''
 

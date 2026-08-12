@@ -1,27 +1,39 @@
-// Filename settings.steps.js  Version 0.1.0
+// Filename: settings.steps.js  Version 0.2.0
 
-import { Then } from '@cucumber/cucumber'
+import { Given, When, Then } from '@cucumber/cucumber'
 
-Then('the settings panel shows an app info card with app name, version, and theme', function () {
+Then('the settings panel shows the following elements', function (table) {
   throw new Error('Not implemented yet')
 })
 
-Then('the settings panel shows the Foodlog sheet id and a link to it', function () {
+Then('the timezone choice is disabled with the current system timezone', function () {
   throw new Error('Not implemented yet')
 })
 
-Then('the settings panel shows a Gemini API Key field with an info icon', function () {
+Then('the App name and Version are shown in the header only, not in the App info card', function () {
   throw new Error('Not implemented yet')
 })
 
-Then('the settings panel shows a Timezone field with an info icon', function () {
+Given('the settings panel is shown', function () {
   throw new Error('Not implemented yet')
 })
 
-Then('the settings panel shows a {string} button', function () {
+Then('the bottom instruction row is empty by default', function () {
   throw new Error('Not implemented yet')
 })
 
-Then('the settings panel shows a warning row below the button', function () {
+When('the user hovers the AI API Key card', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the bottom instruction row shows the AI API Key explanation', function () {
+  throw new Error('Not implemented yet')
+})
+
+When('the user hovers the Timezone card', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the bottom instruction row shows the Timezone explanation', function () {
   throw new Error('Not implemented yet')
 })

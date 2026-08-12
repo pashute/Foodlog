@@ -1,0 +1,11 @@
+config:
+  stage: prototype
+  config-version: 0.1.1
+
+app:
+  app-name: Foodlog
+  app-version: 0.1.1
+  theme: dark
+
+sheets:
+  sheet-name: Foodlog

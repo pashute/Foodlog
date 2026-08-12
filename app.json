@@ -3,9 +3,17 @@
     "name": "Foodlog",
     "slug": "foodlog",
     "version": "0.1.1",
+    "scheme": "foodlog",
     "web": {
       "bundler": "metro",
       "output": "single"
-    }
+    },
+    "android": {
+      "package": "com.foodlog.foodlog"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-asset"
+    ]
   }
 }

@@ -1,8 +1,31 @@
-# Filename entry.feature  Version 0.1.0
+# Filename: entry.feature
+# Version: 0.2.0
+# App entry / login state scenarios
 
-Feature: screens/interaction/entry
+Feature: App entry
 
-  Scenario: App opens with header and disabled settings
+  As a user I open the app
+  And these are the first things I see
+
+  Scenario: Opened but not logged in
+    Given the user opened the app 
+    But the user was not logged in previously
     Then the header is shown
     And the settings panel is shown
-    And the settings panel is disabled by default
+    And the settings panel is disabled by default until login
+
+  Scenario: Continued log in after crash
+    Given the user closed the app 
+    But did not log out - for any reason including an app crash
+    Then the app will check OAuth if still logged in 
+    And if not will log out and notify of error
+
+  Scenario: Logging in 
+    Given the user has now logged in 
+    Then the hamburger is enabled with the menu items
+    | name       | action                  | state                                |
+    | settings   | opens settings page     | on diary page                        |
+    | Enter meal | opens diary page        | on settings page. Enabled if all set |
+    | Log out    | logs out and clears app | Logged or logging  in                |
+   
+    

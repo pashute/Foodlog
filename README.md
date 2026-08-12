@@ -1,6 +1,6 @@
 # Foodlog
 
-### File: README.md — Version 0.1.1
+### File: README.md — Version 0.1.2
 
 Log your meals easily
 
@@ -10,12 +10,14 @@ Foodlog is a free open-source ad-free lightweight, privacy-focused food logging 
 
 <p float="left">
   <img src="dev/docs/screenshots/foodlog-settings.png" width="45%" alt="Settings screen" />
-  <img src="dev/docs/screenshots/foodlog-logger.png" width="45%" alt="Logger screen" />
+  <img src="dev/docs/screenshots/foodlog-diary.png" width="45%" alt="Diary screen" />
 </p>
 
 ## Donate
 
 If you like it, you may voluntarily donate to support development. 
+
+Todo: Donate button goes here and link
 
 
 ## Safe private information
@@ -38,14 +40,11 @@ Setup your Gemini account to assist you with logging the meals.
 
 And start talking
 
-Here are some screenshots
-
-
-
----
-
 ### Settings
 Access the settings view by clicking the settings hamburger icon on the top right corner. Here you can configure:
-* **Gemini API Key:** Enter your personal Gemini API key to power the parsing of your food notes.
-* **Google Sheet ID:** Link the specific Google Sheet where your food logs will be recorded.
-* **Donations:** Use the Lemon Squeezy link in the settings panel if you would like to make a voluntary contribution ([link-to-be-given-here]).
+
+* **Gemini API Key:** Enter your personal Gemini API key to power the parsing of your food entries.
+
+* **Google Sheet:** See your Foodlog sheet
+  
+* **Donations:** Use the Github Support button in the settings panel if you would like to make a voluntary contribution ([link-to-be-given-here]).

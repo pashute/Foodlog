@@ -1,9 +1,7 @@
-#### # Foodlog Requirements
+  # File: requirements.md 
+  # Version 0.1.5
 
-_Version 0.1.2_
-### File: requirements.md — Version 0.1.2
-
-# App Requirements Specification
+# Foodlog App Requirements Specification
 
 ## Core Workflow & UI 
 
@@ -21,15 +19,28 @@ This section should be defined in the screens/layout and screens/interactions  f
 - User & Settings: top right corner 
   - Login link 
     - Changes to username with Avatar when logged in
-    - Enables Settings page and Logger page
+    - Enables Settings page and Diary page
   - Settings hamburger 
     - Enabled when logged in
     - Menu:  Settings, Log out
 
+#### OAuth login
+ - When user presses the app header's [Login with Google]
+   - A calming scope starter popup shows, explaining why we need drive.file scope and an ai api key.
+   - Clicking on [Continue Login with Google] 
+   goes back to main page and starts OAuth process.
+   (actually it closes the modal, and awaiting onStarter handles the binary result: abort or continue) .
+   - We want drive.file scope for google access 
+   - We want a refresh token for long term access (stored in secure strorage)
+   - Until the user is logged in, only the disabled settings page is shown. 
+   - The logged in usermail is stored in the storage, saved on app closed (while other values are deleted during logout) and usermail is erased only on explicit logout or new login to different user. 
+   - We verify the token is a refresh token, 
+   - We verify the token is with scope drive.file 
+   - On any error that occurs we notify the user and logout
 
 #### Settings page:  
 
-- App info card: App name, Version, and Theme (Dark by default).
+- App info card: Theme (Dark by default). App name and Version are shown in the header only, not repeated here.
 
 - Foodlog sheet  id and direct link.   
   - Created in user's Google Sheets on login if not stored in local chrome.   
@@ -38,12 +49,12 @@ This section should be defined in the screens/layout and screens/interactions  f
   - Error disables logging
   - During prototype stage this functionality and the sheet data itself is mocked. 
 
-- Gemini API Key: []  (i)
-  - Clicking or hovering on the i information shows a popup with the following: 
-  
+- Gemini API Key: status LED + Import button.
+  - Hovering/focusing this card shows its explanation in the dedicated instructions row at the bottom of the screen (not a popup): 
+
   For your privacy and security, you'll use your own Gemini access to read your meals and calculate energy and carbs. To do that use your Gemini key. It is stored locally and not shared with anyone. 
 
-  - Tap "Get my Gemini key" — this opens Google AI Studio, already signed in as your account.
+  - Tap "Import" — opens Google AI Studio, already signed in as your account, to get/paste the key.
   - Tap "Create API key."
   - Copy the key and paste it here. 
 
@@ -52,12 +63,14 @@ and as to paste it by pressing a button or be actually pasting it and pressing e
 
 (See Gemini key implementation under Technology section in this document)
 
-- **Timezone:** Current user’s timezone. Click to change. (i) 
-- Hovering over info button says: This changes the timezone in this app. Not the system settings. 
+- **Timezone:** Current user's timezone. Click to change. 
+  - Hovering/focusing this card shows in the dedicated instructions row: This changes the timezone in this app. Not the system settings. 
+
+- Only one instructions row exists, at the bottom of the whole Settings screen. It is empty/idle by default and its text changes to match whichever card is currently hovered or focused — there are no separate per-card info-icon popups.
 
 -- `Go to App`  button
 -- disabled if api key not there, if the Foodlog sheet missing  or if not logged in. 
---- in those cases explain in the Settings warning row below the button:  Please log in. 
+--- in those cases explain in the same bottom instructions row:  Please log in. 
 
 ##### Gemini key access implementation notes 
 
@@ -74,7 +87,7 @@ Validate before saving
 Store with secure android keystore.
 
 
-### Logger page
+### Diary page
 
 Under app header
 
@@ -115,7 +128,7 @@ Under app header
 	- **Food log** opens the user's Foodlog Google Sheet directly.
 
 
-## AI Logic & Clarification (Gemini Flash-Lite)
+## AI Logic & AI Suggestions (Gemini Flash-Lite)
 
 - **Carb & Calorie Estimate:** Parses the input string, and estimates carbohydrates and calories per recognized food item, plus a total.
 
@@ -173,9 +186,11 @@ Under app header
 ### Config module and .yaml
 
 - A infrastructure/config module with a get(section, key) takes from config.yaml in the source, with the following sections: 
-  - app:  appname (Foodlog), version (0.1.1), theme: (dark)
-  - storage:  encryption (secure android keystore), aiKeyName (GeminiKey)
-  - sheets: name (Foodlog), link: (sheets.google.com/Foodlog), id (the foodlog file id), 
+  - config: stage (prototype), config-version (0.1.1)
+  - app: app-name (Foodlog), app-version (0.1.1), theme (dark)
+  - sheets: sheet-name (Foodlog)
+
+  Note: authToken, aiApiKey, and sheetId now live in the storage module (see infrastructure/storage), not config.
 - 
  Note: at prototype stage there is no file, just a mockup file (in dev/features/infrastructure) that returns a simulation of results for the get(section, key) calls. 
 
@@ -190,20 +205,46 @@ Under app header
   - Desktop → open system browser via Tauri opener.
   - Android → Chrome Custom Tab (expo-web-browser).
   
-### OAuth
+### OAuth - implementation notes
 
-in src/infrastructure/auth.   Prototype mock in dev/features/infrastructure
+The OAuth basic code is in src/infrastructure/auth.   Prototype mockup is in src/prototype/oauth
+The feature definitions are in dev/features/infrastructure
 
 The OAuth will deal with the four stages of logging in
 - Checking for already logged in chrome. If not: 
-- Checking for multiple accounts and chosing the username's one
+- Checking for multiple accounts and choosing the username's one
 - Login with drive.file scope
 - Log out if requested.
 
-The two client ids (for Tauri desktop app and for the android one)
-will be stored in src/infrastructure/auth/ 
+The two client ids (One for Tauri desktop app, and one for the android one) will be stored in src/infrastructure/auth/authClientIds.js 
 
 Note: During prototype stage a mockup of the screens and their functionaly will be provided.
+
+#### Three login paths (branched by platform) and a mock
+The auth code for logging in is in: 
+`src/infrastructure/auth/`
+
+When calling the OAuth, where the code differs between platforms it should branch out to the three files: 
+- oauth.tauri.js - expo desktop web turned win exe with tauri
+- oauth.android.js - for android 
+- oauth.ios.js - for ios
+And a fourth path in the prototype/oauth folder
+- oauth.mock.js for a mock version 
+
+The oauth.mock version includes:
+- a mock session creation function 
+and
+- two mock popups: accountChoice.mock.dlg.jsx
+               and permitConsent.mock.dlg.jsx
+- both report to oauth.mock.onLogin with an OAuth object
+  - Deny   - gives error,  access denied.
+  - Cancel - gives error, popup closed by user.
+  - Continue / OK - gives refresh token  and drive.file scope
+
+On all branches:   
+- The token is verified to be refresh and with said scope
+- And its elements are stored in the local secure storage. 
+
 
 ### AI
 
