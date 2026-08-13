@@ -2,7 +2,16 @@
 File version 0.4.0
 Last updated: 2026-08-13 01:44
 
-## Blocking: web bundle blank page
+## Startup walkthrough (in progress)
 
-`require is not defined` in browser. Added metro.config.cjs + babel.config.cjs (were missing). Rebuild after adding them produced byte-identical bundle hash to broken one — suspect stale Metro cache, not confirmed.
+This starts the Expo CLI dev server, which:
+1. Reads `app.json` for project config 
+(name, slug, `web.bundler: "metro"`, 
+             `web.output: "single"`).
+2. Boots Metro (the bundler) using `metro.config.cjs`, 
+  which calls `getDefaultConfig` from `expo/metro-config`.
+3. Metro's entry point is resolved from `package.json:6` 
+            → `"main": "index.js"`.
+
+Nothing else runs yet — no app code has executed, just server + bundler startup.
 
