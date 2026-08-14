@@ -41,7 +41,8 @@
       "<rootDir>/dev/testing/units/screens/tauri/**/*.test.jsx"
     ],
     "moduleNameMapper": {
-      "^react-native$": "react-native-web"
+      "^react-native$": "react-native-web",
+      "\\.(png|jpg|jpeg|gif)$": "<rootDir>/dev/testing/fileMock.js"
     }
   }
 }

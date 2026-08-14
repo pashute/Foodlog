@@ -1,5 +1,5 @@
 # Filename: header.feature
-# Version: 0.3.0
+# Version: 0.4.0
 # Header layout and hamburger menu
 
 Feature: screens/layout/header
@@ -24,11 +24,9 @@ Feature: screens/layout/header
 
   @header.hamburger
   Scenario: Hamburger selected
-    Given the hamburger icon was selected 
-    Then a menu is shown, depending on the state: 
-    | name       | action                  | state                                |
-    | settings   | opens settings page     | on diary page                        |
-    | Enter meal | opens diary page        | on settings page. Enabled if all set |
-    | Log out    | logs out and clears app | Logged or logging  in                |
-
-  
+    Given the hamburger icon was selected
+    Then the menu shows only the items relevant to the current page, hiding the rest:
+    | name       | action                  | shown when         | enabled when   |
+    | settings   | opens settings page     | on diary page       | always         |
+    | Enter meal | opens diary page        | on settings page    | logged in      |
+    | Log out    | logs out and clears app | logged in           | always         |

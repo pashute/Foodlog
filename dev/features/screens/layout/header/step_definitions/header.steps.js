@@ -1,5 +1,5 @@
 // Filename: header.steps.js
-// Version: 0.2.0
+// Version: 0.3.0
 
 import { Given, Then } from '@cucumber/cucumber'
 
@@ -56,6 +56,6 @@ Given('the hamburger icon was selected', function () {
   throw new Error('Not implemented yet')
 })
 
-Then('a menu is shown, depending on the state:', function (table) {
+Then('the menu shows only the items relevant to the current page, hiding the rest:', function (table) {
   throw new Error('Not implemented yet')
 })

@@ -1,4 +1,4 @@
-// Filename: accountChoice.mock.dlg.jsx  Version 0.2.0
+// Filename: accountChoice.mock.dlg.jsx  Version 0.3.0
 
 // React component only — logic lives in accountChoice.mock.js (see that
 // file for why they're split). Mount this once; oauth.mock.js drives it
@@ -11,14 +11,14 @@ import { accounts, _registerVisibilityHandler, cancel, chooseSelected } from './
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   container: { width: '85%', maxWidth: 380, borderRadius: 12, padding: 20, backgroundColor: '#222' },
-  title: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12 },
-  account: { paddingVertical: 10 },
-  accountText: { color: '#e0e0e0' },
-  disabledText: { color: '#666' },
+  title: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12, textAlign: 'center' },
+  account: { paddingVertical: 10, alignItems: 'center' },
+  accountText: { color: '#e0e0e0', textAlign: 'center' },
+  disabledText: { color: '#666', textAlign: 'center' },
   button: { backgroundColor: '#4a9eff', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginTop: 16 },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: '#fff', fontWeight: '600', textAlign: 'center' },
   cancelButton: { paddingVertical: 10, alignItems: 'center' },
-  cancelButtonText: { color: '#b0b0b0' },
+  cancelButtonText: { color: '#b0b0b0', textAlign: 'center' },
 })
 
 export default function AccountChoiceDlg() {

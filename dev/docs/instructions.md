@@ -5,12 +5,18 @@ AI should not touch this file without explicit permission and may change only on
 
 ## 0. Beeping
 
+In claude settings I have Permissions allow for: 
+- "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\beep.ps1\")",
+- "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\callme.ps1\")
+
+`beep.ps1` - beeps once. `callme.ps1` - beeps 3 times in a stepped pattern. 
+
 - 0.1 Every batch of actions starts with a beep.
-- 0.2 Beep by running a PowerShell **script file** (not an inline command):
-  - `& "./dev/testing/beep.ps1"` — a single beep. Use to start a batch.
-  - beep twice when finished successfully.
-  - `& "./dev/testing/callme.ps1"` — three stepped beeps. Use if you need the user, BEFORE the action that will prompt the user for permission.
-- 0.3 Use `callme.ps1` also if an error occurred.
+- 0.2 Beep by running the PowerShell **script files** (not an inline command) so that I hear the beep and don't have to first give it permission to run. 
+
+- Use `callme.ps1` every time you need the user's (the developer) interaction or want the user's response.
+- Use `callme.ps1` BEFORE an action that will prompt the user for permission.
+- 0.3 Use `callme.ps1` if an error occurred. 
 
 
 ## 1. AI and developer interaction and methodology

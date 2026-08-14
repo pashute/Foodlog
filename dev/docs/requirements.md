@@ -41,6 +41,7 @@ This section should be defined in the screens/layout and screens/interactions  f
 #### Settings page:  
 
 - App info card: Theme (Dark by default). App name and Version are shown in the header only, not repeated here.
+  - Info icon (ⓘ) at the end of the row. Pressing and holding it shows in the dedicated instruction card: Theme change not yet available.
 
 - Foodlog sheet  id and direct link.   
   - Created in user's Google Sheets on login if not stored in local chrome.   
@@ -49,28 +50,27 @@ This section should be defined in the screens/layout and screens/interactions  f
   - Error disables logging
   - During prototype stage this functionality and the sheet data itself is mocked. 
 
-- Gemini API Key: status LED + Import button.
-  - Hovering/focusing this card shows its explanation in the dedicated instructions row at the bottom of the screen (not a popup): 
-
-  For your privacy and security, you'll use your own Gemini access to read your meals and calculate energy and carbs. To do that use your Gemini key. It is stored locally and not shared with anyone. 
-
-  - Tap "Import" — opens Google AI Studio, already signed in as your account, to get/paste the key.
-  - Tap "Create API key."
-  - Copy the key and paste it here. 
-
-The app should autodetect an api key in the clipboard
-and as to paste it by pressing a button or be actually pasting it and pressing enter. The Change button changes to Save. 
+- Gemini API Key: status LED + Start AI button + info icon (ⓘ), icon after the button.
+  - Pressing and holding the info icon shows in the dedicated instruction card: Press "Start AI" to see how & why
+  - Tapping "Start AI" opens the Gemini key setup dialog:
+    - Header: Gemini key
+    - Explains, in plain "it's about you" language (no "we need"/apologizing), that a free personal Gemini session keeps the user's meal data private, with a link to Google's [Privacy Statement](https://policies.google.com/privacy)
+    - Numbered steps, each paired with a screenshot (already in `src/imgs/aiKey`, each circling the relevant button): go to [Google AI Studio](https://aistudio.google.com/app/api-keys); click Create API Key in the top-left corner; use the default project; paste the key
+    - A field to paste the key and a SAVE button, enabled only once the pasted key looks valid; an invalid save attempt shows "Invalid key, try again"
 
 (See Gemini key implementation under Technology section in this document)
 
-- **Timezone:** Current user's timezone. Click to change. 
-  - Hovering/focusing this card shows in the dedicated instructions row: This changes the timezone in this app. Not the system settings. 
+- **Timezone:** Current user's timezone. Click to change. Info icon (ⓘ) after the Change button.
+  - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app. Not the system settings. 
 
-- Only one instructions row exists, at the bottom of the whole Settings screen. It is empty/idle by default and its text changes to match whichever card is currently hovered or focused — there are no separate per-card info-icon popups.
+- Only one instruction card exists, at the top of the whole Settings screen. It is idle by default and its text changes to match whichever info icon is currently pressed and held, reverting to the idle instruction on release — there are no separate per-card popups.
 
--- `Go to App`  button
--- disabled if api key not there, if the Foodlog sheet missing  or if not logged in. 
---- in those cases explain in the same bottom instructions row:  Please log in. 
+-- `Go to Diary`  button
+-- disabled if api key not there, if the Foodlog sheet missing, or if not logged in. 
+--- in those cases the top instruction card shows one problem at a time, in priority order:
+---- not logged in: 'Press "Login with Google" to use the app.'
+---- AI key missing/invalid: "Press [Start AI] for AI key instructions"
+---- no problem: "Press Go to Data Entry"
 
 ##### Gemini key access implementation notes 
 

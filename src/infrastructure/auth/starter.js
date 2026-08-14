@@ -1,4 +1,4 @@
-// Filename: starter.js  Version 0.1.0
+// Filename: starter.js  Version 0.2.1
 
 // Logic + imperative-promise API for the pre-login "calming scope" starter
 // popup (requirements.md "OAuth login"). Split from starter.dlg.jsx (the
@@ -8,11 +8,10 @@
 // import this plain module when they only need popup()/test hooks.
 
 export const title = 'Connect Google Drive'
-export const messageText1 =
-  "We use the 'drive.file' scope so this app can write " +
-  'and read the Foodlog sheet it explicitly creates for you, ' +
-  'that only you can access and see.'
-export const messageText2 = 'It cannot touch or see any of your other files.'
+export const messageText1 = 'Foodlog stores your data in your own file.\nOnly you can access it. Only you see it.'
+export const messageText2 = 'Foodlog cannot touch and does not see any other files.'
+export const messageText3 =
+  'For that you will be logging in with the drive.file permissions, allowing Foodlog to open only the Foodlog sheet it created.'
 export const readFurtherLabel = 'See more on our website'
 
 // Duplicated from auth.js's driveSafeUrl (not imported from auth.js here to

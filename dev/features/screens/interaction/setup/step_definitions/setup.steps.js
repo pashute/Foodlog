@@ -1,15 +1,31 @@
-// Filename setup.steps.js  Version 0.1.0
+// Filename setup.steps.js  Version 0.3.0
 
-import { Given, Then } from '@cucumber/cucumber'
+import { Given, When, Then } from '@cucumber/cucumber'
 
-Given('no Gemini API key is stored', function () {
+Given('the settings panel state is login {string} and AI key {string}', function (login, aiKey) {
   throw new Error('Not implemented yet')
 })
 
-Then('the AI API Key status LED is red', function () {
+Then('the top instruction card shows {string}', function (instruction) {
   throw new Error('Not implemented yet')
 })
 
-Then(/^the instructions row shows "Gemini API key needed\. See instructions"$/, function () {
+Given('an application error occurs, other than an AI key problem', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the top instruction card text is shown in red and bold', function () {
+  throw new Error('Not implemented yet')
+})
+
+When('the user presses and holds the {string} info icon', function (row) {
+  throw new Error('Not implemented yet')
+})
+
+When('the user releases the info icon', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the top instruction card reverts to its previous instruction', function () {
   throw new Error('Not implemented yet')
 })

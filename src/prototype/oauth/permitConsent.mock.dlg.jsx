@@ -1,4 +1,4 @@
-// Filename: permitConsent.mock.dlg.jsx  Version 0.2.0
+// Filename: permitConsent.mock.dlg.jsx  Version 0.3.0
 
 // React component only — logic lives in permitConsent.mock.js (see that
 // file for why they're split).
@@ -17,14 +17,14 @@ import {
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   container: { width: '85%', maxWidth: 420, borderRadius: 12, padding: 20, backgroundColor: '#222' },
-  title: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12 },
-  permission: { color: '#e0e0e0', marginBottom: 12 },
-  warning: { color: '#b0b0b0', fontSize: 12, marginBottom: 6 },
-  footer: { color: '#888', fontSize: 11, marginTop: 8, marginBottom: 16 },
+  title: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12, textAlign: 'center' },
+  permission: { color: '#e0e0e0', marginBottom: 12, textAlign: 'center' },
+  warning: { color: '#b0b0b0', fontSize: 12, marginBottom: 6, textAlign: 'center' },
+  footer: { color: '#888', fontSize: 11, marginTop: 8, marginBottom: 16, textAlign: 'center' },
   button: { backgroundColor: '#4a9eff', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginBottom: 10 },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: '#fff', fontWeight: '600', textAlign: 'center' },
   denyButton: { paddingVertical: 10, alignItems: 'center' },
-  denyButtonText: { color: '#b0b0b0' },
+  denyButtonText: { color: '#b0b0b0', textAlign: 'center' },
 })
 
 export default function PermitConsentDlg() {

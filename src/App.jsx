@@ -1,5 +1,5 @@
 // Filename: App.jsx
-// Version: 0.1.0
+// Version: 0.2.3
 // App root (screens/interaction/entry): wires Header + Settings/Diary and
 // owns login/page state.
 
@@ -8,25 +8,16 @@ import { View, StyleSheet } from 'react-native'
 import Header from './screens/layout/header/Header.jsx'
 import Settings from './screens/layout/settings/Settings.jsx'
 import Diary from './screens/layout/diary/Diary.jsx'
+import PhonePanel from './screens/layout/phonePanel/PhonePanel.jsx'
+import StarterDlg from './infrastructure/auth/starter.dlg.jsx'
+import AccountChoiceDlg from './prototype/oauth/accountChoice.mock.dlg.jsx'
+import PermitConsentDlg from './prototype/oauth/permitConsent.mock.dlg.jsx'
 import * as auth from './infrastructure/auth/auth.js'
 import { isPrototype } from './infrastructure/config/config.js'
-import { update as storageUpdate, KEYS } from './infrastructure/storage/storage.js'
-
-// Prototype-stage demo seed: start already logged in as "pashute" with a
-// configured AI key, so the running app matches the reference mockups
-// instead of an empty first-run state. Not real auth — Log out below still
-// exercises the real logged-out state, and Login with Google still runs
-// the real mock popup flow.
-function seedPrototypeDemo() {
-  if (!isPrototype()) return
-  storageUpdate(KEYS.aiApiKey, 'AIzaSyDemoKeyForPrototypeStage7Qk')
-  storageUpdate('usermail', 'pashute@gmail.com')
-}
-seedPrototypeDemo()
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(isPrototype())
-  const [username, setUsername] = useState(isPrototype() ? 'pashute' : '')
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [username, setUsername] = useState('')
   const [page, setPage] = useState('settings')
 
   const handleLogin = async () => {
@@ -45,17 +36,33 @@ export default function App() {
   }
 
   return (
-    <View style={styles.app}>
-      <Header
-        loggedIn={loggedIn}
-        username={username}
-        currentPage={page}
-        onLoginPress={handleLogin}
-        onNavigate={setPage}
-        onLogout={handleLogout}
-      />
-      {page === 'diary' && loggedIn ? <Diary /> : <Settings />}
-    </View>
+    <>
+      <PhonePanel>
+        <View style={styles.app}>
+          <Header
+            loggedIn={loggedIn}
+            username={username}
+            currentPage={page}
+            onLoginPress={handleLogin}
+            onNavigate={setPage}
+            onLogout={handleLogout}
+          />
+          {page === 'diary' && loggedIn ? <Diary /> : <Settings loggedIn={loggedIn} />}
+        </View>
+      </PhonePanel>
+
+      {/* Login popups: mounted once here so their imperative popup()
+          promises (starter.js / accountChoice.mock.js / permitConsent.mock.js)
+          have a rendered Modal to resolve against. Without this, auth.login()
+          hangs forever awaiting a dialog that never appears. */}
+      <StarterDlg />
+      {isPrototype() && (
+        <>
+          <AccountChoiceDlg />
+          <PermitConsentDlg />
+        </>
+      )}
+    </>
   )
 }
 

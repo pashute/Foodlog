@@ -1,5 +1,5 @@
 // Filename: Header.jsx
-// Version: 0.2.0
+// Version: 0.2.2
 // App header (screens/layout/header): brand + login/avatar + hamburger menu
 
 import { useState } from 'react'
@@ -20,11 +20,15 @@ export default function Header({
   const appname = configGet('app', 'app-name')
   const version = configGet('app', 'app-version')
 
+  // Items hide themselves when not relevant (already on that page, or not
+  // logged in for logout) rather than showing disabled. `enabled` only
+  // applies to "Enter meal", which stays visible on the settings page but
+  // is greyed out until logged in.
   const menuItems = [
-    { name: 'settings', label: 'Settings', action: () => onNavigate('settings'), enabled: currentPage !== 'settings' },
-    { name: 'diary', label: 'Enter meal', action: () => onNavigate('diary'), enabled: currentPage !== 'diary' && loggedIn },
-    { name: 'logout', label: 'Log out', action: onLogout, enabled: loggedIn },
-  ]
+    { name: 'settings', label: 'Settings', action: () => onNavigate('settings'), shown: currentPage !== 'settings' },
+    { name: 'diary', label: 'Enter meal', action: () => onNavigate('diary'), shown: currentPage !== 'diary', enabled: loggedIn },
+    { name: 'logout', label: 'Log out', action: onLogout, shown: loggedIn },
+  ].filter((item) => item.shown)
 
   return (
     <View style={styles.header}>
@@ -56,21 +60,24 @@ export default function Header({
 
       {menuOpen && (
         <View style={styles.menu}>
-          {menuItems.map((item) => (
-            <Pressable
-              key={item.name}
-              disabled={!item.enabled}
-              onPress={() => {
-                setMenuOpen(false)
-                item.action()
-              }}
-              style={styles.menuItem}
-            >
-              <Text style={[styles.menuItemText, !item.enabled && styles.menuItemDisabled]}>
-                {item.label}
-              </Text>
-            </Pressable>
-          ))}
+          {menuItems.map((item) => {
+            const enabled = item.enabled !== false
+            return (
+              <Pressable
+                key={item.name}
+                disabled={!enabled}
+                onPress={() => {
+                  setMenuOpen(false)
+                  item.action()
+                }}
+                style={styles.menuItem}
+              >
+                <Text style={[styles.menuItemText, !enabled && styles.menuItemDisabled]}>
+                  {item.label}
+                </Text>
+              </Pressable>
+            )
+          })}
         </View>
       )}
     </View>
@@ -86,6 +93,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#2e303a',
     backgroundColor: '#16171d',
+    zIndex: 10,
+    elevation: 10,
   },
   brandRow: { flexDirection: 'row', alignItems: 'baseline' },
   brand: { fontSize: 20, fontWeight: '700', color: '#f3f4f6' },

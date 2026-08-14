@@ -1,4 +1,4 @@
-// Filename: starter.dlg.jsx  Version 0.3.0
+// Filename: starter.dlg.jsx  Version 0.4.0
 
 // React component only — logic lives in starter.js (see that file for why
 // they're split). Mount this once; auth.js drives it via starter.js's
@@ -11,6 +11,7 @@ import {
   title,
   messageText1,
   messageText2,
+  messageText3,
   readFurtherLabel,
   driveSafeUrl,
   _registerVisibilityHandler,
@@ -42,17 +43,20 @@ function _styles() {
       fontWeight: '600',
       marginBottom: 16,
       color: dark ? '#fff' : '#111',
+      textAlign: 'center',
     },
     text: {
       fontSize: 15,
       lineHeight: 22,
       marginBottom: 12,
       color: dark ? '#d0d0d0' : '#333',
+      textAlign: 'center',
     },
     link: {
       fontSize: 14,
       color: '#4a9eff',
       marginBottom: 20,
+      textAlign: 'center',
     },
     button: {
       backgroundColor: '#4a9eff',
@@ -64,6 +68,7 @@ function _styles() {
     buttonText: {
       color: '#fff',
       fontWeight: '600',
+      textAlign: 'center',
     },
     cancelButton: {
       paddingVertical: 10,
@@ -71,6 +76,7 @@ function _styles() {
     },
     cancelButtonText: {
       color: dark ? '#b0b0b0' : '#666',
+      textAlign: 'center',
     },
   })
 }
@@ -97,6 +103,7 @@ export default function StarterDlg() {
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.text}>{messageText1}</Text>
           <Text style={styles.text}>{messageText2}</Text>
+          <Text style={styles.text}>{messageText3}</Text>
           <TouchableOpacity onPress={() => Linking.openURL(driveSafeUrl)}>
             <Text style={styles.link}>{readFurtherLabel}</Text>
           </TouchableOpacity>
