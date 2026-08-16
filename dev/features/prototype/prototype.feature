@@ -1,4 +1,4 @@
-# Filename prototype.feature  Version 0.1.0
+# Filename prototype.feature  Version 0.1.1
 
 Feature: Infrastructure modules available via mockup code
     Mockup code for the basis of Config, Storage, Authentication, AI, and Sheets
@@ -168,4 +168,33 @@ Feature: Infrastructure modules available via mockup code
     When the user presses the sheet link in settings
     Then the local nodejs mock-sheet server adds the current data to the table in the template
     And serves the updated mock html file to be opened in the browser
-    
+
+# ------------------------------
+# Diary entry prototype scenario
+
+  @diaryEntry
+  Scenario: Diary entry round trip with mock AI data
+    Given the diary panel is shown in prototype mode
+    When the user types "cucumber yogurt" and presses submit
+    Then the analyzed list shows
+      | item     | guess | qty | size | wgt   | crb | cal |
+      | cucumber | yes   | 1   | med  | 200 g | 6 g | 28 kcal |
+      | yogurt   | yes   | 1   | std  | 170 g | 8 g | 110 kcal |
+    And the totals show "14 g" carbs and "138 kcal" energy
+    And the Fix, Accept All, Save, and Discard buttons are enabled
+    When the user unticks the yogurt checkbox and ticks the cucumber checkbox
+    Then the food list shows "cucumber (200 g)" and "yogurt? (170 g)"
+    When the user presses Fix
+    Then the meal input shows "(14g, 138cals), 1 med cucumber (200g, 6g,28c), 1? std? yogurt (170g, 8g,110c)"
+    When the user presses submit
+    Then the analyzed list is shown with every item accepted
+    When the user presses Save
+    Then a popup confirms "Record recorded ok."
+    And the diary panel resets to an empty entry at zero minutes ago
+
+  @diaryEntry.error
+  Scenario: Diary entry shows an AI error for unrecognized text
+    Given the diary panel is shown in prototype mode
+    When the user types "{unrecognized meal text}" and presses submit
+    Then the error text "AI error occured. Please contact support@foodlog.com" replaces the food list
+    And the Fix, Accept All, Save, and Discard buttons stay disabled

@@ -8,7 +8,8 @@
     "test:bdd": "cucumber-js",
     "test:unit": "node --test dev/testing/units/**/*.test.js",
     "test:ui": "jest",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "mock:sheet-server": "node src/prototype/sheet/sheetServer.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",

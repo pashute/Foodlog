@@ -1,22 +1,28 @@
 // Filename: sheet.js
-// version 0.2.0
+// version 0.2.1
 
 // Sheet module to access and retrieve data from the Foodlog sheet on Google Drive.
 
-import { _ensurePrototype } from '../config/config.js'
+import { isPrototype } from '../config/config.js'
 import * as sheetMock from '../../prototype/sheet.mock.js'
 
+// Real Drive/Sheets API creation isn't built yet — same NotImplementedYet
+// placeholder convention as auth.js/starter.js's driveSafeUrl.
+const REAL_SHEET_LINK = 'https://NotImplementedYet.github.com/drive-sheet.html'
+
+function _realExistsOrCreate() {
+  return { id: null, name: 'Foodlog', link: REAL_SHEET_LINK, header: [], rows: [] }
+}
+
 export function existsOrCreate() {
-  _ensurePrototype()
-  return sheetMock.existsOrCreate()
+  return isPrototype() ? sheetMock.existsOrCreate() : _realExistsOrCreate()
 }
 
 export function log(mealData) {
-  _ensurePrototype()
-  return sheetMock.log(mealData)
+  if (isPrototype()) return sheetMock.log(mealData)
+  throw new Error('Not implemented yet')
 }
 
 export function link() {
-  _ensurePrototype()
-  return sheetMock.existsOrCreate().link
+  return existsOrCreate().link
 }

@@ -1,4 +1,4 @@
-// Filename ai.test.js  Version 0.2.0
+// Filename ai.test.js  Version 0.2.1
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -13,7 +13,7 @@ test('ai module - analyze', async () => {
   const setRows = await analyze('(14g, 138cals), 1? med? cucumber (200g, 6g,28c), 1? std? yogurt (170g, 8g,110c)')
   assert.strictEqual(setRows[0].status, 'set')
 
-  assert.deepStrictEqual(await analyze('unknown meal text'), [])
+  await assert.rejects(() => analyze('unknown meal text'), /AI error occured/)
 })
 
 test('ai module - summarize', async () => {

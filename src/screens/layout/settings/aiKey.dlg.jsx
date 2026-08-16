@@ -1,5 +1,5 @@
 // Filename: aiKey.dlg.jsx
-// Version: 0.1.0
+// Version: 0.1.1
 // Gemini AI Setup dialog (screens/layout/settings): opens on "Start AI",
 // walks the user through getting a free Gemini API key and pasting it.
 
@@ -9,7 +9,7 @@ import { keyStatus } from '../../../infrastructure/ai/ai.js'
 import aiKeyGetImg from '../../../imgs/aiKey/aiKeyGet.png'
 import aiKeyCreateImg from '../../../imgs/aiKey/aiKeyCreate.png'
 
-export const privacyStatementUrl = 'https://policies.google.com/privacy'
+export const privacyStatementUrl = 'https://policies.google.com/privacy#intro'
 export const aiStudioUrl = 'https://aistudio.google.com/app/api-keys'
 
 export default function AiKeyDlg({ visible, onSave = () => {}, onClose = () => {} }) {

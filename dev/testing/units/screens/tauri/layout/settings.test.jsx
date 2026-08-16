@@ -1,8 +1,9 @@
 // Filename: settings.test.jsx
-// Version: 0.7.0
+// Version: 0.7.1
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { Linking } from 'react-native'
 import Settings from '../../../../../../src/screens/layout/settings/Settings.jsx'
 import { initialize, update, KEYS } from '../../../../../../src/infrastructure/storage/storage.js'
 
@@ -86,6 +87,14 @@ test('pressing Go to Diary calls onGoToDiary when enabled', () => {
   render(<Settings loggedIn onGoToDiary={onGoToDiary} />)
   fireEvent.click(screen.getByRole('button', { name: /go to diary/i }))
   expect(onGoToDiary).toHaveBeenCalled()
+})
+
+test('pressing "Open in Google Sheets" opens the mock sheet link', () => {
+  const openSpy = jest.spyOn(Linking, 'openURL').mockImplementation(() => {})
+  render(<Settings />)
+  fireEvent.click(screen.getByText('Open in Google Sheets'))
+  expect(openSpy).toHaveBeenCalledWith('http://localhost:3000/Foodlog.mock.html')
+  openSpy.mockRestore()
 })
 
 test('pressing Go to Diary does nothing when disabled', () => {

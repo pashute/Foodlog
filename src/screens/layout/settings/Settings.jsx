@@ -1,12 +1,12 @@
 // Filename: Settings.jsx
-// Version: 0.7.0
+// Version: 0.7.1
 // Settings screen (screens/layout/settings + screens/interaction/setup)
 
 import { useState } from 'react'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, Linking } from 'react-native'
 import { get as configGet } from '../../../infrastructure/config/config.js'
 import { get as storageGet, update as storageUpdate, KEYS } from '../../../infrastructure/storage/storage.js'
-import { existsOrCreate } from '../../../infrastructure/sheet/sheet.js'
+import { existsOrCreate, link as sheetLink } from '../../../infrastructure/sheet/sheet.js'
 import { keyStatus } from '../../../infrastructure/ai/ai.js'
 import AiKeyDlg from './aiKey.dlg.jsx'
 
@@ -136,7 +136,9 @@ export default function Settings({ loggedIn = false, appError = null, onGoToDiar
           <Text style={styles.value} numberOfLines={1} ellipsizeMode="tail">
             {sheet?.name ?? 'Foodlog'}
           </Text>
-          <Text style={styles.link}>Open in Google Sheets</Text>
+          <Pressable onPress={() => Linking.openURL(sheetLink())}>
+            <Text style={styles.link}>Open in Google Sheets</Text>
+          </Pressable>
         </View>
       </View>
 

@@ -1,4 +1,4 @@
-// Filename sheet.test.js  Version 0.1.0
+// Filename sheet.test.js  Version 0.1.1
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -17,4 +17,5 @@ test('sheet module', () => {
   assert.strictEqual(sheet1.rows[0].meal, 'test meal')
 
   assert.strictEqual(link(), sheet1.link)
+  assert.strictEqual(link(), 'http://localhost:3000/Foodlog.mock.html')
 })

@@ -1,4 +1,4 @@
-// Filename ai.mock.js  Version 0.2.0
+// Filename ai.mock.js  Version 0.2.1
 
 // Mock AI module (prototype stage). Canned responses derived from the
 // fixture data in dev/features/prototype/prototype.feature (@ai-carbs, #ai-lang).
@@ -8,6 +8,9 @@
 // The "fixed" key below is the exact output of Diary.jsx's buildFixString()
 // for the 'cucumber yogurt' entry — pressing Fix then resubmitting must
 // round-trip to the same items with status 'set', so keep these in sync.
+//
+// analyze() throws for any text not in cannedAnalysis — Diary.jsx shows
+// this as the AI error message in place of the food list (diaryEntry.feature).
 
 const cannedAnalysis = {
   'cucumber yogurt': [
@@ -29,8 +32,12 @@ const cannedSummary = {
   '08:57': '3g:  10? std? almonds (12g, 3g,70c)',
 }
 
+export const AI_ERROR_MESSAGE = 'AI error occured. Please contact support@foodlog.com'
+
 export async function analyze(meal) {
-  return cannedAnalysis[meal] ?? []
+  const result = cannedAnalysis[meal]
+  if (!result) throw new Error(AI_ERROR_MESSAGE)
+  return result
 }
 
 export async function summarize(time) {

@@ -1,10 +1,12 @@
 // Filename: Diary.jsx
-// Version: 0.2.0
+// Version: 0.3.0
 // Diary screen (screens/layout/diary, was "logger"): log a meal, see the AI
-// carb/energy estimate, fix guesses, and save the entry to the Foodlog sheet.
+// carb/energy estimate, tick/untick items to accept or flag as a guess,
+// fix guesses, and save the entry to the Foodlog sheet.
+// See dev/features/screens/interaction/diary/diaryEntry.feature.
 
-import { useEffect, useState } from 'react'
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { useState } from 'react'
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Modal } from 'react-native'
 import { analyze } from '../../../infrastructure/ai/ai.js'
 import { log as sheetLog } from '../../../infrastructure/sheet/sheet.js'
 
@@ -22,56 +24,101 @@ function parseDetails(detailsStr) {
 }
 
 // Reconstructs the AI's telegraphic, re-editable string from the current
-// items: totals first, then one entry per item with "?" after each guessed
-// field (qty, size) so the user can see and correct exactly what's unsure.
+// items: totals first, then one entry per item with "?" after each unaccepted
+// (still-guess) field (qty, size) so the user can see and correct exactly
+// what's unsure.
 function buildFixString(macros, totalCarbs, totalEnergy) {
   const items = macros
     .map((it) => {
       const { qty, sz } = parseDetails(it.details)
-      const mark = it.status === 'guess' ? '?' : ''
+      const mark = it.guess ? '?' : ''
       return `${qty}${mark} ${sz}${mark} ${it.name} (${it.wgt}g, ${it.crb}g,${it.cal}c)`
     })
     .join(', ')
   return `(${totalCarbs}g, ${totalEnergy}cals), ${items}`
 }
 
+function formatTime(date) {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
 export default function Diary() {
   const [minutesAgo, setMinutesAgo] = useState(0)
-  const [meal, setMeal] = useState('cucumber yogurt')
+  const [entryTimestamp, setEntryTimestamp] = useState(null)
+  const [meal, setMeal] = useState('')
   const [items, setItems] = useState([])
+  const [error, setError] = useState(null)
+  const [savedVisible, setSavedVisible] = useState(false)
 
-  useEffect(() => {
-    analyze('cucumber yogurt').then(setItems)
-  }, [])
+  const displayTime = entryTimestamp ?? new Date(Date.now() - minutesAgo * 60000)
+  const time = formatTime(displayTime)
 
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - minutesAgo)
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-
-  const macros = items.map((it) => ({ ...it, ...parseMacros(it.data) }))
+  const macros = items.map((it) => ({ ...it, ...parseMacros(it.data), guess: !it.accepted }))
   const totalCarbs = macros.reduce((sum, it) => sum + it.crb, 0)
   const totalEnergy = macros.reduce((sum, it) => sum + it.cal, 0)
-  const hasGuesses = macros.some((it) => it.status === 'guess')
+  const hasGuesses = macros.some((it) => it.guess)
+  const hasItems = items.length > 0
 
-  const handleSubmit = () => {
-    analyze(meal).then(setItems)
+  const bumpMinutesAgo = (delta) => {
+    setMinutesAgo((m) => {
+      const next = Math.max(0, m + delta)
+      if (entryTimestamp) setEntryTimestamp(new Date(Date.now() - next * 60000))
+      return next
+    })
+  }
+
+  const resetForm = () => {
+    setMeal('')
+    setItems([])
+    setError(null)
+    setEntryTimestamp(null)
+    setMinutesAgo(0)
+  }
+
+  const handleSubmit = async () => {
+    if (!meal.trim()) return
+    try {
+      const result = await analyze(meal)
+      setItems(result.map((it) => ({ ...it, accepted: it.status === 'set' })))
+      setError(null)
+      setEntryTimestamp((ts) => ts ?? new Date(Date.now() - minutesAgo * 60000))
+    } catch (e) {
+      setError(e.message)
+      setItems([])
+    }
+  }
+
+  const toggleAccept = (id) => {
+    setItems((prev) => prev.map((it) => (it.item === id ? { ...it, accepted: !it.accepted } : it)))
+  }
+
+  const handleAcceptAll = () => {
+    setItems((prev) => prev.map((it) => ({ ...it, accepted: true })))
   }
 
   const handleFix = () => {
-    setMeal(buildFixString(macros, totalCarbs, totalEnergy))
+    const fixStr = buildFixString(macros, totalCarbs, totalEnergy)
+    if (entryTimestamp) setMinutesAgo(Math.round((Date.now() - entryTimestamp) / 60000))
+    setItems([])
+    setError(null)
+    setMeal(fixStr)
   }
 
   const handleSave = () => {
     sheetLog({
-      date: now.toLocaleDateString(),
-      dow: now.toLocaleDateString([], { weekday: 'short' }),
-      time,
+      date: entryTimestamp.toLocaleDateString(),
+      dow: entryTimestamp.toLocaleDateString([], { weekday: 'short' }),
+      time: formatTime(entryTimestamp),
       carbs: totalCarbs,
       status: hasGuesses ? 'guess' : 'set',
       meal,
     })
-    setMeal('')
-    setItems([])
+    setSavedVisible(true)
+    resetForm()
+  }
+
+  const handleDiscard = () => {
+    resetForm()
   }
 
   return (
@@ -80,7 +127,7 @@ export default function Diary() {
         <Pressable
           style={styles.stepperBtn}
           disabled={minutesAgo === 0}
-          onPress={() => setMinutesAgo((m) => Math.max(0, m - 1))}
+          onPress={() => bumpMinutesAgo(-1)}
           accessibilityRole="button"
           aria-label="minus minute"
         >
@@ -91,7 +138,7 @@ export default function Diary() {
         </View>
         <Pressable
           style={styles.stepperBtn}
-          onPress={() => setMinutesAgo((m) => m + 1)}
+          onPress={() => bumpMinutesAgo(1)}
           accessibilityRole="button"
           aria-label="plus minute"
         >
@@ -116,10 +163,11 @@ export default function Diary() {
           multiline
           value={meal}
           onChangeText={setMeal}
-          placeholder="Enter your meal"
+          placeholder="e.g. cucumber yogurt"
         />
         <Pressable
-          style={styles.submitBtn}
+          style={[styles.submitBtn, !meal.trim() && styles.submitBtnDisabled]}
+          disabled={!meal.trim()}
           onPress={handleSubmit}
           accessibilityRole="button"
           aria-label="submit meal"
@@ -138,31 +186,61 @@ export default function Diary() {
           </Text>
         </View>
 
-        <ScrollView style={styles.foodScroll}>
-          {macros.map((it) => (
-            <View key={it.item} style={styles.itemRow}>
-              <Text style={styles.itemName}>
-                {it.name}
-                {it.status === 'guess' ? '?' : ''} ({it.wgt} g)
-              </Text>
-              <Text style={styles.itemMacro}>
-                carbs {it.crb} g &middot; {it.cal} kcal
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
+        {error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : (
+          <ScrollView style={styles.foodScroll}>
+            {macros.map((it) => (
+              <View key={it.item} style={styles.itemRow}>
+                <Pressable
+                  style={styles.checkbox}
+                  onPress={() => toggleAccept(it.item)}
+                  accessibilityRole="checkbox"
+                  aria-checked={it.accepted}
+                  aria-label={`accept ${it.name}`}
+                >
+                  <Text style={styles.checkboxGlyph}>{it.accepted ? '☑' : '☐'}</Text>
+                </Pressable>
+                <Text style={styles.itemName}>
+                  {it.name}
+                  {it.guess ? '?' : ''} ({it.wgt} g)
+                </Text>
+                <Text style={styles.itemMacro}>
+                  carbs {it.crb} g &middot; {it.cal} kcal
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        )}
 
-        <View style={styles.btnPair}>
-          <Pressable style={styles.btn} onPress={handleFix}>
+        <View style={styles.btnRow}>
+          <Pressable style={styles.btn} disabled={!hasItems} onPress={handleFix} accessibilityRole="button">
             <Text style={styles.btnText}>Fix</Text>
           </Pressable>
-          <Pressable style={[styles.btn, styles.btnPrimary]} onPress={handleSave}>
-            <Text style={styles.btnText}>{hasGuesses ? 'Save Anyway' : 'Save'}</Text>
+          <Pressable style={styles.btn} disabled={!hasItems} onPress={handleAcceptAll} accessibilityRole="button">
+            <Text style={styles.btnText}>Accept All</Text>
+          </Pressable>
+          <Pressable style={[styles.btn, styles.btnPrimary]} disabled={!hasItems} onPress={handleSave} accessibilityRole="button">
+            <Text style={styles.btnText}>Save</Text>
+          </Pressable>
+          <Pressable style={styles.btn} disabled={!hasItems} onPress={handleDiscard} accessibilityRole="button">
+            <Text style={styles.btnText}>Discard</Text>
           </Pressable>
         </View>
       </View>
 
       <Text style={styles.foodLogLink}>Food log &#8599;</Text>
+
+      <Modal visible={savedVisible} transparent animationType="fade">
+        <View style={styles.popupBackdrop}>
+          <View style={styles.popupCard}>
+            <Text style={styles.popupText}>Record recorded ok.</Text>
+            <Pressable style={styles.popupBtn} onPress={() => setSavedVisible(false)}>
+              <Text style={styles.btnText}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -216,6 +294,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  submitBtnDisabled: { opacity: 0.4 },
   submitText: { color: '#fff', fontSize: 18 },
   card: { borderWidth: 1, borderColor: '#2e303a', backgroundColor: '#1c1d24', borderRadius: 16, padding: 16 },
   aiTitle: { color: '#f3f4f6', fontSize: 17, fontWeight: '700', marginBottom: 14 },
@@ -229,17 +308,21 @@ const styles = StyleSheet.create({
   },
   totalLabel: { color: '#f3f4f6', fontWeight: '700' },
   totalValue: { color: '#f3f4f6', fontWeight: '700', fontSize: 16 },
+  errorText: { color: '#f87171', fontSize: 14.5, marginBottom: 14 },
   foodScroll: { maxHeight: 190, marginBottom: 14 },
   itemRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 9,
     borderBottomWidth: 1,
     borderBottomColor: '#2e303a',
   },
-  itemName: { color: '#f3f4f6', fontSize: 14.5 },
+  checkbox: { paddingRight: 8 },
+  checkboxGlyph: { color: '#9ca3af', fontSize: 16 },
+  itemName: { color: '#f3f4f6', fontSize: 14.5, flex: 1 },
   itemMacro: { color: '#9ca3af', fontSize: 14.5 },
-  btnPair: { flexDirection: 'row', gap: 10 },
+  btnRow: { flexDirection: 'row', gap: 8 },
   btn: {
     flex: 1,
     alignItems: 'center',
@@ -250,6 +333,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#26272f',
   },
   btnPrimary: { fontWeight: '600' },
-  btnText: { color: '#f3f4f6', fontSize: 15 },
+  btnText: { color: '#f3f4f6', fontSize: 14 },
   foodLogLink: { color: '#7aa2ff', fontSize: 14, textAlign: 'center', marginTop: 16 },
+  popupBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' },
+  popupCard: {
+    backgroundColor: '#1c1d24',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    gap: 16,
+    borderWidth: 1,
+    borderColor: '#2e303a',
+  },
+  popupText: { color: '#f3f4f6', fontSize: 15 },
+  popupBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    backgroundColor: '#26272f',
+  },
 })
