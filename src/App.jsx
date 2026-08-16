@@ -1,5 +1,5 @@
 // Filename: App.jsx
-// Version: 0.2.3
+// Version: 0.2.4
 // App root (screens/interaction/entry): wires Header + Settings/Diary and
 // owns login/page state.
 
@@ -47,7 +47,11 @@ export default function App() {
             onNavigate={setPage}
             onLogout={handleLogout}
           />
-          {page === 'diary' && loggedIn ? <Diary /> : <Settings loggedIn={loggedIn} />}
+          {page === 'diary' && loggedIn ? (
+            <Diary />
+          ) : (
+            <Settings loggedIn={loggedIn} onGoToDiary={() => setPage('diary')} />
+          )}
         </View>
       </PhonePanel>
 

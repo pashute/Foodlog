@@ -1,5 +1,5 @@
 // Filename: Settings.jsx
-// Version: 0.6.0
+// Version: 0.7.0
 // Settings screen (screens/layout/settings + screens/interaction/setup)
 
 import { useState } from 'react'
@@ -41,7 +41,7 @@ function idleInstruction({ appError, loggedIn, aiKeyStatus }) {
   return 'Press Go to Data Entry'
 }
 
-export default function Settings({ loggedIn = false, appError = null }) {
+export default function Settings({ loggedIn = false, appError = null, onGoToDiary = () => {} }) {
   const [pressText, setPressText] = useState('')
   const [showAiKeyDlg, setShowAiKeyDlg] = useState(false)
 
@@ -143,6 +143,7 @@ export default function Settings({ loggedIn = false, appError = null }) {
       <Pressable
         style={[styles.goBtn, goToAppDisabled && styles.goBtnDisabled]}
         disabled={goToAppDisabled}
+        onPress={onGoToDiary}
         accessibilityRole="button"
       >
         <Text style={styles.goBtnText}>Go to Diary</Text>

@@ -1,5 +1,5 @@
 filename: ai.feature
-version: 0.1.1
+version: 0.1.2
 
 Feature: AI analysis and summary
   As the app user
@@ -9,7 +9,7 @@ Feature: AI analysis and summary
   @ai.analysis
   Scenario: AI analyzes meal information
     Given the user provides partial meal data
-    When the user submits the mail
+    When the user submits the meal
     Then the AI breaks down the meal entries into individual items
     And the AI looks at past patterns in the Foodlog sheet
     And the AI provides a suggested qty, size, and nutritional information for each item

@@ -1,4 +1,4 @@
-// Filename: settings.steps.js  Version 0.7.0
+// Filename: settings.steps.js  Version 0.8.0
 
 import { Given, When, Then } from '@cucumber/cucumber'
 
@@ -87,5 +87,17 @@ Then('SAVE is disabled until a valid-looking key is entered', function () {
 })
 
 Then('an invalid save attempt shows {string}', function (message) {
+  throw new Error('Not implemented yet')
+})
+
+Given('Go to Diary is enabled (logged in, AI key OK, sheet ready)', function () {
+  throw new Error('Not implemented yet')
+})
+
+When('the user presses Go to Diary', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the user is shown the Diary screen', function () {
   throw new Error('Not implemented yet')
 })

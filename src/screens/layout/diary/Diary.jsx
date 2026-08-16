@@ -1,12 +1,12 @@
 // Filename: Diary.jsx
-// Version: 0.1.0
+// Version: 0.2.0
 // Diary screen (screens/layout/diary, was "logger"): log a meal, see the AI
-// carb/energy estimate. The Foodlog Google Sheet itself is unaffected by
-// this rename.
+// carb/energy estimate, fix guesses, and save the entry to the Foodlog sheet.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native'
 import { analyze } from '../../../infrastructure/ai/ai.js'
+import { log as sheetLog } from '../../../infrastructure/sheet/sheet.js'
 
 function parseMacros(dataStr) {
   const crb = Number(dataStr.match(/crb:(\d+)/)?.[1] ?? 0)
@@ -15,10 +15,34 @@ function parseMacros(dataStr) {
   return { crb, cal, wgt }
 }
 
+function parseDetails(detailsStr) {
+  const qty = detailsStr.match(/qty:([^,]+)/)?.[1]?.trim() ?? ''
+  const sz = detailsStr.match(/sz:([^,]+)/)?.[1]?.trim() ?? ''
+  return { qty, sz }
+}
+
+// Reconstructs the AI's telegraphic, re-editable string from the current
+// items: totals first, then one entry per item with "?" after each guessed
+// field (qty, size) so the user can see and correct exactly what's unsure.
+function buildFixString(macros, totalCarbs, totalEnergy) {
+  const items = macros
+    .map((it) => {
+      const { qty, sz } = parseDetails(it.details)
+      const mark = it.status === 'guess' ? '?' : ''
+      return `${qty}${mark} ${sz}${mark} ${it.name} (${it.wgt}g, ${it.crb}g,${it.cal}c)`
+    })
+    .join(', ')
+  return `(${totalCarbs}g, ${totalEnergy}cals), ${items}`
+}
+
 export default function Diary() {
   const [minutesAgo, setMinutesAgo] = useState(0)
   const [meal, setMeal] = useState('cucumber yogurt')
-  const [items, setItems] = useState(() => analyze('cucumber yogurt'))
+  const [items, setItems] = useState([])
+
+  useEffect(() => {
+    analyze('cucumber yogurt').then(setItems)
+  }, [])
 
   const now = new Date()
   now.setMinutes(now.getMinutes() - minutesAgo)
@@ -27,6 +51,28 @@ export default function Diary() {
   const macros = items.map((it) => ({ ...it, ...parseMacros(it.data) }))
   const totalCarbs = macros.reduce((sum, it) => sum + it.crb, 0)
   const totalEnergy = macros.reduce((sum, it) => sum + it.cal, 0)
+  const hasGuesses = macros.some((it) => it.status === 'guess')
+
+  const handleSubmit = () => {
+    analyze(meal).then(setItems)
+  }
+
+  const handleFix = () => {
+    setMeal(buildFixString(macros, totalCarbs, totalEnergy))
+  }
+
+  const handleSave = () => {
+    sheetLog({
+      date: now.toLocaleDateString(),
+      dow: now.toLocaleDateString([], { weekday: 'short' }),
+      time,
+      carbs: totalCarbs,
+      status: hasGuesses ? 'guess' : 'set',
+      meal,
+    })
+    setMeal('')
+    setItems([])
+  }
 
   return (
     <View style={styles.container}>
@@ -74,7 +120,7 @@ export default function Diary() {
         />
         <Pressable
           style={styles.submitBtn}
-          onPress={() => setItems(analyze(meal))}
+          onPress={handleSubmit}
           accessibilityRole="button"
           aria-label="submit meal"
         >
@@ -107,11 +153,11 @@ export default function Diary() {
         </ScrollView>
 
         <View style={styles.btnPair}>
-          <Pressable style={styles.btn}>
+          <Pressable style={styles.btn} onPress={handleFix}>
             <Text style={styles.btnText}>Fix</Text>
           </Pressable>
-          <Pressable style={[styles.btn, styles.btnPrimary]}>
-            <Text style={styles.btnText}>Log anyway</Text>
+          <Pressable style={[styles.btn, styles.btnPrimary]} onPress={handleSave}>
+            <Text style={styles.btnText}>{hasGuesses ? 'Save Anyway' : 'Save'}</Text>
           </Pressable>
         </View>
       </View>

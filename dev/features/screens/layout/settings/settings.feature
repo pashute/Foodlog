@@ -1,4 +1,4 @@
-# Filename: settings.feature  Version 0.7.0
+# Filename: settings.feature  Version 0.8.0
 
 Feature: screens/layout/settings
 
@@ -46,3 +46,9 @@ Feature: screens/layout/settings
     And a field to paste the key and a SAVE button
     And SAVE is disabled until a valid-looking key is entered
     And an invalid save attempt shows "Invalid key, try again"
+
+  @settings.goToDiary
+  Scenario: Go to Diary navigates to the Diary screen
+    Given Go to Diary is enabled (logged in, AI key OK, sheet ready)
+    When the user presses Go to Diary
+    Then the user is shown the Diary screen

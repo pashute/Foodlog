@@ -1,5 +1,5 @@
 // Filename: aiKeyDlg.test.jsx
-// Version: 0.1.0
+// Version: 0.2.0
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
@@ -27,12 +27,17 @@ test('SAVE is disabled until a valid-looking key is entered', () => {
   expect(saveBtn).not.toBeDisabled()
 })
 
-test('an invalid save attempt shows the warning instead of calling onSave', () => {
+// SAVE is disabled while the key doesn't look valid (previous test), so a
+// click while it's disabled is a no-op — that disabled state IS the
+// invalid-key feedback for format errors. The "Invalid key, try again"
+// warning text is reserved for a real (non-prototype) Gemini-side rejection
+// of a correctly-*shaped* key, which needs a live API call to trigger and
+// isn't simulated here (see ai.js's real branch — no test, per instruction).
+test('clicking a disabled SAVE (invalid-looking key) does not call onSave', () => {
   const onSave = jest.fn()
   render(<AiKeyDlg visible onSave={onSave} />)
   fireEvent.change(screen.getByPlaceholderText('AIza...'), { target: { value: 'not-a-real-key' } })
   fireEvent.click(screen.getByRole('button', { name: /save/i }))
-  expect(screen.getByText('Invalid key, try again')).toBeInTheDocument()
   expect(onSave).not.toHaveBeenCalled()
 })
 

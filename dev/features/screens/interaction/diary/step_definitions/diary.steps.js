@@ -1,5 +1,5 @@
 // Filename: diary.steps.js
-// Version: 0.1.0
+// Version: 0.2.0
 // Step defs for screens/interaction/diary.feature — rendering assertions
 // need a rendered tree (RNTL/RTL tier, see dev/testing/units/screens/tauri),
 // not this cucumber/node tier. Left honest, not faked.
@@ -39,5 +39,49 @@ Then('the computed time updates accordingly', function () {
 })
 
 Then('the minus button is disabled', function () {
+  throw new Error('Not implemented yet')
+})
+
+Given('the AI estimate has at least one guessed item', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the second action button reads {string}', function (label) {
+  throw new Error('Not implemented yet')
+})
+
+Given('the AI estimate has no guessed items', function () {
+  throw new Error('Not implemented yet')
+})
+
+Given('the AI estimate is shown', function () {
+  throw new Error('Not implemented yet')
+})
+
+When('the user presses Fix', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the meal input is replaced with a comma-separated string', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('it starts with the totals in grams and calories', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('each guessed item has "?" after its guessed quantity and size', function () {
+  throw new Error('Not implemented yet')
+})
+
+When('the user presses Save or Save Anyway', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the current meal maps to the next Foodlog sheet row', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the diary panel resets to an empty entry', function () {
   throw new Error('Not implemented yet')
 })

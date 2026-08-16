@@ -5,7 +5,12 @@
       "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\beep.ps1\")",
       "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\callme.ps1\")",
       "gh auth *",
-      "gh issue *"
+      "gh issue *",
+      "grep *",
+      "cd *",
+      "jest *",
+      "npm *",
+      "npx *"
     ]
   }
 }
