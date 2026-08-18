@@ -1,5 +1,5 @@
 /**
- * Auth Module  Version 0.4.0
+ * Auth Module  Version 0.4.2
  *
  * Thin dispatcher (requirements.md "OAuth login" / "OAuth - implementation
  * notes"). login() shows the starter popup, awaits the user's continue/
@@ -12,13 +12,13 @@
  * at top level) so plain `node --test` never has to parse them.
  */
 
-import { isPrototype } from '../config/config.js'
-import { get as storageGet, update as storageUpdate, KEYS } from '../storage/storage.js'
+import { isPrototype, getByKey, KEYS as CONFIG_KEYS } from '../config/config.js'
+import { get as storageGet, update as storageUpdate, remove as storageRemove, KEYS } from '../storage/storage.js'
 
-// Duplicated from starter.dlg.jsx's local copy (not imported from there, to
-// avoid an auth.js <-> starter.dlg.jsx circular import): the local bundled
-// drive-safe page. Website location still to be decided (see requirements.md).
-export const driveSafeUrl = 'https://NotImplementedYet.github.com/drive-safe.html'
+// Now sourced from config (urls.drive-safe) instead of a locally duplicated
+// literal — was previously copy-pasted here and in starter.js separately.
+// Website location still to be decided (see requirements.md).
+export const driveSafeUrl = getByKey(CONFIG_KEYS.keyUrlDriveSafe)
 
 const _platformModule = async () => {
   if (typeof window !== 'undefined' && window.__TAURI__) {
@@ -85,7 +85,15 @@ export async function isLoggedIn() {
   return oauth.isLoggedIn()
 }
 
+// Clears the 3 secret keys (auth, ai, sheets) on logout — usermail is kept
+// (see @auth.app-closed in oauth.feature: "the usermail will stay in the
+// storage").
 export async function logout() {
   const oauth = await _oauthModule()
   oauth.logout()
+  await Promise.all([
+    storageRemove(KEYS.authToken),
+    storageRemove(KEYS.aiApiKey),
+    storageRemove(KEYS.sheetId),
+  ])
 }

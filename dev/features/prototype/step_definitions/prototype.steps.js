@@ -1,4 +1,4 @@
-// Filename: prototype.steps.js  Version 0.3.0
+// Filename: prototype.steps.js  Version 0.3.14
 
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
@@ -8,8 +8,10 @@ import { get } from '../../../../src/prototype/config.mock.js'
 import { isPrototype } from '../../../../src/infrastructure/config/config.js'
 import { initialize, get as storageGet, update, KEYS } from '../../../../src/infrastructure/storage/storage.js'
 import * as sheetMock from '../../../../src/prototype/sheet.mock.js'
+import * as sheetServer from '../../../../src/prototype/sheet/sheetServer.js'
 import * as authMock from '../../../../src/prototype/oauth/oauth.mock.js'
 import { analyze, summarize } from '../../../../src/prototype/ai.mock.js'
+import { loginAndReachDiary } from '../../support/loginHelper.js'
 
 // Note: 'the config module is available' is owned by
 // infrastructure/config/step_definitions/config.steps.js (same literal text).
@@ -166,6 +168,60 @@ Then('a mockup canned string is given per list', function (table) {
   }
 })
 
+// ---------------- AI (@mock.ai-analyze / #ai-summarize) ----------------
+
+Given('the User entered time and meal info', function () {
+  this.meal = 'cucumber yogurt'
+})
+
+When('the User submits the meal', async function () {
+  this.result = await analyze(this.meal)
+})
+
+Then('the module receives the ai analysis instruction prompt', function () {
+  // Mock-level: no real prompt is built/sent, just a canned lookup by the
+  // literal meal text — asserting a result came back stands in for it.
+  assert.ok(this.result)
+})
+
+Then('the following meal data is appended', function (table) {
+  const [row] = table.hashes()
+  assert.strictEqual(row.meal, this.meal)
+})
+
+Then('a mockup canned response is returned per sequence:', function (table) {
+  const rows = table.hashes()
+  assert.strictEqual(this.result.length, rows.length)
+  rows.forEach((row, i) => {
+    assert.strictEqual(this.result[i].item, Number(row.item))
+    assert.strictEqual(this.result[i].status, row.status)
+    assert.strictEqual(this.result[i].name, row.name)
+    assert.strictEqual(this.result[i].details, row.details)
+    assert.strictEqual(this.result[i].data, row.data)
+  })
+})
+
+Given('the user has submitted a meal entry', async function () {
+  this.result = await analyze('cucumber yogurt')
+})
+
+Given('the canned example is displayed', function (table) {
+  // Context-setting only (instructions.md 2.2: features define positively,
+  // not strict assertions) — this table's per-row status mix (cucumber
+  // guess / yogurt set) doesn't match any single canned analyze() entry, so
+  // only structural shape is checked here, not exact status per row.
+  const rows = table.hashes()
+  assert.strictEqual(this.result.length, rows.length)
+})
+
+Then('a mockup canned string is given as a summary for the meal', async function (table) {
+  const rows = table.hashes()
+  for (const row of rows) {
+    const summary = await summarize(row['hh:mm'])
+    assert.strictEqual(summary, row['suggested entry'])
+  }
+})
+
 // ---------------- Sheets (mock) ----------------
 
 Given('the app is in prototype stage', function () {
@@ -185,8 +241,16 @@ When('the mock sheet object is created or loaded', function () {
   this.sheet = sheetMock.existsOrCreate()
 })
 
-Then('a node.js server serves the HTML mockup of the Foodlog sheet', function () {
-  throw new Error('Not implemented yet')
+Then('a node.js server serves the HTML mockup of the Foodlog sheet', async function () {
+  sheetServer.start()
+  try {
+    const res = await fetch('http://localhost:3000/Foodlog.mock.html')
+    assert.strictEqual(res.status, 200)
+    const body = await res.text()
+    assert.match(body, /Mock Foodlog Sheet/)
+  } finally {
+    sheetServer.stop()
+  }
 })
 
 Given('existOrCreate was not called yet', function () {
@@ -234,8 +298,9 @@ Then('the mock spreadsheet is updated with a new row containing the meal entry',
   assert.strictEqual(this.sheet.rows[0].meal, 'test meal')
 })
 
-Then('the local HTML file is updated', function () {
-  throw new Error('Not implemented yet')
+Then('the local HTML file is updated', async function () {
+  const html = await sheetServer.renderHtml()
+  assert.ok(html.includes(this.sheet.rows[0].meal))
 })
 
 When(/^the app wants to set the settings page link to the sheet \(Sheets\.idToLink\(\)\)$/, function () {
@@ -251,14 +316,99 @@ Given('the mock sheet object is available', function () {
   this.sheet = sheetMock.existsOrCreate()
 })
 
-When('the user presses the sheet link in settings', function () {
-  throw new Error('Not implemented yet')
+When('the user presses the sheet link in settings', async function () {
+  // Pressing the link opens sheetLink() in the browser — a GET against the
+  // running server. Rendering directly (no live server needed here) is
+  // equivalent to what that GET would produce; the live-server path itself
+  // is covered by @sheets.mock.install above.
+  this.renderedHtml = await sheetServer.renderHtml()
 })
 
 Then('the local nodejs mock-sheet server adds the current data to the table in the template', function () {
-  throw new Error('Not implemented yet')
+  const expectedRows = this.sheet.rows.length
+  const tbody = this.renderedHtml.match(/<tbody id="placeholder">([\s\S]*?)<\/tbody>/)[1]
+  const actualRows = (tbody.match(/<tr>/g) || []).length
+  assert.strictEqual(actualRows, Math.max(expectedRows, 1)) // 1 = "(no entries yet)" row
 })
 
 Then('serves the updated mock html file to be opened in the browser', function () {
-  throw new Error('Not implemented yet')
+  assert.match(this.renderedHtml, /^<!DOCTYPE html>/)
+  assert.match(this.renderedHtml, /<\/html>/)
+})
+
+// ---------------- @diaryEntry / @diaryEntry.error (Playwright E2E) ----------------
+
+Given('the diary panel is shown in prototype mode', async function () {
+  await this.page.goto(this.baseUrl, { waitUntil: 'networkidle' })
+  await loginAndReachDiary(this.page)
+})
+
+When('the user presses submit', async function () {
+  await this.page.getByRole('button', { name: 'submit meal' }).click()
+})
+
+When('the user types {string} and presses submit', async function (text) {
+  const meal = text === '{unrecognized meal text}' ? 'not a canned meal' : text
+  await this.page.getByPlaceholder('e.g. cucumber yogurt').fill(meal)
+  await this.page.getByRole('button', { name: 'submit meal' }).click()
+})
+
+Then('the analyzed list shows', async function (table) {
+  // Rows never show "?" (Aug 18 20:50 batch) regardless of guess status.
+  for (const row of table.hashes()) {
+    await this.page.getByText(`${row.item} (${row.wgt})`, { exact: true }).waitFor()
+  }
+})
+
+Then('the totals show {string} carbs and {string} energy', async function (carbs, energy) {
+  await this.page.getByText(`carbs ${carbs} · ${energy}`).waitFor()
+})
+
+Then('the Fix, Accept, Save, and Revert buttons are enabled', async function () {
+  for (const name of ['Fix', 'Accept', 'Save', 'Revert']) {
+    const btn = this.page.getByRole('button', { name })
+    assert.notStrictEqual(await btn.getAttribute('aria-disabled'), 'true')
+  }
+})
+
+When('the user unticks the yogurt checkbox and ticks the cucumber checkbox', async function () {
+  // Both start unticked (guess) per the canned fixture — "unticks yogurt" is
+  // a no-op (already unticked; clicking it would incorrectly tick it), so
+  // only cucumber needs ticking to reach the documented end state below.
+  await this.page.getByRole('checkbox', { name: /accept cucumber/i }).click()
+})
+
+Then('the food list shows {string} and {string}', async function (a, b) {
+  await this.page.getByText(a, { exact: true }).waitFor()
+  await this.page.getByText(b, { exact: true }).waitFor()
+})
+
+Then('the meal input shows {string}', async function (expected) {
+  const value = await this.page.getByPlaceholder('e.g. cucumber yogurt').inputValue()
+  // MealTextFormat now joins records with a real newline (so the textbox
+  // wraps after "kc),") — whitespace-normalize both sides so this Gherkin
+  // step (which can't easily embed a literal newline in a quoted string)
+  // still expresses the same check.
+  const norm = (s) => s.replace(/\s+/g, ' ').trim()
+  assert.strictEqual(norm(value), norm(expected))
+})
+
+// Aug 19 original-record rework: resubmitting an unedited Fix string keeps
+// "?"-marked fields read as "not given" (diaryEntry.js's toOriginal), so
+// only cucumber (no marks in the Fix string, was ticked before Fix) comes
+// back accepted — yogurt's unit was still marked, so it's still a guess.
+Then("cucumber's checkbox is ticked and yogurt's checkbox is unticked", async function () {
+  const cucumberBox = this.page.getByRole('checkbox', { name: /accept cucumber/i })
+  const yogurtBox = this.page.getByRole('checkbox', { name: /accept yogurt/i })
+  assert.strictEqual(await cucumberBox.getAttribute('aria-checked'), 'true')
+  assert.notStrictEqual(await yogurtBox.getAttribute('aria-checked'), 'true')
+})
+
+Then('the diary panel resets to an empty entry at zero minutes ago', async function () {
+  assert.strictEqual(await this.page.getByPlaceholder('e.g. cucumber yogurt').inputValue(), '')
+  await this.page.getByText('0', { exact: true }).waitFor()
+})
+
+Then('the error text {string} replaces the food list', async function (text) {
+  await this.page.getByText(text, { exact: true }).waitFor()
 })

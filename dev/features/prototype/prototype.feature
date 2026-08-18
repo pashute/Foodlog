@@ -1,4 +1,4 @@
-# Filename prototype.feature  Version 0.1.1
+# Filename prototype.feature  Version 0.2.2
 
 Feature: Infrastructure modules available via mockup code
     Mockup code for the basis of Config, Storage, Authentication, AI, and Sheets
@@ -18,7 +18,7 @@ Feature: Infrastructure modules available via mockup code
       | section | key            | value     |
       | config  | stage          | prototype |
       | app     | app-name       | Foodlog   |
-      | app     | app-version    | 0.1.1     |
+      | app     | app-version    | 0.1.2     |
       | app     | theme          | dark      |
       | sheets  | sheet-name     | Foodlog   |
   
@@ -94,18 +94,18 @@ Feature: Infrastructure modules available via mockup code
     And a mockup canned response is returned per sequence: 
     | hh:mm   | item | status | name     | details       | data                      |
     | {given} | 1    | guess  | cucumber | qty:1, sz:med | wgt:200, crb:6, cal:28    |
-    | {given} | 2    | guess  | yogurt   | qty:1, sz:std | wgt:170g, crb:8, cal:110c |
+    | {given} | 2    | guess  | yogurt   | qty:1, sz:cup | wgt:170g, crb:8, cal:110c |
 
-  #ai-summarize 
-  Scenario: AI resulting text 
+  @mock.ai-summarize
+  Scenario: AI resulting text
     Given the user has submitted a meal entry
     And the canned example is displayed
     | time    | item | status | name     | details        | data json                 |
     | {given} | 1    | guess  | cucumber | qty:1, sz:med  | wgt:200, crb:6, cal:28    |
-    | {given} | 2    | set    | yogurt   | qty:1, sz:std  | wgt:170g, crb:8, cal:110c |
-    And a mockup canned string is given as a summary for the meal 
+    | {given} | 2    | set    | yogurt   | qty:1, sz:cup  | wgt:170g, crb:8, cal:110c |
+    And a mockup canned string is given as a summary for the meal
     | hh:mm | suggested entry                                                        |
-    | 08:03 | 14g: 1? med? cucumber (200g, 6g,28c), 1 std yogurt (170g, 8g, 110c ) |
+    | 08:03 | 14g: 1? med? cucumber (200g, 6g,28c), 1? cup? yogurt (170g, 8g, 110c ) |
     
 # --------------------------    
 # Sheet Prototype Scenarios
@@ -177,19 +177,19 @@ Feature: Infrastructure modules available via mockup code
     Given the diary panel is shown in prototype mode
     When the user types "cucumber yogurt" and presses submit
     Then the analyzed list shows
-      | item     | guess | qty | size | wgt   | crb | cal |
+      | item     | guess | qty | unit | wgt   | crb | cal |
       | cucumber | yes   | 1   | med  | 200 g | 6 g | 28 kcal |
-      | yogurt   | yes   | 1   | std  | 170 g | 8 g | 110 kcal |
+      | yogurt   | yes   | 1   | cup  | 170 g | 8 g | 110 kcal |
     And the totals show "14 g" carbs and "138 kcal" energy
-    And the Fix, Accept All, Save, and Discard buttons are enabled
+    And the Fix, Accept, Save, and Revert buttons are enabled
     When the user unticks the yogurt checkbox and ticks the cucumber checkbox
-    Then the food list shows "cucumber (200 g)" and "yogurt? (170 g)"
+    Then the food list shows "cucumber (200 g)" and "yogurt (170 g)"
     When the user presses Fix
-    Then the meal input shows "(14g, 138cals), 1 med cucumber (200g, 6g,28c), 1? std? yogurt (170g, 8g,110c)"
+    Then the meal input shows "(14g, 138cals), 1 med cucumber (wgt: 200g, crb: 6g, nrg: 28kc), 1 cup? yogurt (wgt: 170g, crb: 8g, nrg: 110kc)"
     When the user presses submit
-    Then the analyzed list is shown with every item accepted
+    Then cucumber's checkbox is ticked and yogurt's checkbox is unticked
     When the user presses Save
-    Then a popup confirms "Record recorded ok."
+    Then the rows area shows "Meal saved"
     And the diary panel resets to an empty entry at zero minutes ago
 
   @diaryEntry.error
@@ -197,4 +197,4 @@ Feature: Infrastructure modules available via mockup code
     Given the diary panel is shown in prototype mode
     When the user types "{unrecognized meal text}" and presses submit
     Then the error text "AI error occured. Please contact support@foodlog.com" replaces the food list
-    And the Fix, Accept All, Save, and Discard buttons stay disabled
+    And the Fix, Accept, Save, and Revert buttons stay disabled

@@ -1,11 +1,11 @@
-// Filename: oauth.android.js  Version 0.2.0
+// Filename: oauth.android.js  Version 0.2.1
 
 // Real login for Android — @react-native-google-signin/google-signin.
 // Native account picker + drive.file consent + offline access (refresh token).
 // Will fail until client ids are filled in — see authClientIds.js.
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { isPrototype } from '../config/config.js'
+import { isPrototype, getByKey, KEYS } from '../config/config.js'
 import * as authMock from '../../prototype/oauth/oauth.mock.js'
 import { client_id_web } from './authClientIds.js'
 
@@ -15,7 +15,7 @@ export const login = async () => {
   }
   GoogleSignin.configure({
     webClientId: client_id_web,
-    scopes: ['https://www.googleapis.com/auth/drive.file'],
+    scopes: [getByKey(KEYS.keyUrlDriveFileScope)],
     offlineAccess: true,
   })
   await GoogleSignin.hasPlayServices()

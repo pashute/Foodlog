@@ -155,7 +155,6 @@ To enable user login and Google Sheets integration, the human developer must con
    - User type: **External**.
    - Fill in app name (`Foodlog`), support email, developer contact.
    - Add scopes:
-     - `https://www.googleapis.com/auth/spreadsheets`
      - `https://www.googleapis.com/auth/drive.file`
    - While unverified, add your Google account under **Test users**.
 

@@ -1,10 +1,12 @@
 # Filename: diary.feature
-# Version: 0.1.0
+# Version: 0.1.1
 # Diary panel layout (was "logger" — the Foodlog sheet name is unaffected)
 
 Feature: screens/layout/diary
 
+  @diaryLayout.panel
   Scenario: Diary panel is shown
+    Given the diary panel is shown
     Then the diary panel shows a minutes-ago box with minus, value, and plus controls
     And the diary panel shows the computed time
     And the diary panel shows the current carbs estimate
@@ -14,6 +16,7 @@ Feature: screens/layout/diary
     And the diary panel shows a multiline instructions area
     And the diary panel shows a "Food log" navigation link
 
+  @diaryLayout.aiEstimate
   Scenario: AI estimate area layout
     Given the AI estimate area is shown
     Then the total carbs and energy are shown above the food item list

@@ -1,8 +1,10 @@
-# Filename: settings.feature  Version 0.8.0
+# Filename: settings.feature  Version 0.8.1
 
 Feature: screens/layout/settings
 
+  @settings.panel
   Scenario: Settings panel is shown
+    Given the settings panel is shown
     Then the settings panel shows the following elements
     | Card              | Element                                            |
     | 1. Instruction    | Single dedicated instruction card                  |
@@ -16,6 +18,7 @@ Feature: screens/layout/settings
     And App info, AI API Key, Foodlog sheet, Timezone, and Go to Diary are all disabled until logged in
     And each info icon is adjacent to its row's button, after it (Theme has no button, so its icon is at the end of the row)
 
+  @settings.instructionCard
   Scenario: Top instruction card changes per pressed info icon
     Given the settings panel is shown
     Then the top instruction card shows the idle instruction by default

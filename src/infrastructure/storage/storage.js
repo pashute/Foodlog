@@ -1,4 +1,4 @@
-// Filename: storage.js  Version 0.3.0
+// Filename: storage.js  Version 0.3.1
 
 // Storage module to access and retrieve data from the local secure storage.
 // Prototype stage delegates to storageMock (synchronous, guarded). Real
@@ -44,6 +44,15 @@ async function _realUpdate(key, value) {
   return value
 }
 
+async function _realRemove(key) {
+  if (typeof window !== 'undefined' && window.__TAURI__) {
+    const { invoke } = await import('@tauri-apps/api/core')
+    return invoke('keyring_delete', { key })
+  }
+  const SecureStore = await import('expo-secure-store')
+  return SecureStore.deleteItemAsync(key)
+}
+
 export function initialize() {
   _ensurePrototype()
   return storageMock.initialize()
@@ -63,4 +72,12 @@ export function update(key, value) {
     return storageMock.update(key, value)
   }
   return _realUpdate(key, value)
+}
+
+export function remove(key) {
+  if (isPrototype()) {
+    _ensurePrototype()
+    return storageMock.remove(key)
+  }
+  return _realRemove(key)
 }

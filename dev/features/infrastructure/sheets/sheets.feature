@@ -1,4 +1,4 @@
-# Filename sheets.feature  Version 0.1.0
+# Filename sheets.feature  Version 0.1.1
 
 Feature: infrastructure/sheets
 
@@ -34,3 +34,12 @@ Feature: infrastructure/sheets
     Given a Foodlog sheet id is stored
     When link is called
     Then the direct URL to the Foodlog sheet is returned for the settings panel
+
+  @sheets.idLifecycle
+  Scenario: Sheet id is empty until first loaded, cleared on logout
+    Given no Foodlog sheet id is stored
+    Then the sheet id is empty
+    When existsOrCreate is called
+    Then the sheet id is stored
+    When the user logs out
+    Then the sheet id is empty again

@@ -1,5 +1,5 @@
 // Filename: oauth.steps.js
-// Version: 0.3.0
+// Version: 0.3.1
 
 // Tests the real module (auth.js), not the mock, per instructions.md.
 // Interactive-rendering assertions ("popup is shown", "browser opens",
@@ -204,12 +204,26 @@ Given('the user logs out', async function () {
   await auth.logout()
 })
 
-Then('all app data is cleared:', function (table) {
-  // auth.logout() only clears oauth.mock.js's in-memory session state —
-  // clearing the 3 storage keys + header/diary/settings UI state needs an
-  // app-level logout coordinator that doesn't exist yet (spans storage.js
-  // and the screens layer, out of this src/infrastructure/auth batch).
-  throw new Error('Not implemented yet')
+Then('all app data is cleared:', async function (table) {
+  // auth.logout() now clears oauth.mock.js's in-memory session state plus
+  // the 3 secret storage keys — verified below. The header/diary/settings
+  // rows are UI component state and need the rendered-tree UI-test tier
+  // (RNTL/RTL) this cucumber/node tier doesn't cover — not asserted here.
+  const rows = table.hashes()
+  const appRow = rows.find((r) => r.module === 'app')
+  assert.strictEqual(appRow['value'], 'logged-out')
+  assert.strictEqual(await auth.isLoggedIn(), false)
+
+  const storageRow = rows.find((r) => r.module === 'storage')
+  assert.strictEqual(storageRow['value'], 'deleted')
+  const [authToken, aiKey, sheetId] = await Promise.all([
+    Promise.resolve(storageGet(KEYS.authToken)),
+    Promise.resolve(storageGet(KEYS.aiApiKey)),
+    Promise.resolve(storageGet(KEYS.sheetId)),
+  ])
+  assert.strictEqual(authToken, undefined)
+  assert.strictEqual(aiKey, undefined)
+  assert.strictEqual(sheetId, undefined)
 })
 
 Then('the settings panel is disabled and shown', function () {

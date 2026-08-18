@@ -1,4 +1,4 @@
-// Filename storage.mock.js  Version 0.1.0
+// Filename storage.mock.js  Version 0.1.1
 
 // Mock secure storage (prototype stage). In-memory key/value store.
 
@@ -15,6 +15,10 @@ export function get(key) {
 export function update(key, value) {
   store.set(key, value)
   return value
+}
+
+export function remove(key) {
+  store.delete(key)
 }
 
 export function keys() {

@@ -1,5 +1,13 @@
-import { BeforeAll, AfterAll, Before, After } from '@cucumber/cucumber'
+// Filename: hooks.js
+// Version: 0.2.0
+
+import { BeforeAll, AfterAll, Before, After, setDefaultTimeout } from '@cucumber/cucumber'
 import { chromium } from 'playwright'
+
+// Default (5000ms) is too short for Playwright steps that drive a full
+// login + navigation click-through (loginHelper.js) against the live dev
+// server.
+setDefaultTimeout(20000)
 
 const baseUrl = process.env.BASE_URL || 'http://localhost:8081'
 

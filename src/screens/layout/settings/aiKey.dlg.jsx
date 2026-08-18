@@ -1,20 +1,22 @@
 // Filename: aiKey.dlg.jsx
-// Version: 0.1.1
+// Version: 0.1.3
 // Gemini AI Setup dialog (screens/layout/settings): opens on "Start AI",
 // walks the user through getting a free Gemini API key and pasting it.
 
 import { useState } from 'react'
 import { Modal, View, Text, TextInput, Image, Pressable, ScrollView, StyleSheet, Linking } from 'react-native'
 import { keyStatus } from '../../../infrastructure/ai/ai.js'
+import { getByKey, KEYS } from '../../../infrastructure/config/config.js'
 import aiKeyGetImg from '../../../imgs/aiKey/aiKeyGet.png'
 import aiKeyCreateImg from '../../../imgs/aiKey/aiKeyCreate.png'
 
-export const privacyStatementUrl = 'https://policies.google.com/privacy#intro'
-export const aiStudioUrl = 'https://aistudio.google.com/app/api-keys'
+export const privacyStatementUrl = getByKey(KEYS.keyUrlGooglePrivacy)
+export const aiStudioUrl = getByKey(KEYS.keyUrlAiStudio)
 
 export default function AiKeyDlg({ visible, onSave = () => {}, onClose = () => {} }) {
   const [value, setValue] = useState('')
   const [showInvalid, setShowInvalid] = useState(false)
+  const [showScreenshot, setShowScreenshot] = useState(false)
 
   const valid = keyStatus(value) === 'ok'
 
@@ -53,20 +55,22 @@ export default function AiKeyDlg({ visible, onSave = () => {}, onClose = () => {
             . And here's how to do it:
           </Text>
 
-          <View style={styles.step}>
+          <View style={styles.step1Row}>
             <Text style={styles.stepText}>
               1. Go to{' '}
               <Text style={styles.link} onPress={() => Linking.openURL(aiStudioUrl)}>
                 Google AI Studio
               </Text>
             </Text>
-            <Image source={aiKeyGetImg} style={styles.stepImg} resizeMode="contain" />
+            <Image source={aiKeyGetImg} style={styles.step1Img} resizeMode="contain" />
           </View>
 
-          <View style={styles.step}>
-            <Text style={styles.stepText}>2. Click on Create API Key in the top-left corner</Text>
-            <Image source={aiKeyCreateImg} style={styles.stepImg} resizeMode="contain" />
-          </View>
+          <Text style={styles.stepText}>
+            2. Click on Create API Key in the top-left corner{' '}
+            <Text style={styles.link} onPress={() => setShowScreenshot(true)}>
+              (see screenshot)
+            </Text>
+          </Text>
 
           <Text style={styles.stepText}>3. Just use the default project</Text>
 
@@ -96,6 +100,17 @@ export default function AiKeyDlg({ visible, onSave = () => {}, onClose = () => {
           </Pressable>
         </ScrollView>
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showScreenshot}
+        onRequestClose={() => setShowScreenshot(false)}
+      >
+        <Pressable style={styles.screenshotOverlay} onPress={() => setShowScreenshot(false)}>
+          <Image source={aiKeyCreateImg} style={styles.screenshotImg} resizeMode="contain" />
+        </Pressable>
+      </Modal>
     </Modal>
   )
 }
@@ -118,9 +133,17 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: '700', color: '#f3f4f6', marginBottom: 16, textAlign: 'center' },
   text: { fontSize: 14.5, lineHeight: 21, color: '#d0d0d0', marginBottom: 14 },
   link: { color: '#7aa2ff' },
-  step: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
-  stepText: { flex: 1, fontSize: 14.5, lineHeight: 21, color: '#d0d0d0' },
-  stepImg: { width: 90, height: 90, borderRadius: 8, backgroundColor: '#111' },
+  step1Row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8, marginBottom: 4 },
+  step1Img: { width: 150, height: 32, borderRadius: 6, backgroundColor: '#111' },
+  stepText: { fontSize: 14.5, lineHeight: 20, color: '#d0d0d0', marginBottom: 4 },
+  screenshotOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  screenshotImg: { width: '100%', height: '100%' },
   input: {
     borderWidth: 1,
     borderColor: '#2e303a',

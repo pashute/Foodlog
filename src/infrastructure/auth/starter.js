@@ -1,4 +1,4 @@
-// Filename: starter.js  Version 0.2.1
+// Filename: starter.js  Version 0.2.2
 
 // Logic + imperative-promise API for the pre-login "calming scope" starter
 // popup (requirements.md "OAuth login"). Split from starter.dlg.jsx (the
@@ -7,6 +7,8 @@
 // extension, not even a parse issue), so auth.js and feature step defs
 // import this plain module when they only need popup()/test hooks.
 
+import { getByKey, KEYS } from '../config/config.js'
+
 export const title = 'Connect Google Drive'
 export const messageText1 = 'Foodlog stores your data in your own file.\nOnly you can access it. Only you see it.'
 export const messageText2 = 'Foodlog cannot touch and does not see any other files.'
@@ -14,10 +16,12 @@ export const messageText3 =
   'For that you will be logging in with the drive.file permissions, allowing Foodlog to open only the Foodlog sheet it created.'
 export const readFurtherLabel = 'See more on our website'
 
-// Duplicated from auth.js's driveSafeUrl (not imported from auth.js here to
-// avoid a starter.js <-> auth.js circular import, since auth.js dynamically
-// imports this file).
-export const driveSafeUrl = 'https://NotImplementedYet.github.com/drive-safe.html'
+// Now sourced from config (urls.drive-safe) — was previously a literal
+// duplicated here and in auth.js separately (config.js has no dependency
+// on either of them, so importing it here doesn't risk the auth.js <->
+// starter.js circular import that duplicating the literal was working
+// around).
+export const driveSafeUrl = getByKey(KEYS.keyUrlDriveSafe)
 
 let _setVisible = null
 let _resolve = null

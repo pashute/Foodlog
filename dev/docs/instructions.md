@@ -1,23 +1,36 @@
 ### Filename instructions.md
-File version 0.1.4
+File version 0.1.7
 
-AI should not touch this file without explicit permission and may change only one section at a time before asking again for permission !!
+AI may not change a thing in this file without explicit permission and may change only one section at a time before asking again for permission !!
+
+AIs memory should contain according to this file the topics: 
+- beep and callme: how and when. 
+- version iteration increment 0.3.0 -> 0.3.1  
+- dev listing:  issue and todo writing with beeps [>] and discussions
+- dev implementing: feature, empty-element, feature wiring, failed test, element filled, testing success, checking feature success, tick ok.
+- dev-step done:  [!] -problem so skipped. or [v] success  or [?] need discussion.
+
+- fix-batch close: run e2e, commit and push, [close issue if instructed]\
+- discuss or skip - if instructed. 
 
 ## 0. Beeping
 
-In claude settings I have Permissions allow for: 
+In order for the developer to be alerted, the ai will use a beep, but not one which will bring up a permission-request alert, which the developer will not hear.  To overcome that:  
+
+In claude settings the human developer gave `Permissions/allow` for: 
 - "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\beep.ps1\")",
 - "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\callme.ps1\")
 
 `beep.ps1` - beeps once. `callme.ps1` - beeps 3 times in a stepped pattern. 
 
-- 0.1 Every batch of actions starts with a beep.
-- 0.2 Beep by running the PowerShell **script files** (not an inline command) so that I hear the beep and don't have to first give it permission to run. 
+- 0.1 Every batch of actions starts with a beep, and every ai action inside the batch starts with a beep. 
+- 0.2 Beep by running the PowerShell **script files** (not an inline [Console]::Beep command) so that the developer hears the beep and won't have to first give it permission to run. 
 
-- Use `callme.ps1` every time you need the user's (the developer) interaction or want the user's response.
-- Use `callme.ps1` BEFORE an action that will prompt the user for permission.
-- 0.3 Use `callme.ps1` if an error occurred. 
-
+- 0.3  For alerts warnings and errors: 
+- AI Code should use `callme.ps1` every time it need's the user's (the developer's) interaction or it wants the user's response.
+- AI Code should use `callme.ps1` BEFORE an action that will prompt the user for permission. Otherwise the user will not hear the callme, and will see the permission request to run `callme` instead. 
+- AI Code should Use `callme.ps1` if an error occurred. 
+- Permission avoidance:  When AI code calls bash or powershell command, first check the local user's .claude\settings.json that no permission popup will be called by the system, and if there will be a permission request first run callme to alert the user. 
 
 ## 1. AI and developer interaction and methodology
 
@@ -37,9 +50,11 @@ In claude settings I have Permissions allow for:
 
 1.6 Action sequences:
 
-1.6.1 When the user requests a sequence of actions or more than one file to be changed, the AI must list the steps it will attempt to take without consent, along with marked checkboxes. The user will unmark steps that they want the AI to stop and ask before modifying code.  
+1.6.1 NQA (no questions asked) 
+When the user requests a sequence of actions or more than one file to be changed, the AI must list these steps that it will attempt to take without consent in the todo file. along with marked NQA checkboxes. The human user-developer will unmark steps that they want the AI to stop and ask before modifying code.  
 
-1.6.2 If the sequence is very long and includes complex steps the AI should break it down into batches of smaller sequences, request from the user a place write them down in a temporary file, and deal with a todo list in memory of only one small batch. 
+1.6.2 Batches breakup
+If the sequence is very long and includes complex steps the AI should break it down into batches of smaller sequences, and clearly mark next batches. Request from the user to remove the future batches to a temporary file, and deal only with a short todo list in memory, one batch at a time.
 
 1.7 "Consult the user" means calling out (beeping three times) asking for the human user's input, suggesting paths to proceed, and waiting for the user's response.  
 
@@ -52,64 +67,15 @@ Note: The term HumandAI Team is intentional as a trademark phrase, and not a spe
 The Coding AI (Claude Code in this case) will assist the human user in the following order:  
 
 ### 2.1 Specs Doc
-Create the requirement specifications document [This has been done].
-
-### 2.2 Feature development
-
-    For each feature:
-
-        a. Discuss the AI's plan for the feature.  
-        
-        Note: Features are not unit tests. They only define positively and do not check failures, unless that is explicitly part of the feature. Failures will be checked and dealt with in the unit tests. 
-        
-        b. Once the user replies to a discussion with closing remarks, the AI can give an extremely short summary of the discussion according to the nuances learned from the user, and may ask if the discussion was completed?  
-        
-        c. Only if the human user closes the discussion is it considered complete and the AI may then move on to the next item. The AI should never infer this but ask explicitly or confirm it with the user, before moving on.
-
-        c. (After user approved) Create the feature Gherkin file.  
-
-        d. Follow up with a discussion. 
-
-        e. If from the user's response to the AI's discussion it seems every topic discussed by both sides has been covered, the AI requests to proceed, and waits for the user's approval. 
-
-### 2.3 Feature implementation:
-    
-    - Before each of the following discuss, and then ask to proceed.   
-    - After each of the following 
-
-    a. create code that fails with not implemented yet
-        (Or Ui elements that say Not Implemented yet)  
-
-    b.  Create unit tests for the code.
-        Run the tests and see that they fails (as expected)  
-
-        Unit test Notes:   
-        - 1. Unit tests should check the existence of the module file or component.  
-        - 2. Unit tests should test for error handling and graceful failure, and try with combinations of data that should fail, or complex combinations of data.  
-        - 3. Unit tests should try to combine testing of data combinations into a table summarizing what was tested extremely tersely and emphasizing only what failed and why. 
-
-    c.  Create the actual code for the feature.
-        Run the unit tests and see that they all passed.
-
-    d. Run the feature test (Gherkin) and see that it is implemented. 
-
-### 2.4 Feature Gherkin writing instructions
-
-2.4.1 concise: The Gherkin files written with the assistance of Claude code should be
-
-- Short, clear, and direct.
-- Written with specific specifications and not generic ones, 
-- Strictly follow the Requirement specifications document. 
+Feature development and implementation:  see featureDev.md
 
 2.4.2 Discussions
 
-Pre-discussion: Each Gherkin file should be discussed and approved by the developer before writing or changing it. (See section )
-
-Discuss with the user after each feature file was touched. 
+Discuss with the human user-developer after each feature file was touched. 
 
 2.4.3 Missing dependencies. 
 
-When a feature is developed and it depends on other features not developed yet, it should be written with Not Implemented Yet and expected to fail.  
+When a feature is developed and it depends on other features not developed yet, the missing feature should have a stub  Not Implemented Yet and expected to fail.  
 
 When implementing the feature, a unit test setup calling the dependency should also fail as expected. 
 The rest of the unit test will abort due to this. 
@@ -145,7 +111,8 @@ html files should have under the <html5> tags
 <head>  etc...
 
 Any change to the file changes the iteration number. 
+i.e.  0.1.2 -> 0.1.3,   and 0.2.0 -> 0.2.1. 
 
 The current major and minor version are as listed in the config. 
 
-The user (human developer) decides this, but before checking in and pushing consult with the user. 
+The user (human developer) decides which major and minor to use, and ai should not change those on its own, but may suggest it to the user in a discussion as appropriate values. 
