@@ -1,45 +1,44 @@
-# Filename sheets.feature  Version 0.1.1
+# Filename sheets.feature  Version 0.2.0
 
-Feature: infrastructure/sheets
+Feature: Foodlog Sheet
 
-  As a developer I want to access and maintain the user's Foodlog Google Sheet
+  @sheets.data
+  Scenario: Foodlog sheet has a defined header and field-based rows
+    Then the Foodlog sheet has this header order:
+      | date | dow | time | carbs | calories | status | meal |
+    And each Foodlog sheet row uses those fields
 
-  @sheets.module
-  Scenario: Sheets module is available
-    Given the Sheets module is available
-    Then it exposes `existsOrCreate`, `log`, and `link`
+  @sheets.production.create
+  Scenario: Create Foodlog data when it does not exist
+    Given the signed-in user has no saved Foodlog sheet
+    When Foodlog data is first needed
+    Then the app uses a Foodlogs folder directly under the user's Drive root
+    And the app creates the Foodlogs folder when it is absent
+    And the app creates a Foodlog spreadsheet in that folder when it is absent
+    And the new spreadsheet has the Foodlog header and no data rows
+    And the app saves the spreadsheet identifier for the user
 
-  @sheets.create
-  Scenario: Create Foodlog sheet if none exists
-    Given no Foodlog sheet id is stored
-    When existsOrCreate is called
-    Then a new Foodlog sheet is created with header row:
-    | date | dow | time | carbs | status | meal |
-    And the sheet id is stored
+  @sheets.production.existing
+  Scenario: Reuse saved Foodlog data
+    Given the signed-in user has a saved Foodlog spreadsheet identifier
+    When Foodlog data is needed
+    Then the app uses that Foodlog spreadsheet
 
-  @sheets.exists
-  Scenario: Reuse existing Foodlog sheet
-    Given a Foodlog sheet id is already stored
-    When existsOrCreate is called
-    Then the existing sheet is used without creating a new one
-
-  @sheets.log
-  Scenario: Log a meal row
-    Given the Sheets module is available
-    When log is called with meal data
-    Then a new row is prepended to the Foodlog sheet
+  @sheets.rows
+  Scenario: Save a Foodlog sheet row
+    Given the Foodlog sheet has a known number of rows
+    When the user presses diary.foods.Save
+    Then the Foodlog sheet has one additional row
+    And the Foodlog sheet latest row has the saved values
 
   @sheets.link
-  Scenario: Get the sheet link
-    Given a Foodlog sheet id is stored
-    When link is called
-    Then the direct URL to the Foodlog sheet is returned for the settings panel
+  Scenario: Open Foodlog sheet
+    Given the Foodlog sheet is available
+    When the user opens the Foodlog sheet from Settings
+    Then the user's Foodlog spreadsheet opens
 
-  @sheets.idLifecycle
-  Scenario: Sheet id is empty until first loaded, cleared on logout
-    Given no Foodlog sheet id is stored
-    Then the sheet id is empty
-    When existsOrCreate is called
-    Then the sheet id is stored
+  @sheets.logout
+  Scenario: Logout clears the saved Foodlog reference
+    Given the signed-in user has a saved Foodlog spreadsheet identifier
     When the user logs out
-    Then the sheet id is empty again
+    Then the saved Foodlog spreadsheet identifier is cleared

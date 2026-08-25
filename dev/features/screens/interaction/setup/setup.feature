@@ -2,6 +2,20 @@
 
 Feature: screens/interaction/setup
 
+  @setup.configuration
+  Scenario: Edit configuration in Settings
+    Given a signed-in user opens configuration in Settings
+    Then the user can edit theme, sheet name, and sheet folder
+    And the user can restore the default values
+    When the user saves configuration changes
+    Then the changes are used for that user
+
+  @setup.configuration.reload
+  Scenario: Reload saved configuration in Settings
+    Given a signed-in user has unsaved configuration changes
+    When the user reloads configuration
+    Then the user's last saved configuration is restored
+
   @setup.instructions
   Scenario Outline: Settings instructions show one problem at a time
     Given the settings panel state is login "<login>" and AI key "<aiKey>"

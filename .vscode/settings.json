@@ -1,6 +1,9 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "npx cucumber-js": true
+        "npx cucumber-js": true,
+        "&": true,
+        "npm install": true,
+        "npx tsc": true
     },
     "cSpell.words": [
         "Foodlog"

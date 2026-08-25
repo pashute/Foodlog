@@ -1,5 +1,5 @@
 # Filename: oauth.feature
-# Version: 0.4.0
+# Version: 0.1.5
 # OAuth Google account integration scenarios
 
 Feature: OAuth Google Account Integration
@@ -13,6 +13,8 @@ Feature: OAuth Google Account Integration
   @auth.scope-popup
   Scenario:  Show pre-login starter dialog Popup
     Given the app is open 
+    And the config is set to app prototype mode
+    And no user is currently authenticated
     When the user presses Continue Login with Google
     Then the starter dialog  popup is shown, 
     And the options are available to the user:
@@ -60,6 +62,12 @@ Feature: OAuth Google Account Integration
     And if an old token is there, it is replaced
     And the usermail is stored in the local secure storage 
 
+  @auth.configuration
+  Scenario: Load saved configuration after login
+    Given a user has saved configuration
+    When login succeeds for that user
+    Then the user's saved configuration is loaded
+
 
   @auth.fail
   Scenario: OAuth login failed
@@ -87,5 +95,37 @@ Feature: OAuth Google Account Integration
   @auth.app-closed
   Scenario: App was closed
     Given the app was closed by the user or forced to closed
-    Then the app will attempt to log out and clear the settings. 
-    But the usermail will stay in the storage. 
+    Then the app will attempt to log out and clear the settings.
+    But the usermail will stay in the storage.
+
+
+  # ---------------------------------------------------------------------
+  # Web (Expo web) real OAuth — Aug 19. Deviates from @auth.verify above:
+  # Google Identity Services (the browser-side library) never hands a
+  # refresh token to JS, by design, so web logs in with an access token
+  # instead. See oauth.web.js and auth.js's _isFreshDriveFileToken (accepts
+  # either shape). GIS itself needs a real browser (window.google, a
+  # rendered consent popup) so login()/trySilentLogin() can't be driven
+  # headlessly here — same boundary as the other real platform modules.
+
+  @auth.web.login
+  Scenario: Web OAuth logs in with an access token, not a refresh token
+    Given the user is on Expo web, not in prototype mode
+    When the user completes the Google Identity Services consent popup
+    Then the result carries an accessToken and scope "drive.file"
+    And the result has no refreshToken
+    # login()/trySilentLogin() need a real browser — not implemented here.
+
+  @auth.web.silent
+  Scenario: Web silent re-auth reuses the existing Google browser session
+    Given the user is on Expo web with an active Google browser session
+    When the app requests a token with prompt "" (no popup)
+    Then a fresh access token is returned with no user interaction
+    # Needs a real browser — not implemented here.
+
+  @auth.web.logout
+  Scenario: Web logout revokes the access token
+    Given the user is logged in on Expo web
+    When the user logs out of the web session
+    Then the access token is revoked via Google Identity Services
+    # Needs a real browser — not implemented here.
