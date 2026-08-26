@@ -1,5 +1,5 @@
 # Filename: diary.feature
-# Version: 0.1.1
+# Version: 0.2.1
 # Diary panel layout (was "logger" — the Foodlog sheet name is unaffected)
 
 Feature: screens/layout/diary

@@ -1,5 +1,5 @@
 /**
- * Auth Module  Version 0.4.3
+ * Auth Module  Version 0.2.1
  *
  * Thin dispatcher (requirements.md "OAuth login" / "OAuth - implementation
  * notes"). login() shows the starter popup, awaits the user's continue/

@@ -1,5 +1,5 @@
 // Filename: Header.tsx
-// Version: 0.2.2
+// Version: 0.2.1
 // App header (screens/layout/header): brand + login/avatar + hamburger menu
 
 import { useState } from 'react'

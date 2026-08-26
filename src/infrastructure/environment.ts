@@ -1,5 +1,5 @@
 // Filename: environment.ts
-// Version 0.2.0
+// Version 0.2.1
 // Always loaded from .env file. Never mocked.
 
 export type OptDevStage = 'prototype' | 'production'

@@ -1,4 +1,4 @@
-// Filename authClientIds.ts  Version 0.1.1
+// Filename authClientIds.ts  Version 0.2.1
 
 // stores auth client ids,
 // one for Tauri desktop, one for android app, and in the future, one for iOS app

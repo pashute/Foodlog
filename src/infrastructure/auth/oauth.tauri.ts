@@ -1,4 +1,4 @@
-// Filename: oauth.tauri.ts  Version 0.2.0
+// Filename: oauth.tauri.ts  Version 0.2.1
 
 // Real login for Tauri desktop — loopback flow (open system browser → Google
 // consent → redirect to 127.0.0.1:<port>). Not implemented yet — see develop.md

@@ -1,5 +1,5 @@
 // Filename: e2e.test.tsx
-// Version: 0.1.3
+// Version: 0.2.1
 // End-to-end coverage not exercised by the per-component unit tests:
 // full <App/> render checked against live config (not hardcoded strings),
 // disabled/enabled correctness across the login boundary, and the real

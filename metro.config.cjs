@@ -1,5 +1,5 @@
 // Filename: metro.config.js
-// Version: 1.0.0
+// Version: 0.2.1
 // Required for `expo export --platform web` / `expo start --web` to wire up
 // the web require-shim correctly — without this file Metro falls back to a
 // bare config and the exported bundle throws "require is not defined".

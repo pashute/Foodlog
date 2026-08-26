@@ -1,5 +1,5 @@
 // Filename: babel.config.js
-// Version: 1.1.0
+// Version: 0.2.1
 
 module.exports = function (api) {
   api.cache.using(() => process.env.NODE_ENV)

@@ -1,5 +1,5 @@
 // Filename: diaryEntry.ts
-// Version: 0.2.2
+// Version: 0.2.1
 // Diary entry logic (plain JS, no JSX) — everything Diary.tsx needs that
 // isn't a React hook or a render. See dev/docs/issues.md (Aug 17/18 sheet/
 // meal-schema discussion) for why this was split out of the component, and

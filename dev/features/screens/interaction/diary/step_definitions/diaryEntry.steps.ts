@@ -1,5 +1,5 @@
 // Filename: diaryEntry.steps.ts
-// Version: 0.3.1
+// Version: 0.2.1
 // Step defs for screens/interaction/diaryEntry.feature — Playwright E2E
 // against the live dev server. Uses the canned 'cucumber yogurt' mock
 // fixture (ai.mock.ts) as "a meal description" the AI recognizes.

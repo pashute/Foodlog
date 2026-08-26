@@ -1,5 +1,5 @@
 ### Filename instructions.md
-File version 0.1.7
+File version 0.2.1
 
 AI may not change a thing in this file without explicit permission and may change only one section at a time before asking again for permission !!
 

@@ -1,4 +1,4 @@
-// Filename: storage.ts  Version 0.3.2
+// Filename: storage.ts  Version 0.2.1
 
 // Storage module to access and retrieve data from the local secure storage.
 // Prototype stage delegates to storageMock (synchronous, guarded). Real

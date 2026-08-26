@@ -1,4 +1,4 @@
-// Filename: permitConsent.mock.ts  Version 0.1.0
+// Filename: permitConsent.mock.ts  Version 0.2.1
 
 // Logic + imperative-promise API for the mock permissions-consent popup.
 // Split from permitConsent.mock.dlg.tsx (the React component) — see

@@ -1,4 +1,4 @@
-// Filename: starter.ts  Version 0.2.2
+// Filename: starter.ts  Version 0.2.1
 
 // Logic + imperative-promise API for the pre-login "calming scope" starter
 // popup (requirements.md "OAuth login"). Split from starter.dlg.tsx (the

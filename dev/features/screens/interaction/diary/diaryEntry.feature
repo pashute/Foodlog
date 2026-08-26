@@ -1,5 +1,5 @@
 # Filename: diaryEntry.feature
-# Version: 0.2.0
+# Version: 0.2.1
 # screens/interaction/diaryEntry — user interactions on the diary panel
 # (renamed from diary.feature; entry text box starts empty, per-item accept
 # checkboxes replace the old blanket Save/Save-Anyway toggle)

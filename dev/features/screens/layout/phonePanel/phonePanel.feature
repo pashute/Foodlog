@@ -1,4 +1,4 @@
-# Filename: phonePanel.feature  Version 0.1.0
+# Filename: phonePanel.feature  Version 0.2.1
 # Web-only phone-shaped frame around the app (screens/layout/phonePanel)
 
 Feature: screens/layout/phonePanel

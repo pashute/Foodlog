@@ -1,4 +1,4 @@
-// Filename setup.steps.ts  Version 0.4.2
+// Filename setup.steps.ts  Version 0.2.1
 
 // Playwright E2E against the live dev server (hooks.ts: this.page/baseUrl).
 // @setup.instructions: only the logged-out rows are driven for real here —

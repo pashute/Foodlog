@@ -1,4 +1,4 @@
-# Filename prototype.feature  Version 0.2.2
+# Filename prototype.feature  Version 0.2.1
 
 Feature: Infrastructure modules available via mockup code
     Mockup code for the basis of Config, Storage, Authentication, AI, and Sheets

@@ -1,5 +1,5 @@
 // Filename: diary.test.tsx
-// Version: 0.5.1
+// Version: 0.2.1
 // Short, readable tests following the diaryEntry sequence: 5.0 empty/placeholder
 // -> 5.1 unrecognized text errors -> 5.2 canned text analyzes, then each button.
 // Canned mock input/output comes from src/prototype/ai.mock.ts (cannedAnalysis).

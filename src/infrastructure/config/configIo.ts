@@ -1,5 +1,5 @@
 // Filename: configIo.ts
-// Version 0.2.0
+// Version 0.2.1
 
 import { isPrototype } from '../environment'
 import { loadConfiguration, type ConfigWarning } from './configAccess'

@@ -1,5 +1,5 @@
 // Filename: oauth.steps.ts
-// Version: 0.4.0
+// Version: 0.2.1
 
 // Tests the real module (auth.ts), not the mock, per instructions.md.
 // Interactive-rendering assertions ("popup is shown", "browser opens",

@@ -1,4 +1,4 @@
-# Filename: settings.feature  Version 0.8.1
+# Filename: settings.feature  Version 0.2.1
 
 Feature: screens/layout/settings
 

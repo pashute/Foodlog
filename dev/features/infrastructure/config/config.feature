@@ -1,4 +1,4 @@
-# Filename config.feature  Version 0.6.0
+# Filename config.feature  Version 0.2.1
 
 Feature: Application Metadata
 

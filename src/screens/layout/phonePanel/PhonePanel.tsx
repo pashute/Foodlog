@@ -1,5 +1,5 @@
 // Filename: PhonePanel.tsx
-// Version: 0.1.3
+// Version: 0.2.1
 // Web-only visual wrapper (screens/layout/phonePanel): frames the app inside
 // a phone-shaped panel on web so it previews closer to the native layout.
 // Native builds (Platform.OS !== 'web') render children unwrapped.

@@ -1,5 +1,5 @@
 # Filename: ai.feature
-# Version: 0.1.4
+# Version: 0.2.1
 
 Feature: AI analysis and summary
   As the app user

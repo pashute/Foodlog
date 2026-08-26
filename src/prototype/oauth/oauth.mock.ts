@@ -1,4 +1,4 @@
-// Filename: oauth.mock.ts  Version 0.2.0
+// Filename: oauth.mock.ts  Version 0.2.1
 
 // Mock OAuth module (prototype stage). Orchestrates the two popup
 // components (accountChoice.mock.dlg.tsx, permitConsent.mock.dlg.tsx)

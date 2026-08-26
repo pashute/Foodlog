@@ -1,4 +1,4 @@
-// Filename guard.ts  Version 0.1.0
+// Filename guard.ts  Version 0.2.1
 
 // Runtime guard (requirements.md "Guard: never run as a plain web app").
 // Refuses to mount key UI outside Tauri or native/Android runtimes.

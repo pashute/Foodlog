@@ -1,5 +1,5 @@
 // Filename: loginHelper.ts
-// Version: 0.1.0
+// Version: 0.2.1
 
 // Shared Playwright helper: drives the real mock-OAuth popup chain (Header
 // "Login with Google" -> starter dialog -> account choice -> permit

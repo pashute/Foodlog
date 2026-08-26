@@ -1,4 +1,4 @@
-// Filename ai.mock.ts  Version 0.2.8
+// Filename ai.mock.ts  Version 0.2.1
 
 // Mock AI module (prototype stage). Canned responses derived from the
 // fixture data in dev/features/prototype/prototype.feature (@ai-carbs, #ai-lang).

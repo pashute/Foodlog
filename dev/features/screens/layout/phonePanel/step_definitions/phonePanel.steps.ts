@@ -1,4 +1,4 @@
-// Filename: phonePanel.steps.ts  Version 0.2.0
+// Filename: phonePanel.steps.ts  Version 0.2.1
 
 // Playwright E2E against the live dev server (hooks.ts: this.page/baseUrl).
 // @phonePanel.native ("running on Android/iOS") can't be driven from a

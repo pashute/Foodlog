@@ -1,4 +1,4 @@
-// Filename main.rs  Version 0.1.0
+// Filename main.rs  Version 0.2.1
 
 fn main() {
     tauri::Builder::default()

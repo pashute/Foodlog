@@ -1,4 +1,4 @@
-// Filename: accountChoice.mock.ts  Version 0.1.0
+// Filename: accountChoice.mock.ts  Version 0.2.1
 
 // Logic + imperative-promise API for the mock Google account-choice popup.
 // Split from accountChoice.mock.dlg.tsx (the React component) because that

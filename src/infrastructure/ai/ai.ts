@@ -1,5 +1,5 @@
 // Filename: ai.ts
-// version 0.4.6
+// version 0.2.1
 
 import { isPrototype } from '../environment.ts'
 import { appConstants } from '../config/config.ts'

@@ -1,4 +1,4 @@
-// Filename: settings.steps.ts  Version 0.9.2
+// Filename: settings.steps.ts  Version 0.2.1
 // [?!] "each with a screenshot" (settings.feature line 45) is stale vs the
 // app: step 2 shows a "(see screenshot)" link opening a popup, not an
 // inline image (see aiKey.dlg.tsx, changed earlier this session). Checked

@@ -1,5 +1,5 @@
 // Filename: diary.steps.ts
-// Version: 0.2.0
+// Version: 0.2.1
 // Step defs for diary.feature (was logger.steps.ts). Playwright E2E against
 // the live dev server — reaching the Diary screen needs a real login +
 // AI-key click-through (loginHelper.ts), since App.tsx's loggedIn state

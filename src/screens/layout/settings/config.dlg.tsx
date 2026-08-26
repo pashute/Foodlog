@@ -1,5 +1,5 @@
 // Filename: config.dlg.tsx
-// Version: 0.1.0
+// Version: 0.2.1
 
 import { useEffect, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'

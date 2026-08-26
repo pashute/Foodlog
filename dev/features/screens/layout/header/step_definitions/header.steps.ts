@@ -1,5 +1,5 @@
 // Filename: header.steps.ts
-// Version: 0.4.1
+// Version: 0.2.1
 
 // Playwright E2E against the live dev server (hooks.ts: this.page/baseUrl).
 // No login needed — the header renders (logged-out state) on every page.

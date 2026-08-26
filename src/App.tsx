@@ -1,5 +1,5 @@
 // Filename: App.tsx
-// Version: 0.2.6
+// Version: 0.2.1
 // App root (screens/interaction/entry): wires Header + Settings/Diary and
 // owns login/page state.
 

@@ -1,4 +1,4 @@
-// Filename storage.mock.ts  Version 0.1.1
+// Filename storage.mock.ts  Version 0.2.1
 
 // Mock secure storage (prototype stage). In-memory key/value store.
 

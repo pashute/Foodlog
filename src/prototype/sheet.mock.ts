@@ -1,4 +1,4 @@
-// Filename sheet.mock.ts  Version 0.1.4
+// Filename sheet.mock.ts  Version 0.2.1
 
 // Mock Foodlog sheet (prototype stage). In-memory spreadsheet object.
 // Mirrors the real branch's contract: sheet id lives in secure storage

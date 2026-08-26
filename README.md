@@ -1,6 +1,6 @@
 # Foodlog
 
-### File: README.md — Version 0.1.2
+### File: README.md — Version 0.2.1
 
 Log your meals easily
 

@@ -1,4 +1,4 @@
-// Filename: ai.steps.ts  Version 0.1.4
+// Filename: ai.steps.ts  Version 0.2.1
 
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'

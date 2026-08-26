@@ -1,5 +1,5 @@
 // Filename: aiKey.dlg.tsx
-// Version: 0.1.4
+// Version: 0.2.1
 // Gemini AI Setup dialog (screens/layout/settings): opens on "Start AI",
 // walks the user through getting a free Gemini API key and pasting it.
 

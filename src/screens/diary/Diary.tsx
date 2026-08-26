@@ -1,5 +1,5 @@
 // Filename: Diary.tsx
-// Version: 0.3.1
+// Version: 0.2.1
 // Diary screen (screens/diary, was screens/layout/diary — restructured Aug
 // 17): log a meal, see the AI carb/energy estimate, tick/untick items to
 // accept or flag as a guess, fix guesses, and save the entry to the Foodlog

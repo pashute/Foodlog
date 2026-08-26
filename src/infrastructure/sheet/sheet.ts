@@ -1,5 +1,5 @@
 // Filename: sheetAPI.ts
-// version 0.1.10
+// version 0.2.1
 
 // Sheet module to access and retrieve data from the Foodlog sheet on Google Drive.
 // See dev/docs/issues.md (Aug 17 sheet/meal-schema discussion) for the design

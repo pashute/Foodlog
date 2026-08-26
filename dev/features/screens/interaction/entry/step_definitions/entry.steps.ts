@@ -1,5 +1,5 @@
 // Filename: entry.steps.ts
-// Version: 0.3.1
+// Version: 0.2.1
 
 // Playwright E2E against the live dev server (hooks.ts: this.page/baseUrl),
 // same tier as the other screens/* features. Scenarios 2 ("Continued log in

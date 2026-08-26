@@ -1,5 +1,5 @@
 // Filename: warn.ts
-// Version 0.1.0
+// Version 0.2.1
 
 export const warningText = {
   invalidConfiguration: 'Saved configuration is invalid. Using defaults.',

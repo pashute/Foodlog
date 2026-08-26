@@ -1,4 +1,4 @@
-// Filename config.test.ts  Version 0.4.0
+// Filename config.test.ts  Version 0.2.1
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'

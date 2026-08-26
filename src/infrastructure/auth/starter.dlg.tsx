@@ -1,4 +1,4 @@
-// Filename: starter.dlg.tsx  Version 0.4.0
+// Filename: starter.dlg.tsx  Version 0.2.1
 
 // React component only — logic lives in starter.ts (see that file for why
 // they're split). Mount this once; auth.ts drives it via starter.ts's

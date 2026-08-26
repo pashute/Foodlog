@@ -1,5 +1,5 @@
 // Filename: sheetServer.ts
-// version 0.2.4
+// version 0.2.1
 
 // Minimal local HTTP server serving the mock Foodlog sheet HTML (prototype
 // stage only) at http://localhost:3000/Foodlog.mock.html — the target of

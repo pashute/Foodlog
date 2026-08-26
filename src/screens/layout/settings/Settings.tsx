@@ -1,5 +1,5 @@
 // Filename: Settings.tsx
-// Version: 0.7.2
+// Version: 0.2.1
 // Settings screen (screens/layout/settings + screens/interaction/setup)
 
 import { useState, useEffect } from 'react'

@@ -1,5 +1,5 @@
 ### Filename issues.md
-File version 0.1.9
+File version 0.2.1
 Last updated: 2026-08-17
 
 ## 2026-08-24 Prototype Test Migration

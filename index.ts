@@ -1,5 +1,5 @@
 // Filename: index.ts
-// Version: 0.1.0
+// Version: 0.2.1
 // Expo entry point — registers the app root.
 
 import { registerRootComponent } from 'expo'
