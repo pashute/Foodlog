@@ -31,3 +31,11 @@ Last updated: 2026-08-17
 - Ran: infrastructure storage feature suite; result details were not retained after the combined run.
 - Ran: screen diary, entry, setup, header, phone panel, and settings feature suites; result details were not retained after the combined run.
 
+## 2026-08-26 Settings Async Test Waits
+
+- Fixed async waits in `Settings.tsx`: AI-key status and sheet loading complete in effects after the initial render.
+- `settings.test.tsx:31` — Fixed AI Key OK assertion by awaiting the loaded status.
+- `settings.test.tsx:38` — Fixed AI Key Invalid assertion by awaiting the loaded status.
+- `settings.test.tsx:91` — Fixed Go to Diary test by awaiting the enabled key and sheet state.
+- `settings.test.tsx:99` — Fixed Google Sheets link test by awaiting the loaded sheet state.
+

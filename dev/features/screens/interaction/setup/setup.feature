@@ -27,7 +27,7 @@ Feature: screens/interaction/setup
       | loggedOut | ok      | Press "Login with Google" to use the app.    |
       | loggedIn  | missing | Press [Start AI] for AI key instructions     |
       | loggedIn  | invalid | Press [Start AI] for AI key instructions     |
-      | loggedIn  | ok      | Press Go to Data Entry                       |
+      | loggedIn  | ok      | Press "Go to Diary" to use the app.        |
 
   @setup.appError
   Scenario: Application error instructions

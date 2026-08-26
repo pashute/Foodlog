@@ -9,12 +9,14 @@
 // by any screens/* scenario that needs a logged-in (and/or Diary-reachable)
 // starting point.
 
+import { formatter, getText } from '../../../src/infrastructure/texts.ts'
+
 export async function loginAsUser1(page) {
   await page.getByText('Login with Google', { exact: true }).click()
   await page.getByText('Continue Login with Google', { exact: true }).click()
   await page.getByText('Continue', { exact: true }).click()
   await page.getByText('Allow', { exact: true }).click()
-  await page.getByText('Press [Start AI] for AI key instructions').waitFor()
+  await page.getByText(getText(formatter.settings.instruction.needAiKey), { exact: true }).waitFor()
 }
 
 export async function setValidAiKey(page) {
@@ -26,6 +28,6 @@ export async function setValidAiKey(page) {
 export async function loginAndReachDiary(page) {
   await loginAsUser1(page)
   await setValidAiKey(page)
-  await page.getByText('Press Go to Data Entry', { exact: true }).waitFor()
+  await page.getByText(getText(formatter.settings.instruction.setupOK), { exact: true }).waitFor()
   await page.getByRole('button', { name: 'Go to Diary' }).click()
 }

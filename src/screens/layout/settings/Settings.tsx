@@ -9,6 +9,7 @@ import { loadUserConfiguration, saveUserConfiguration } from '../../../infrastru
 import { get as storageGet, update as storageUpdate, KEYS } from '../../../infrastructure/storage/storage.ts'
 import { existsOrCreate } from '../../../infrastructure/sheet/sheet.ts'
 import { keyStatus } from '../../../infrastructure/ai/ai.ts'
+import { formatter, getText } from '../../../infrastructure/texts.ts'
 import AiKeyDlg from './aiKey.dlg.tsx'
 import ConfigDlg from './config.dlg.tsx'
 
@@ -18,11 +19,7 @@ const AI_KEY_LED = { missing: 'ledRed', invalid: 'ledAmber', ok: 'ledGreen' }
 // Shown while an info icon is pressed and held. No hover anywhere in this
 // app — it's a phone app, so hints reveal on press-and-hold, not pointer
 // position, and revert to the idle instruction on release.
-const PRESS_TEXT = {
-  theme: 'Theme change not yet available',
-  aiKey: 'Press "Start AI" to see how & why',
-  timezone: 'This changes the timezone in this app. Not the system settings.',
-}
+const PRESS_TEXT = formatter.settings.info
 
 // e.g. 120 -> "GMT+2", -330 -> "GMT-5:30"
 function formatGmtOffset(offsetMinutes) {
@@ -38,9 +35,9 @@ function formatGmtOffset(offsetMinutes) {
 // dev/features/screens/interaction/setup/setup.feature.
 function idleInstruction({ appError, loggedIn, aiKeyStatus }) {
   if (appError) return appError
-  if (!loggedIn) return 'Press "Login with Google" to use the app.'
-  if (aiKeyStatus !== 'ok') return 'Press [Start AI] for AI key instructions'
-  return 'Press Go to Data Entry'
+  if (!loggedIn) return getText(formatter.settings.instruction.needLogin)
+  if (aiKeyStatus !== 'ok') return getText(formatter.settings.instruction.needAiKey)
+  return getText(formatter.settings.instruction.setupOK)
 }
 
 export default function Settings({ loggedIn = false, usermail = '', appError = null, onGoToDiary = () => {} }) {
@@ -58,7 +55,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
   const refreshAiKeyStatus = () => {
     Promise.resolve(storageGet(KEYS.aiApiKey))
       .then((key) => setAiKeyStatus(keyStatus(key)))
-      .catch(() => setLoadError('Could not check AI key status - try again'))
+      .catch(() => setLoadError(getText(formatter.settings.error.aiKeyStatus)))
   }
 
   useEffect(() => {
@@ -74,7 +71,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
     }
     Promise.resolve(existsOrCreate())
       .then(setSheet)
-      .catch(() => setLoadError('Could not reach your Foodlog sheet - try again'))
+      .catch(() => setLoadError(getText(formatter.settings.error.sheet)))
   }, [loggedIn])
 
   const theme = config().app.theme
@@ -101,7 +98,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
             <Text style={styles.value}>{theme === 'dark' ? 'Dark' : 'Light'}</Text>
             <Pressable
               style={styles.infoIcon}
-              onPressIn={() => setPressText(PRESS_TEXT.theme)}
+              onPressIn={() => setPressText(getText(PRESS_TEXT.theme))}
               onPressOut={() => setPressText('')}
               aria-label="theme info"
             >
@@ -118,7 +115,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
           <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => loadUserConfiguration(usermail).then(() => {
             setConfigurationVersion((version) => version + 1)
             setLoadError(null)
-          }).catch(() => setLoadError('Could not reload configuration'))}>
+          }).catch(() => setLoadError(getText(formatter.settings.error.configurationLoad)))}>
             <Text style={styles.btnText}>Reload</Text>
           </Pressable>
       </View>
@@ -139,7 +136,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
             </Pressable>
             <Pressable
               style={styles.infoIcon}
-              onPressIn={() => setPressText(PRESS_TEXT.aiKey)}
+              onPressIn={() => setPressText(getText(PRESS_TEXT.aiKey))}
               onPressOut={() => setPressText('')}
               aria-label="AI key info"
             >
@@ -163,7 +160,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
             </View>
             <Pressable
               style={styles.infoIcon}
-              onPressIn={() => setPressText(PRESS_TEXT.timezone)}
+              onPressIn={() => setPressText(getText(PRESS_TEXT.timezone))}
               onPressOut={() => setPressText('')}
               aria-label="timezone info"
             >
@@ -203,7 +200,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
           setAiKeyStatus(keyStatus(key))
           setShowAiKeyDlg(false)
           Promise.resolve(storageUpdate(KEYS.aiApiKey, key)).catch(() => {
-            setLoadError('Could not save AI key - try again')
+            setLoadError(getText(formatter.settings.error.aiKeySave))
             refreshAiKeyStatus()
           })
         }}
@@ -215,7 +212,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
           setConfigurationVersion((version) => version + 1)
           setShowConfigDlg(false)
           setLoadError(null)
-        }).catch(() => setLoadError('Could not save configuration'))}
+        }).catch(() => setLoadError(getText(formatter.settings.error.configurationSave)))}
       />
     </View>
   )

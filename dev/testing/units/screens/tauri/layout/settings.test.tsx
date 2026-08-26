@@ -1,7 +1,7 @@
 // Filename: settings.test.tsx
 // Version: 0.2.1
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { Linking } from 'react-native'
 import Settings from '../../../../../../src/screens/layout/settings/Settings.tsx'
@@ -26,16 +26,16 @@ test('shows "AI Key Missing" label when no AI key is stored', () => {
   expect(screen.getByText('AI Key Missing')).toBeInTheDocument()
 })
 
-test('shows "AI Key OK" once a well-formed AI key is stored', () => {
+test('shows "AI Key OK" once a well-formed AI key is stored', async () => {
   update(KEYS.aiApiKey, 'AIzaMockKey1234567')
   render(<Settings />)
-  expect(screen.getByText('AI Key OK')).toBeInTheDocument()
+  expect(await screen.findByText('AI Key OK')).toBeInTheDocument()
 })
 
-test('shows "AI Key Invalid" when the stored key has the wrong shape', () => {
+test('shows "AI Key Invalid" when the stored key has the wrong shape', async () => {
   update(KEYS.aiApiKey, 'not-a-real-key')
   render(<Settings />)
-  expect(screen.getByText('AI Key Invalid')).toBeInTheDocument()
+  expect(await screen.findByText('AI Key Invalid')).toBeInTheDocument()
 })
 
 test('shows the login instruction when not logged in, regardless of AI key state', () => {
@@ -49,10 +49,10 @@ test('shows the AI key instruction when logged in but the key is missing or inva
   expect(screen.getByText('Press [Start AI] for AI key instructions')).toBeInTheDocument()
 })
 
-test('shows the "no problem" instruction when logged in with a valid key', () => {
+test('shows the "no problem" instruction when logged in with a valid key', async () => {
   update(KEYS.aiApiKey, 'AIzaMockKey1234567')
   render(<Settings loggedIn />)
-  expect(screen.getByText('Press Go to Data Entry')).toBeInTheDocument()
+  expect(await screen.findByText('Press "Go to Diary" to use the app.')).toBeInTheDocument()
 })
 
 test('shows a red, bold instruction when an application error is passed', () => {
@@ -83,17 +83,21 @@ test('pressing Start AI opens the Gemini key dialog', () => {
   expect(screen.getByText('Gemini key')).toBeInTheDocument()
 })
 
-test('pressing Go to Diary calls onGoToDiary when enabled', () => {
+test('pressing Go to Diary calls onGoToDiary when enabled', async () => {
   update(KEYS.aiApiKey, 'AIzaMockKey1234567')
   const onGoToDiary = jest.fn()
   render(<Settings loggedIn onGoToDiary={onGoToDiary} />)
-  fireEvent.click(screen.getByRole('button', { name: /go to diary/i }))
+  const goToDiary = screen.getByRole('button', { name: /go to diary/i })
+  await waitFor(() => expect(goToDiary).toBeEnabled())
+  fireEvent.click(goToDiary)
   expect(onGoToDiary).toHaveBeenCalled()
 })
 
-test('pressing "Open in Google Sheets" opens the mock sheet link', () => {
+test('pressing "Open in Google Sheets" opens the mock sheet link', async () => {
   const openSpy = jest.spyOn(Linking, 'openURL').mockImplementation(() => {})
-  render(<Settings />)
+  update(KEYS.aiApiKey, 'AIzaMockKey1234567')
+  render(<Settings loggedIn />)
+  await waitFor(() => expect(screen.getByRole('button', { name: /go to diary/i })).toBeEnabled())
   fireEvent.click(screen.getByText('Open in Google Sheets'))
   expect(mockSheetLink()).toMatch(new RegExp(`^${mockConstants.urls.mockMyDrive}`))
   expect(openSpy).toHaveBeenCalledWith(mockSheetLink())

@@ -10,6 +10,7 @@
 
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
+import { formatter, getText } from '../../../../../../src/infrastructure/texts.ts'
 
 const INFO_ICON_LABEL = { theme: 'theme info', 'ai key': 'AI key info', timezone: 'timezone info' }
 
@@ -30,11 +31,17 @@ Then('the top instruction card shows {string}', async function (instruction) {
 // the already-quoted step text — cucumber sees these as distinct literal
 // step patterns instead. Same assertion, just matched differently.
 Then('the top instruction card shows "Press {string} to use the app."', async function (label) {
-  await this.page.getByText(`Press "${label}" to use the app.`, { exact: true }).waitFor()
+  const instruction = {
+    'Login with Google': formatter.settings.instruction.needLogin,
+    'Go to Diary': formatter.settings.instruction.setupOK,
+  }[label]
+  assert.ok(instruction, `no formatter for ${label}`)
+  await this.page.getByText(getText(instruction), { exact: true }).waitFor()
 })
 
 Then('the top instruction card shows "Press {string} to see how & why"', async function (label) {
-  await this.page.getByText(`Press "${label}" to see how & why`, { exact: true }).waitFor()
+  assert.strictEqual(label, 'Start AI', `no formatter for ${label}`)
+  await this.page.getByText(getText(formatter.settings.info.aiKey), { exact: true }).waitFor()
 })
 
 Given('an application error occurs, other than an AI key problem', function () {
@@ -61,5 +68,5 @@ When('the user releases the info icon', async function () {
 })
 
 Then('the top instruction card reverts to its previous instruction', async function () {
-  await this.page.getByText('Press "Login with Google" to use the app.').waitFor()
+  await this.page.getByText(getText(formatter.settings.instruction.needLogin), { exact: true }).waitFor()
 })

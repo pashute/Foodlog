@@ -1,30 +1,18 @@
 // Filename: settings.steps.ts  Version 0.2.1
-// [?!] "each with a screenshot" (settings.feature line 45) is stale vs the
-// app: step 2 shows a "(see screenshot)" link opening a popup, not an
-// inline image (see aiKey.dlg.tsx, changed earlier this session). Checked
-// against what's actually there below rather than the literal wording.
 
+// 
 // Playwright E2E against the live dev server (hooks.ts: this.page/baseUrl).
-// @settings.aiKeyStatus (Invalid example) and the "invalid save attempt"
-// step are left stub: the app has no way to reach an "Invalid"-stored key or
-// a rejected-save state through normal UI interaction in prototype mode —
-// SAVE stays disabled for anything that doesn't already look valid, and the
-// real Gemini-rejection warning needs a live network call (see
-// aiKeyDlg.test.tsx's existing note on this same limitation). Not faked.
 
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
 import { loginAsUser1, setValidAiKey } from '../../../../support/loginHelper.ts'
+import { formatter, getText } from '../../../../../../src/infrastructure/texts.ts'
 
-// Shared with screens/interaction/entry.feature and setup.feature (same
-// literal text, registered once here to avoid an ambiguous-step error).
-// Registered as both Given and Then via the same text since it's used as
-// each in different scenarios (cucumber matches by text, not keyword).
-// Cucumber matches by text only, not Given/When/Then keyword, so one
-// registration covers both "Given" and "Then" usages across scenarios.
+// Shared with screens/interaction/entry.feature and setup.feature 
+// (same literal text, registered once, here, to avoid the `ambiguous-step` error).
 Given('the settings panel is shown', async function () {
   await this.page.goto(this.baseUrl, { waitUntil: 'networkidle' })
-  await this.page.getByText(/Press ".*" to use the app\.|Press \[.*\]|Go to Data Entry/).waitFor()
+  await this.page.getByText(getText(formatter.settings.instruction.needLogin), { exact: true }).waitFor()
 })
 
 Then('the settings panel shows the following elements', async function (_table) {
@@ -70,49 +58,46 @@ Then(/^each info icon is adjacent to its row's button, after it \(Theme has no b
   assert.ok(aiKeyIconBox.x > startAiBox.x, 'expected the AI key info icon to the right of Start AI')
 })
 
-Given('the settings panel is shown and the user is logged in', async function () {
+Given('the settings panel is logged in', async function () {
   await this.page.goto(this.baseUrl, { waitUntil: 'networkidle' })
   await loginAsUser1(this.page)
 })
 
-Then('the top instruction card shows the idle instruction by default', async function () {
-  await this.page.getByText('Press "Login with Google" to use the app.', { exact: true }).waitFor()
-})
-
-When('the user presses and holds the AI API Key info icon', async function () {
+When('the user interacts with one of the info icons on the Settings panel', async function () {
   const icon = this.page.getByLabel('AI key info')
   const box = await icon.boundingBox()
   await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await this.page.mouse.down()
 })
 
-Then('the top instruction card shows the AI API Key hint', async function () {
-  await this.page.getByText('Press "Start AI" to see how & why', { exact: true }).waitFor()
-})
+Then('the top instruction card responds correctly:', async function (table) {
+  const interactions = table.rowsHash()
+  assert.strictEqual(interactions.hold, 'key based instruction')
+  assert.strictEqual(interactions.release, 'back to original instruction')
+  assert.strictEqual(interactions.hover, 'no hover response (phone-like app behavior)')
 
-When('the user presses and holds the Timezone info icon', async function () {
-  await this.page.mouse.up() // release whichever icon was held before
-  const icon = this.page.getByLabel('timezone info')
-  const box = await icon.boundingBox()
-  await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-  await this.page.mouse.down()
-})
-
-Then('the top instruction card shows the Timezone hint', async function () {
-  await this.page
-    .getByText('This changes the timezone in this app. Not the system settings.', { exact: true })
-    .waitFor()
-})
-
-Then('releasing an info icon reverts the top instruction card to its former instruction', async function () {
+  await this.page.getByText(getText(formatter.settings.info.aiKey), { exact: true }).waitFor()
   await this.page.mouse.up()
-  await this.page.getByText('Press "Login with Google" to use the app.', { exact: true }).waitFor()
+  await this.page.getByText(getText(formatter.settings.instruction.needLogin), { exact: true }).waitFor()
+  await this.page.getByLabel('AI key info').hover()
+  await this.page.getByText(getText(formatter.settings.instruction.needLogin), { exact: true }).waitFor()
 })
 
-Then('there is no hover behavior anywhere in the app — press only, like a phone', async function () {
-  await this.page.getByLabel('AI key info').hover()
-  // Hover alone (no mouse.down) must not reveal the press-hint.
-  await this.page.getByText('Press "Login with Google" to use the app.', { exact: true }).waitFor()
+Then('the correct instruction is shown:', async function (table) {
+  const expected = {
+    Theme: getText(formatter.settings.info.theme),
+    'AI API Key': getText(formatter.settings.info.aiKey),
+    Timezone: getText(formatter.settings.info.timezone),
+  }
+  for (const [section, instruction] of Object.entries(table.rowsHash())) {
+    assert.strictEqual(expected[section], instruction, `unexpected instruction row for ${section}`)
+    const icon = this.page.getByLabel(section === 'AI API Key' ? 'AI key info' : `${section.toLowerCase()} info`)
+    const box = await icon.boundingBox()
+    await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await this.page.mouse.down()
+    await this.page.getByText(instruction, { exact: true }).waitFor()
+    await this.page.mouse.up()
+  }
 })
 
 Given('the stored AI key is {string}', function (_key) {
@@ -153,14 +138,30 @@ Then('an invalid save attempt shows {string}', function (_message) {
   throw new Error('Not implemented yet') // SAVE stays disabled for invalid-looking keys — never reachable via UI
 })
 
+When('an error occurs (i.e., invalid AI key, missing sheet, etc.)', function () {
+  throw new Error('Not implemented yet') // prototype UI has no user-triggerable Settings error state
+})
+
+Then('the error message is shown on the top instruction card in the Settings panel.', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the message is written in red text', function () {
+  throw new Error('Not implemented yet')
+})
+
+Then('the message is a short 1 line message that fits in the card', function () {
+  throw new Error('Not implemented yet')
+})
+
 // Parens are Cucumber Expression "optional text" syntax — must be escaped
 // to match them literally (bit me on this exact step: unescaped, it never
 // matched the .feature text at all, reporting as "undefined").
-Given(/^Go to Diary is enabled \(logged in, AI key OK, sheet ready\)$/, async function () {
+Given('the settings panel is ready for data entry', async function () {
   await this.page.goto(this.baseUrl, { waitUntil: 'networkidle' })
   await loginAsUser1(this.page)
   await setValidAiKey(this.page)
-  await this.page.getByText('Press Go to Data Entry', { exact: true }).waitFor()
+  await this.page.getByText(getText(formatter.settings.instruction.setupOK), { exact: true }).waitFor()
 })
 
 When('the user presses Go to Diary', async function () {

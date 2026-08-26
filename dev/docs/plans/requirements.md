@@ -70,7 +70,7 @@ This section should be defined in the screens/layout and screens/interactions  f
 --- in those cases the top instruction card shows one problem at a time, in priority order:
 ---- not logged in: 'Press "Login with Google" to use the app.'
 ---- AI key missing/invalid: "Press [Start AI] for AI key instructions"
----- no problem: "Press Go to Data Entry"
+---- no problem: "Press \"Go to Diary\" to use the app."
 
 ##### Gemini key access implementation notes 
 

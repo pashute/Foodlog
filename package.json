@@ -8,8 +8,8 @@
     "test:bdd": "tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js",
     "test:unit": "tsx --test dev/testing/units/**/*.test.ts",
     "test:ui": "jest",
-    "dev": "concurrently \"npm:mock:sheet-server\" \"npm:web\"",
-    "web": "expo start --web",
+    "dev": "npm run web",
+    "web": "concurrently \"npm:mock:sheet-server\" \"expo start --web\"",
     "mock:sheet-server": "tsx src/prototype/sheet/sheetServer.ts"
   },
   "dependencies": {

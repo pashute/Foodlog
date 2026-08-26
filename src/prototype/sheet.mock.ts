@@ -11,7 +11,7 @@ import { sheetHeaders } from '../infrastructure/sheet/sheet.ts'
 
 const MOCK_BASE = mockConstants.urls.mockMyDrive
 
-let sheet: { header: readonly string[]; rows: unknown[] } | null = null
+let sheet: { id: string; header: readonly string[]; rows: unknown[] } | null = null
 let sheetId: string | undefined
 
 export function existsOrCreate() {
@@ -20,6 +20,7 @@ export function existsOrCreate() {
   }
   sheetId ??= 'mock-sheet-id'
   sheet = {
+    id: sheetId,
     header: sheetHeaders,
     rows: [],
   }
