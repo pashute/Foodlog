@@ -6,7 +6,6 @@ import '@testing-library/jest-dom'
 import { Linking } from 'react-native'
 import Settings from '../../../../../../src/screens/layout/settings/Settings.tsx'
 import { initialize, update, KEYS } from '../../../../../../src/infrastructure/storage/storage.ts'
-import { mockConstants } from '../../../../../../src/infrastructure/config/config.ts'
 import { link as mockSheetLink } from '../../../../../../src/prototype/sheet.mock.ts'
 
 beforeEach(() => {
@@ -99,7 +98,7 @@ test('pressing "Open in Google Sheets" opens the mock sheet link', async () => {
   render(<Settings loggedIn />)
   await waitFor(() => expect(screen.getByRole('button', { name: /go to diary/i })).toBeEnabled())
   fireEvent.click(screen.getByText('Open in Google Sheets'))
-  expect(mockSheetLink()).toMatch(new RegExp(`^${mockConstants.urls.mockMyDrive}`))
+  expect(mockSheetLink()).toBe(`${window.location.origin}/mock-sheet/mock-sheet-id`)
   expect(openSpy).toHaveBeenCalledWith(mockSheetLink())
   openSpy.mockRestore()
 })

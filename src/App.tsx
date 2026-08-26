@@ -12,6 +12,7 @@ import PhonePanel from './screens/layout/phonePanel/PhonePanel.tsx'
 import StarterDlg from './infrastructure/auth/starter.dlg.tsx'
 import AccountChoiceDlg from './prototype/oauth/accountChoice.mock.dlg.tsx'
 import PermitConsentDlg from './prototype/oauth/permitConsent.mock.dlg.tsx'
+import MockSheet from './prototype/sheet/MockSheet.tsx'
 import * as auth from './infrastructure/auth/auth.ts'
 import { isPrototype } from './infrastructure/environment'
 import { initializeConfiguration, loadUserConfiguration } from './infrastructure/config/configIo'
@@ -67,6 +68,12 @@ export default function App() {
     setUsername('')
     setUsermail('')
     setPage('settings')
+  }
+
+  const showingMockSheet = isPrototype() && typeof window !== 'undefined' && window.location.pathname.startsWith('/mock-sheet/')
+
+  if (showingMockSheet) {
+    return <MockSheet />
   }
 
   return (

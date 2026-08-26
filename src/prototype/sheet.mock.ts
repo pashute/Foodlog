@@ -55,6 +55,9 @@ function _syncToServer(mealData) {
 }
 
 export function idToLink(id) {
+  if (typeof window !== 'undefined') {
+    return new URL(`/mock-sheet/${id}`, window.location.origin).toString()
+  }
   return `${MOCK_BASE}/${id}`
 }
 
