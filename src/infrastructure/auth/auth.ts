@@ -68,7 +68,7 @@ export async function login() {
 
   // storage.get() returns a plain value in prototype mode, a Promise in
   // real mode (see storage.ts) — Promise.resolve() handles both uniformly.
-  const usermail = await Promise.resolve(storageGet('usermail'))
+  const usermail = await Promise.resolve(storageGet(KEYS.usermail))
 
   const oauth = await _oauthModule()
   const result = await oauth.login(usermail ? { usermail } : undefined)
@@ -81,7 +81,7 @@ export async function login() {
   }
 
   await storageUpdate(KEYS.authToken, result.refreshToken)
-  await storageUpdate('usermail', result.usermail)
+  await storageUpdate(KEYS.usermail, result.usermail)
   return { success: true, usermail: result.usermail }
 }
 

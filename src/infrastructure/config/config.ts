@@ -35,6 +35,8 @@ export const appConstants = {
   },
 } as const
 
+export const storageApiUrl = process.env.CLOUDFLARE_STORAGE_URL ?? ''
+
 
 // == mock constants ==
 

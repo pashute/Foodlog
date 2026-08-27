@@ -2,12 +2,10 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { initialize, get, update, KEYS } from '../../../../src/infrastructure/storage/storage.ts'
+import { initialize, get, update, remove, KEYS } from '../../../../src/infrastructure/storage/storage.ts'
 
-// get/update/remove are always Promises now, in both stages (Aug 19 batch
-// — see storage.ts's note above the exports).
 test('storage module', async () => {
-  assert.deepStrictEqual(Object.keys(KEYS).sort(), ['aiApiKey', 'authToken', 'sheetId'])
+  assert.deepStrictEqual(Object.keys(KEYS).sort(), ['aiApiKey', 'authToken', 'sheetId', 'usermail'])
 
   initialize()
   assert.strictEqual(await get(KEYS.authToken), undefined)
@@ -17,6 +15,16 @@ test('storage module', async () => {
 
   await update(KEYS.aiApiKey, 'gemini-key')
   await update(KEYS.sheetId, 'sheet-abc')
+  await update(KEYS.usermail, 'user@example.com')
   assert.strictEqual(await get(KEYS.aiApiKey), 'gemini-key')
   assert.strictEqual(await get(KEYS.sheetId), 'sheet-abc')
+  assert.strictEqual(await get(KEYS.usermail), 'user@example.com')
+
+  await remove(KEYS.authToken)
+  await remove(KEYS.aiApiKey)
+  await remove(KEYS.sheetId)
+  assert.strictEqual(await get(KEYS.authToken), undefined)
+  assert.strictEqual(await get(KEYS.aiApiKey), undefined)
+  assert.strictEqual(await get(KEYS.sheetId), undefined)
+  assert.strictEqual(await get(KEYS.usermail), 'user@example.com')
 })

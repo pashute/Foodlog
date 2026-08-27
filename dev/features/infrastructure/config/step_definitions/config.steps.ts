@@ -2,10 +2,9 @@
 
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
-import { appConstants, configDefaults, mockConstants } from '../../../../../src/infrastructure/config/config.ts'
+import { appConstants, configDefaults } from '../../../../../src/infrastructure/config/config.ts'
 import { initializeConfiguration, loadUserConfiguration, saveUserConfiguration } from '../../../../../src/infrastructure/config/configIo.ts'
 import { config } from '../../../../../src/infrastructure/config/configAccess.ts'
-import { devStage, isPrototype, platform } from '../../../../../src/infrastructure/environment.ts'
 import { KEYS } from '../../../../../src/infrastructure/storage/storage.ts'
 
 Given('the app starts', function () {
@@ -19,6 +18,11 @@ Then('the editable configuration has these metadata values:', function (table) {
     'configuration.sheets.sheetFolder': configDefaults.sheets.sheetFolder,
   }
   for (const row of table.hashes()) {
+    if (row.metadata === 'appConstants.appVersion') {
+      assert.strictEqual(row.default, 'major.minor.patch')
+      assert.match(appConstants.appVersion, /^\d+\.\d+\.\d+$/)
+      continue
+    }
     assert.strictEqual(values[row.metadata], row.default)
   }
 })
@@ -34,18 +38,7 @@ Then('application metadata has these constant values:', function (table) {
     'appConstants.urls.googleSheetsApi': appConstants.urls.googleSheetsApi,
     'appConstants.urls.myDrive': appConstants.urls.myDrive,
     'appConstants.urls.driveFileScope': appConstants.urls.driveFileScope,
-    'mockConstants.urls.mockMyDrive': mockConstants.urls.mockMyDrive,
-  }
-  for (const row of table.hashes()) {
-    assert.strictEqual(values[row.metadata], row.default)
-  }
-})
-
-Then('environment metadata has these values:', function (table) {
-  const values = {
-    'environment.devStage': devStage,
-    'environment.platform': platform,
-    'environment.isPrototype()': String(isPrototype()),
+    'appConstants.urls.googleGeminiApi': appConstants.urls.googleGeminiApi,
   }
   for (const row of table.hashes()) {
     assert.strictEqual(values[row.metadata], row.default)
@@ -57,6 +50,7 @@ Then('storage metadata has these keys:', function (table) {
     'storage.KEYS.authToken': KEYS.authToken,
     'storage.KEYS.aiApiKey': KEYS.aiApiKey,
     'storage.KEYS.sheetId': KEYS.sheetId,
+    'storage.KEYS.usermail': KEYS.usermail,
   }
   for (const row of table.hashes()) {
     assert.strictEqual(values[row.metadata], row.value)

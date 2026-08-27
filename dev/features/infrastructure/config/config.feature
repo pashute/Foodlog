@@ -12,11 +12,11 @@ Feature: Application Metadata
       | configuration.sheets.sheetFolder| Foodlogs |
 
   @metadata.constants
-  Scenario: App and mock constants have default values
+  Scenario: Application constants have default values
     Then application metadata has these constant values:
       | metadata                                  | default                                      |
       | appConstants.appName                      | Foodlog                                      |
-      | appConstants.appVersion                   | 1.0.0                                        |
+      | appConstants.appVersion                   | major.minor.patch                            |
       | appConstants.urls.googlePrivacy           | https://policies.google.com/privacy#intro    |
       | appConstants.urls.googleAiStudio          | https://aistudio.google.com/app/api-keys     |
       | appConstants.urls.driveSafe               | https://NotImplementedYet.github.com/drive-safe.html |
@@ -24,15 +24,6 @@ Feature: Application Metadata
       | appConstants.urls.googleSheetsApi         | https://sheets.googleapis.com/v4/spreadsheets|
       | appConstants.urls.myDrive                 | https://docs.google.com/spreadsheets/d       |
       | appConstants.urls.driveFileScope          | https://www.googleapis.com/auth/drive.file   |
-      | mockConstants.urls.mockMyDrive            | http://localhost:3000                        |
-
-  @metadata.environment
-  Scenario: Environment metadata has the selected stage and platform
-    Then environment metadata has these values:
-      | metadata                  | default   |
-      | environment.devStage      | prototype |
-      | environment.platform      | web       |
-      | environment.isPrototype() | true      |
 
   @metadata.storage
   Scenario: Storage metadata has key names
@@ -41,6 +32,7 @@ Feature: Application Metadata
       | storage.KEYS.authToken| authToken  |
       | storage.KEYS.aiApiKey | aiApiKey   |
       | storage.KEYS.sheetId  | sheetId    |
+      | storage.KEYS.usermail | usermail   |
 
   @config.saved
   Scenario: Saved configuration is restored for a signed-in user

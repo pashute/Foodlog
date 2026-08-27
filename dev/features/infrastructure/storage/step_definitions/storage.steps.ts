@@ -4,7 +4,7 @@ import { Given, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
 import { initialize, get, update, KEYS } from '../../../../../src/infrastructure/storage/storage.ts'
 
-Given('the local secure storage is used for critical data', function () {
+Given('the storage module is available', function () {
   assert.strictEqual(typeof initialize, 'function')
 })
 

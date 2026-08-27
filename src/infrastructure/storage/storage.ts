@@ -1,56 +1,59 @@
 // Filename: storage.ts  Version 0.2.1
 
-// Storage module to access and retrieve data from the local secure storage.
-// Prototype stage delegates to storageMock (synchronous, guarded). Real
-// storage is platform-branched and inherently async (Tauri `invoke` /
-// expo-secure-store are Promise-based), so the real branch below returns a
-// Promise while the prototype branch keeps returning a plain value — callers
-// must not assume a fixed return shape until this module leaves prototype
-// stage. Platform modules are dynamically imported (never at top level, same
-// pattern as auth.ts) so `node --test` and bundler targets that lack one of
-// the two platforms never have to resolve the other's import.
+// Storage module for the Cloudflare-backed secure and configuration stores.
+// Prototype stage delegates to storageMock so tests and mock screens remain
+// local and deterministic.
 
 import { isPrototype } from '../environment'
 import * as storageMock from '../../prototype/storage.mock.ts'
+import { storageApiUrl } from '../config/config'
 
 // constant key names
 export const KEYS = Object.freeze({
   authToken: 'authToken',
   aiApiKey: 'aiApiKey',
   sheetId: 'sheetId',
+  usermail: 'usermail',
 })
 
-// Real (non-prototype) secure storage, platform-branched. Not implemented
-// yet: Tauri side has no `keyring_get`/`keyring_set`/`keyring_delete` Rust
-// commands registered (see src-tauri/src/main.rs), and Android's
-// `expo-secure-store` package is not yet in package.tson — both calls below
-// are real code, but will only work once those are added.
+const secureRoutes = {
+  authToken: 'token',
+  aiApiKey: 'key',
+  sheetId: 'sheet',
+  usermail: 'user/mail',
+}
+
+function routeFor(key) {
+  if (key.startsWith('configuration:')) return 'config'
+  const route = secureRoutes[key]
+  if (!route) throw new Error(`Unsupported storage key: ${key}`)
+  return route
+}
+
+async function request(method, route, value) {
+  if (!storageApiUrl) throw new Error('Cloudflare storage URL is not configured')
+  const isConfigRequest = route.startsWith('config/')
+  const response = await fetch(`${storageApiUrl}/${route}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    ...(value === undefined ? {} : { body: JSON.stringify(isConfigRequest ? value : { value }) }),
+  })
+  if (!response.ok) throw new Error(`Storage request failed: ${response.status}`)
+  if (response.status === 204) return undefined
+  const body = await response.json()
+  return body.value
+}
+
 async function _realGet(key) {
-  if (typeof window !== 'undefined' && window.__TAURI__) {
-    const { invoke } = await import('@tauri-apps/api/core')
-    return invoke('keyring_get', { key })
-  }
-  const SecureStore = await import('expo-secure-store')
-  return SecureStore.getItemAsync(key)
+  return request('GET', `${routeFor(key)}/get`)
 }
 
 async function _realUpdate(key, value) {
-  if (typeof window !== 'undefined' && window.__TAURI__) {
-    const { invoke } = await import('@tauri-apps/api/core')
-    return invoke('keyring_set', { key, value })
-  }
-  const SecureStore = await import('expo-secure-store')
-  await SecureStore.setItemAsync(key, value)
-  return value
+  return request('POST', `${routeFor(key)}/store`, value)
 }
 
 async function _realRemove(key) {
-  if (typeof window !== 'undefined' && window.__TAURI__) {
-    const { invoke } = await import('@tauri-apps/api/core')
-    return invoke('keyring_delete', { key })
-  }
-  const SecureStore = await import('expo-secure-store')
-  return SecureStore.deleteItemAsync(key)
+  return request('POST', `${routeFor(key)}/store`, null)
 }
 
 export function initialize() {

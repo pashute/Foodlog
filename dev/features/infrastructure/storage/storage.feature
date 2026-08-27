@@ -2,11 +2,11 @@
 
 Feature: infrastructure/storage
 
-  As a developer I want a secure local storage module for critical data
+  As a developer I want a storage module for critical data
 
   @storage.module
   Scenario: Storage module is available
-    Given the local secure storage is used for critical data
+    Given the storage module is available
     Then the app can access it through a storage module
     And the module supports `initialize`, `get`, and `update`.
 
@@ -18,3 +18,4 @@ Feature: infrastructure/storage
     | authToken | Authentication refresh token    | login process               |
     | aiApiKey  | AI (Gemini-Lite) key            | user supplied during setup  |
     | sheetId   | Foodlog Google sheet ID         | access of sheet after login |
+    | usermail  | Current user's mail             | login process               |

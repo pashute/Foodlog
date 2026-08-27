@@ -1,7 +1,6 @@
 // Filename: configIo.ts
 // Version 0.2.1
 
-import { isPrototype } from '../environment'
 import { loadConfiguration, type ConfigWarning } from './configAccess'
 import { configDefaults, type Configuration } from './config'
 import { setWarning } from '../warn'
@@ -18,7 +17,6 @@ export function initializeConfiguration(): ConfigWarning[] {
 }
 
 export async function loadUserConfiguration(usermail: string): Promise<ConfigWarning[]> {
-  if (isPrototype()) return initializeConfiguration()
   const saved = await storageGet(storageKey(usermail))
   let parsed: unknown
   try {
@@ -26,13 +24,19 @@ export async function loadUserConfiguration(usermail: string): Promise<ConfigWar
   } catch {
     parsed = saved
   }
+  if (parsed && typeof parsed === 'object' && 'theme' in parsed) {
+    parsed = {
+      ...configDefaults,
+      app: { theme: parsed.theme },
+    }
+  }
   const warnings = loadConfiguration(parsed)
   setWarning(warnings[0])
   return warnings
 }
 
 export async function saveUserConfiguration(usermail: string, configuration: Configuration): Promise<ConfigWarning[]> {
-  await storageUpdate(storageKey(usermail), JSON.stringify(configuration))
+  await storageUpdate(storageKey(usermail), { theme: configuration.app.theme })
   return loadUserConfiguration(usermail)
 }
 
