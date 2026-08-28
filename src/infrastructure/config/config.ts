@@ -36,6 +36,8 @@ export const appConstants = {
 } as const
 
 export const storageApiUrl = process.env.CLOUDFLARE_STORAGE_URL ?? ''
+export const authRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT ?? 'https://pashute.github.io/foodlog/auth/'
+export const desktopAuthRedirectUrl = process.env.EXPO_PUBLIC_DESKTOP_AUTH_REDIRECT ?? 'foodlog://auth/'
 
 
 // == mock constants ==

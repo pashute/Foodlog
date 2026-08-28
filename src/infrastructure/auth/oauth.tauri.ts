@@ -1,22 +1,16 @@
-// Filename: oauth.tauri.ts  Version 0.2.1
+// Production desktop OAuth uses the shared Expo Auth Session flow.
 
-// Real login for Tauri desktop — loopback flow (open system browser → Google
-// consent → redirect to 127.0.0.1:<port>). Not implemented yet — see develop.md
-// 4.3 "Path of least resistance" for the intended approach.
+import { get as storageGet, KEYS } from '../storage/storage.ts'
+import { client_id_tauri } from './authClientIds.ts'
+import { authorize, refresh } from './oauthSession.ts'
 
-import { isPrototype } from '../environment.ts'
-import * as authMock from '../../prototype/oauth/oauth.mock.ts'
-
-export const login = async () => {
-  if (isPrototype()) {
-    return authMock.login()
-  }
-  throw new Error('Not implemented yet')
-}
+export const login = () => authorize(client_id_tauri, 'desktop')
 
 export const trySilentLogin = async () => {
-  if (isPrototype()) {
-    return authMock.trySilentLogin()
-  }
-  throw new Error('Not implemented yet')
+  const token = await Promise.resolve(storageGet(KEYS.authToken))
+  if (!token) return null
+  try { return await refresh(token, 'desktop') } catch { return null }
 }
+
+export const isLoggedIn = async () => Boolean(await Promise.resolve(storageGet(KEYS.authToken)))
+export const logout = () => undefined

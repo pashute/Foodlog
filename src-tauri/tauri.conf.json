@@ -2,6 +2,12 @@
   "productName": "Foodlog",
   "version": "0.1.1",
   "identifier": "com.pashute.foodlog",
+  "plugins": {
+    "deep-link": {
+      "mobile": [],
+      "desktop": ["foodlog"]
+    }
+  },
   "build": {
     "frontendDist": "../dist"
   },

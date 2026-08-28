@@ -3,7 +3,7 @@
     "name": "Foodlog",
     "slug": "foodlog",
     "version": "0.1.2",
-    "scheme": "foodlog",
+    "scheme": "com.foodlog",
     "web": {
       "bundler": "metro",
       "output": "single"

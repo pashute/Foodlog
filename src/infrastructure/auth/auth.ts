@@ -80,9 +80,10 @@ export async function login() {
     return { success: false, error: 'invalid_token' }
   }
 
-  await storageUpdate(KEYS.authToken, result.refreshToken)
-  await storageUpdate(KEYS.usermail, result.usermail)
-  return { success: true, usermail: result.usermail }
+  const token = result.refreshToken ?? result.accessToken
+  await storageUpdate(KEYS.authToken, token)
+  if (result.usermail) await storageUpdate(KEYS.usermail, result.usermail)
+  return { success: true, usermail: result.usermail ?? usermail }
 }
 
 export async function trySilentLogin() {
