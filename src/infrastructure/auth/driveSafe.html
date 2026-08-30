@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Safe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #222;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #b0b0b0;
+            margin-bottom: 12px;
+        }
+
+        .highlight {
+            color: #4a9eff;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #333;
+            margin: 24px 0;
+        }
+
+        .info-box {
+            background-color: #2a2a2a;
+            border-left: 4px solid #4a9eff;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+
+        .info-box p {
+            color: #d0d0d0;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drive Safe</h1>
+        <h2>Your very own Foodlog app<br />
+        is yours and only yours.</h2>
+        
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <div class="section-title">Google Authentication Scope</div>
+            <p>The <span class="highlight">drive.file</span> scope of Google authentication 
+                allows Foodlog, running on your device and logged in to your user, 
+                to write and access only the sheet that it creates for you on your own drive.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Your Privacy Protection</div>
+            <div class="info-box">
+                <p>The app cannot see or access any other files or folders on your Google Drive. 
+                    <strong>So the data stays yours and yours only.</strong></p>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">Leak prevention</div>
+            <div class="info-box">
+                <p><strong>To prevent data leaks when using Gemini AI to estimate the carbs in your meals, 
+                    the app talks directly to your own Gemini session 
+                    without anyone else having access to it.</strong></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

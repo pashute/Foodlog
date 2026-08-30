@@ -1,0 +1,23 @@
+{
+  "productName": "Foodlog",
+  "version": "0.1.1",
+  "identifier": "com.pashute.foodlog",
+  "plugins": {
+    "deep-link": {
+      "mobile": [],
+      "desktop": ["foodlog"]
+    }
+  },
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Foodlog",
+        "width": 480,
+        "height": 800
+      }
+    ]
+  }
+}

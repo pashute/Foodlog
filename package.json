@@ -1,0 +1,58 @@
+{
+  "name": "foodlog",
+  "private": true,
+  "version": "0.1.2",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "test:bdd": "tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js",
+    "test:unit": "tsx --test dev/testing/units/**/*.test.ts",
+    "test:ui": "jest",
+    "dev": "npm run web",
+    "web": "concurrently \"npm:mock:sheet-server\" \"dotenv -e platform.env -- expo start --web --https\"",
+    "mock:sheet-server": "tsx src/prototype/sheet/sheetServer.ts"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~4.0.1",
+    "@react-native-google-signin/google-signin": "^13.1.0",
+    "@tauri-apps/api": "^2.0.0",
+    "expo": "^52.0.0",
+    "expo-asset": "~11.0.5",
+    "expo-auth-session": "~6.0.3",
+    "expo-secure-store": "~14.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-native": "^0.76.0",
+    "react-native-web": "^0.19.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "@cucumber/cucumber": "^13.2.0",
+    "@tauri-apps/cli": "^2.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^26.2.0",
+    "@types/react": "^18.3.31",
+    "babel-jest": "^29.7.0",
+    "babel-plugin-dynamic-import-node": "^2.3.3",
+    "concurrently": "^9.2.1",
+    "dotenv-cli": "^8.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "playwright": "^1.62.0",
+    "tsx": "^4.23.12",
+    "typescript": "5.6.3"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "<rootDir>/dev/testing/units/screens/tauri/**/*.test.tsx"
+    ],
+    "moduleNameMapper": {
+      "^react-native$": "react-native-web",
+      "\\.(png|jpg|jpeg|gif)$": "<rootDir>/dev/testing/fileMock.ts"
+    }
+  }
+}

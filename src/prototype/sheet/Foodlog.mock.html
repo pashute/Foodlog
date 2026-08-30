@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Filename: Foodlog.mock.html
+    Version: 0.2.1
+  Description: Static template for the mock Foodlog sheet page, served (with
+  rows injected) by sheetServer.js. Table styled with Google-Sheets-style
+  grid borders (Aug 19 20:50 batch item).
+-->
+<head>
+    <title>Mock Foodlog Sheet</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table {
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 4px 8px;
+            text-align: left;
+        }
+        thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            border-bottom: 1px solid #ccc;
+        }
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mock Foodlog Sheet</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Carbs (g)</th>
+                <th>Calories (kcal)</th>
+                <th>Status</th>
+                <th>Meal</th>
+            </tr>
+        </thead>
+        <tbody id="placeholder">
+            <tr>
+                <td colspan="6">(no entries yet)</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

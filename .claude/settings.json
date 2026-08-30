@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell([console]::beep*)",
+      "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\beep.ps1\")",
+      "PowerShell(& \"c:\\dev\\myProjects\\Foodlog\\dev\\testing\\callme.ps1\")",
+      "gh auth *",
+      "gh issue *",
+      "grep *",
+      "cd *",
+      "jest *",
+      "npm *",
+      "npx *"
+    ]
+  }
+}
