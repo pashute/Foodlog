@@ -1,5 +1,9 @@
 // Filename: config.ts
-// Version 0.2.1
+// Version 0.2.2
+
+import { appConstants } from './appConstants.ts'
+
+export { appConstants }
 
 export type Theme = 'light' | 'dark'
 
@@ -16,24 +20,6 @@ export interface Configuration {
 type DeepReadonly<T> = {
   readonly [Key in keyof T]: T[Key] extends object ? DeepReadonly<T[Key]> : T[Key]
 }
-
-// == app constants ==
-
-export const appConstants = {
-  appName: 'Foodlog',
-  appVersion: '0.2.3',
-
-  urls: {
-    googlePrivacy: 'https://policies.google.com/privacy#intro',
-    googleAiStudio: 'https://aistudio.google.com/app/api-keys',
-    driveSafe: 'https://NotImplementedYet.github.com/drive-safe.html',
-    googleDriveApi: 'https://www.googleapis.com/drive/v3',
-    googleSheetsApi: 'https://sheets.googleapis.com/v4/spreadsheets',
-    myDrive: 'https://docs.google.com/spreadsheets/d',
-    driveFileScope: 'https://www.googleapis.com/auth/drive.file',
-    googleGeminiApi: 'https://generativelanguage.googleapis.com/v1beta/models',
-  },
-} as const
 
 export const storageApiUrl = process.env.CLOUDFLARE_STORAGE_URL ?? ''
 export const authRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT ?? 'https://pashute.github.io/foodlog/auth/'

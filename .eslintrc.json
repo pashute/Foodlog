@@ -1,0 +1,27 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-restricted-imports": [
+      "warn",
+      {
+        "paths": [
+          {
+            "name": "*/infrastructure/config/appConstants",
+            "message": "appConstants is private. Import from infrastructure/config or infrastructure/config/config instead."
+          }
+        ]
+      }
+    ]
+  }
+}
