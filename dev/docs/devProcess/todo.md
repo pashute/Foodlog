@@ -55,30 +55,30 @@
 - [ ] Add defaults on first access (if key missing)
 - [ ] Verify FOODLOG_CONFIG_KV binding exists
 
-### Create auth.servercode.ts (src/backend/auth/)
+### Create auth.servercode.ts (src/backend/auth/) - DONE
 
-- [ ] Implement exchangeAuthCode endpoint (/api/auth/exchange)
-  - [ ] Receive: code, clientId, redirectUri, codeVerifier, platform
-  - [ ] Call Google token endpoint with client_secret
-  - [ ] Decode id_token JWT to extract userId
-  - [ ] Store refresh_token in KV (secure namespace, native platforms only)
-  - [ ] Create session token (HMAC signed JWT with 7-day expiry)
-  - [ ] Return: {sessionToken, accessToken, expiresIn}
-- [ ] Implement refreshAccessToken endpoint (/api/auth/refresh)
-  - [ ] Validate Bearer sessionToken from Authorization header
-  - [ ] Extract userId from token payload
-  - [ ] Retrieve refresh_token from KV using userId
-  - [ ] Call Google token endpoint
-  - [ ] Return: {accessToken, expiresIn}
-  - [ ] Return 401 if refresh fails (lazy pattern)
+- [v] Implement exchangeAuthCode endpoint (/api/auth/exchange)
+  - [v] Receive: code, clientId, redirectUri, codeVerifier, platform
+  - [v] Call Google token endpoint with client_secret
+  - [v] Decode id_token JWT to extract userId
+  - [v] Store refresh_token in KV (secure namespace, native platforms only)
+  - [v] Create session token (HMAC signed JWT with 7-day expiry)
+  - [v] Return: {sessionToken, accessToken, expiresIn}
+- [v] Implement refreshAccessToken endpoint (/api/auth/refresh)
+  - [v] Validate Bearer sessionToken from Authorization header
+  - [v] Extract userId from token payload
+  - [v] Retrieve refresh_token from KV using userId
+  - [v] Call Google token endpoint
+  - [v] Return: {accessToken, expiresIn}
+  - [v] Return 401 if refresh fails (lazy pattern)
 
 ## AI coding - Client-side integration
 
-### Integrate auth.serverAccess.ts into oauthSession.ts
+### Integrate auth.serverAccess.ts into oauthSession.ts - DONE
 
-- [ ] Replace `exchange()` function with `auth.serverAccess.exchangeAuthCode()`
-- [ ] Replace refresh logic with `auth.serverAccess.refreshAccessToken()`
-- [ ] Handle 401 errors properly (message to UI)
+- [v] Replace `exchange()` function with `auth.serverAccess.exchangeAuthCode()`
+- [v] Replace refresh logic with `auth.serverAccess.refreshAccessToken()`
+- [v] Handle 401 errors properly (message to UI)
 
 ### Integrate config.serverAccess.ts into configAccess.ts
 
