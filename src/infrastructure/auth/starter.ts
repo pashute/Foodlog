@@ -8,13 +8,13 @@
 // import this plain module when they only need popup()/test hooks.
 
 import { appConstants } from '../config/config.ts'
+import { formatter } from '../texts.ts'
 
-export const title = 'Connect Google Drive'
-export const messageText1 = 'Foodlog stores your data in your own file.\nOnly you can access it. Only you see it.'
-export const messageText2 = 'Foodlog cannot touch and does not see any other files.'
-export const messageText3 =
-  'For that you will be logging in with the drive.file permissions, allowing Foodlog to open only the Foodlog sheet it created.'
-export const readFurtherLabel = 'See more on our website'
+export const title = formatter.starter.title
+export const messageText1 = formatter.starter.message1
+export const messageText2 = formatter.starter.message2
+export const messageText3 = formatter.starter.message3
+export const readFurtherLabel = formatter.starter.readMore
 
 // Now sourced from config (urls.drive-safe) — was previously a literal
 // duplicated here and in auth.ts separately (config.ts has no dependency

@@ -1,4 +1,5 @@
-// Filename: storage.ts  Version 0.2.1
+// Filename: storage.ts  
+// Version 0.2.2
 
 // Storage module for the Cloudflare-backed secure and configuration stores.
 // Prototype stage delegates to storageMock, called from mock screens.
@@ -7,7 +8,10 @@ import { isPrototype } from '../environment'
 import * as storageMock from '../../prototype/storage.mock.ts'
 import { configurationApiUrl, storageApiUrl } from '../config/config'
 
-let sessionToken = typeof sessionStorage === 'undefined' ? undefined : sessionStorage.getItem('foodlog-session') ?? undefined
+let sessionToken = 
+  typeof sessionStorage === 'undefined' ? undefined 
+                                        : sessionStorage.getItem('foodlog-session') 
+                                        ?? undefined
 
 export function setSessionToken(token: string | undefined): void {
   sessionToken = token

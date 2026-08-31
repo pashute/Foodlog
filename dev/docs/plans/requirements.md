@@ -27,16 +27,8 @@ This section should be defined in the screens/layout and screens/interactions  f
 #### OAuth login
  - When user presses the app header's [Login with Google]
    - A calming scope starter popup shows, explaining why we need drive.file scope and an ai api key.
-   - Clicking on [Continue Login with Google] 
-   goes back to main page and starts OAuth process.
-   (actually it closes the modal, and awaiting onStarter handles the binary result: abort or continue) .
-   - We want drive.file scope for google access 
-   - We want a refresh token for long term access (stored in secure strorage)
-   - Until the user is logged in, only the disabled settings page is shown. 
-   - The logged in usermail is stored in the storage, saved on app closed (while other values are deleted during logout) and usermail is erased only on explicit logout or new login to different user. 
-   - We verify the token is a refresh token, 
-   - We verify the token is with scope drive.file 
    - On any error that occurs we notify the user and logout
+   - Successful login is followed by setup (sheet, config, ai)
 
 #### Settings page:  
 
@@ -45,10 +37,10 @@ This section should be defined in the screens/layout and screens/interactions  f
 
 - Foodlog sheet  id and direct link.   
   - Created in user's Google Sheets on login if not stored in local chrome.   
-  - Before creation searches for an existing Foodlog sheet.   
-  - ID and link stored in local chrome storage.   
-  - Error disables logging
-  - During prototype stage this functionality and the sheet data itself is mocked. 
+  - Before creation searches for an existing Foodlog sheet.
+  - ID stored in user storage
+  - Error disables diary
+  - During prototype stage this functionality and the sheet data itself are mocked. 
 
 - Gemini API Key: status LED + Start AI button + info icon (ⓘ), icon after the button.
   - Pressing and holding the info icon shows in the dedicated instruction card: Press "Start AI" to see how & why
@@ -61,7 +53,7 @@ This section should be defined in the screens/layout and screens/interactions  f
 (See Gemini key implementation under Technology section in this document)
 
 - **Timezone:** Current user's timezone. Click to change. Info icon (ⓘ) after the Change button.
-  - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app. Not the system settings. 
+  - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app, but not the system settings. Currently unchangeable from the default IDT UTC+3 Jerusalem, Israel.
 
 - Only one instruction card exists, at the top of the whole Settings screen. It is idle by default and its text changes to match whichever info icon is currently pressed and held, reverting to the idle instruction on release — there are no separate per-card popups.
 

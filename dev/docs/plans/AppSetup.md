@@ -1,176 +1,293 @@
-# File: AppSetup.md
-# Version 0.2.1
+/# Filename: appSetup.md
+/# Version: 0.2.4
 
-# OAuth
+New definitions:  
 
-# AI Todo list
-AI will read the todo.md instructions 
-Then it will go over this file (appsetup.md) and create todos in the Todo.md 
+OAuth and Cloudflare overhaul
+
+Instead of client side oauth  
+we move it to cloudflare,  for security
+
+hoping the users don't cause the cloudflare account to exceed its limits. 
+
+------------------
+
+## Todo planning
+
+## General notes before starting
+1. Keep code with the clean decoupled design  
+i.e. mock called very late in flow, tests check the module calls not the implementation, so they all go the same path, and only end up forking according to target platform development stage or type of server. 
+
+For config and storage we built a design where the data is separate from how it is accessed and then through accessors it gets loaded when neeeds to be loaded (or its parts get loaded when they need to be loaded).  No mention of how and where it is actually taken from or stored at, for as late as possible. 
+
+1. Specific note about targets:  We have four types of web code: all four are platform web: 
+- developer stage: prototype or production 
+- server type: develop (localhost) published (github pages)
+
+- [ ] We have to fix this in the definitions of the env, (with remarks similar to the ones there now)
+and use them accordingly. 
+
+
+## AI Todo list
+- AI will read the todo.md instructions 
+- Then it will go over this file (appsetup.md) and create todos in the Todo.md 
 for the developer to review. 
-The AI should not fix or change anything in the code till then. 
-The AI should not touch the appSetup.md file
+- The AI should not fix or change anything in the code till the todo list plan was approved. No coding. No running. 
+- The AI should not touch this appSetup.md file
 
-The todo batch should be called # batch cloud storage aug 30
+- The todo batch should be called: # batch cloud storage aug 31
 
 The top of the todo batch will have a section for the user's item headlines. 
-They'll be Marked completed if known to be done. with file location. 
-Left unmarked otherwise. 
+called ## developer todo list (oauth and storage overhaul)
+Mark them completed if known to be done. list file location if known. 
+Leave unmarked otherwise. 
 
-Then comes the coding section which the AI is to do. 
-It will be broken into sections of coding and code fixes.  
-Marked also are points for discussion (only terse headline of the discussion needed)
-
-# How it is done currently (from claud's review)
-Sequence: oauthSession.ts requests scopes [driveFileScope, 'openid', 'email'] 
-with access_type: 'offline', 
-prompt: 'consent' → 
-  PKCE auth-code flow → exchanges code via the Cloudflare worker's 
-    /auth/exchange (server holds the client secret) 
-    → returns {accessToken?, refreshToken?, scope, usermail, sessionToken}. 
-    - auth.ts login() validates the scope is drive.file (_isFreshDriveFileToken), 
-    - stores the session token,
-    - and persists refreshToken ?? accessToken 
-    under KEYS.authToken via storageUpdate.
-TODO:  Here is where things will change. 
-      storageUpdate should use the new workerStorage.ts
-      I'm not sure what needs to be stored. One single token that has everything in it?
-      two tokens, three?  
-      AI should determine what is needed and create the keys or use them as defined below.  
-
-
-
-fully written — sheet.ts, not a stub. _authedFetch calls sheets.googleapis.com / Drive /files using Authorization: Bearer with the stored authToken.
-
-Did we already write the code that reads the folder + sheet, at least for mock?
-
-Yes, for both real and mock:
-
-Real: _existsOrCreate (sheet.ts:222) → try stored sheetId (_readById) → on failure, _findOrCreateSheet → _findByName'd folder → find/create sheet by name → throws 'Cannot access Foodlog Sheet' on total failure. Matches AppSetup.md lines 76–80.
-Mock: oauth.mock.ts simulates login (account-choice + consent popups, returns a fake refreshToken); sheet.mock.ts simulates existsOrCreate/log/link in-memory, synced to sheetServer.ts for browser preview.
-Caveat: the real end-to-end test for this path is currently skipped in sheet.test.ts:140 (requires a real signed-in Google session) — so the production sequence is written but not exercised by tests.
-
-"It said I am now authenticated" — consistent with the above: a successful OAuth exchange got you an authToken with drive.file scope, which is what sheet.ts will now use for the folder/sheet lookup.
-
-Note: AppSetup.md's storage-key spec (lines 33–47, separate sheet/driveapi:* / sheet/sheetsapi:* keys, u{hash}/{keyname} format) is out of date — actual code uses a single authToken key and a different worker key format (token:<userId>, in src/backend/storage/worker.ts, not workerStorage.ts).
-
-# How it should be done
-
-`https://console.cloud.google.com/`:
-
-- api keys: 
-   - OAuth Login token
-
-   - Sheets and drive keys
-   - Sheet ID
-   - AI Key
-   - // OAuth client id -- Public! Saved in .env file.
-
-`https://aistudio.google.com/`
-
-- api key:  
-  - AI
-
-# Cloudflare registration
-
-`console.cloud.google.com`.
-    developer online to create app worker:
+- [ ] developer online: using `console.cloud.google.com`.
+     create app worker. 
     - [v]  created: https://foodlog-storage.pashute.workers.dev/
-    store worker dev url in .env
-    - [v] stored
-    store worker published url in .env 
-      todo in future...
+
+
+Then comes the `## AI coding` section which the AI is to do (once approved)
+Break it into sections of coding (storage overhaul, post-login entry procedure, storage load, config load, settings warn update (red),  etc. 
+
+- I think we should start with the two  src/backend/storage ts files  workerConfig and workerStorage.
+
+- Add also points for discussion where you want it 
+  - only terse headline of each discussion topic needed
+
+## Cloudflare setup
+
+- [ ] The developer has set up cloudflare
+- [ ] 
+
+- [ ]  worker url: 
+  - [ ]  CLOUDFLARE_STORAGE_URL 
+  - [ ]  and CLOUDFLARE_CONFIGURATION_URL 
+  are in src/infrastructure/config/config.ts (env vars)
+
+We have two worker kv storages
+- [ ] foodlog_storage_kv
+  - [ ] per client and user:
+
+    - [ ] auth/token  // refresh token
+    - [ ] user/email
+    - [ ] sheet/id
+    - [ ] ai/key
+
+- [ ] foodlog_config_kv
+- [ ] defaults loaded on app entry
+- [ ] values from CF loaded after login
+- [ ] SAVE on changes to config edit screen
+- [ ] Change config screen with timezone
+- [ ] Change settings Warn function to draw red line around instruction card border. and Red font. 
+- [ ] Change to return to white when error text removed. 
+- [ ] Check that each error has a path to clear it. 
+  - [ ] currently all config fields are for the future, and cannot be edited.
+    - [ ] ui/theme // (default: dark)
+    - [ ] timezone/name // (default: idt)
+    - [ ] timezone/shift // number. note `UTC+` for positive numbers or `UTC` for negative ones.
+    - [ ] timezone/location // default Jerusalem/Israel
+
+We need to set the client secret in CF secret storage  and client id in client wide (for all users) clientid  in foodlog_storage_kv 
+
+- [ ]  client secret setup code:  (terminal)
+
+- [ ]  clientid setup code: EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID (web), EXPO_PUBLIC_GOOGLE_TAURI_CLIENT_ID (tauri), etc. - from env vars
+- [ ]  clientid in app - in src/infrastructure/auth/authClientIds.ts (sourced from env vars)
+
+## Cloudflare Oauth: 
+
+### 1. Initial Client Login Flow
+
+1a. On the entry screen the user presses **Let me in**.
+
+- [x] put login button text in infrastructure/texts.ts and take from there. (starter.dlg.tsx has hardcoded text, need to extract to texts.ts) 
+
+- [x] make login instruction in parts from texts with button name. and take from that instruction for the start instruction. (starter.ts has hardcoded text, need to extract) 
   
-    The following key bindings are per user: 
-    AI should write code in /infrastructure/storage/  in both workerStorage.ts, and in workerConfig.ts  
-    - create and accesses the keys on the fly per user with user's email hash prepended format:
-      u{userhash}/{keyname}:   
+1b. On the starter popup the user presses **Login with Google**.
 
-    for secure storage developer online should create:  
-    Encrypted secure worker KV with namespace binding: `FOODLOG_SECURE_KV`.
-      - [v] created. 
-    
-    AI to write code in workerStorage.ts:
-    - Keys created and accessed by workerStorage per user  in the agreed format as listed above:
-      - Token:  `auth/token:*`.
-      - Hash:  `auth/email:*`. 
--     - Sheetid: `sheet/sheetid:*`.
-      - Gemini API: `ai/geminiapi:*`.
-      do not return secure values to unauthenticated callers.
+- [x] src/infrastructure/auth/starter.dlg.tsx — UI component, logic in starter.ts (separated for testability)
 
-    AI to write code in workerStorage.ts:
-    - Keys created and accessed by workerStorage per user:  in the agreed format as above
-      for config storage (happens to be secure as well) developer online should create:
-      namespace:  `FOODLOG_CONFIG_KV`,
-      - [v] done
-      
-      - Theme:  `ui/theme:*`,
-      - TimezoneName: `timezone/name:*`,
-      - TimezoneUtcShift: `timezone/utcshift:*`,
-      - TimezoneLocation: `timezone/location:*`,
+1. **OAuth Trigger:** The client generates a PKCE `code_verifier` and `code_challenge`, and launches the OAuth session. 
+   * *Crucial Rule for Refresh Tokens:* The request **must** include `access_type=offline` and `prompt=consent` to ensure Google returns a refresh token on the first exchange.
 
-      defaults:  (set in the database, but also in the app storage object until fetched from cloud after login)
+- [x] src/infrastructure/auth/oauth.web.ts (web) / oauth.tauri.ts / oauth.android.ts / oauth.ios.ts — platform-specific implementations
+- [x] Unified dispatcher in src/infrastructure/auth/auth.ts (calls platform-specific login() based on runtime detection). Mock kept separate in src/prototype/oauth/oauth.mock.ts. Correct structure preserved.
 
-      Theme:  `dark`
-      Timezone:  `IDT` UTC`+3`,`Jerusalem, Israel`
-      (that's name, utc shift, and location)
+2. **Authentication:** The user chooses an account or logs in directly with their credentials.
 
-    The storage keys are created during login entry (after login) and updated during their respective access and saving:  
+- [v] this is part of auth. we don't control it except in the prototype mock. 
 
-    Storage:
-      - Token and Hash (user email hash) - from successful login token and email. 
-            
-      - Sheetid (per user)
-        - from stored per user, 
-        - kept after attempt to reach it directly succeeded, 
-        - or retrieved after successful attempt to reach it by folder and name
-        - or retrieved after created now sheet in user's folder on drive
-        - or emptied if was full and these all fail. 
-        - and error message shown.  Link to sheet changed to red and disabled. 
-        re-enabled with color after login and sheet loading success.
+3. **Consent:** Google displays the permission screen, and the user accepts.
+
+- [v] same as above. not in our hands. 
+
+4. **Auth Code Capture:** Google redirects back to the client application, returning a temporary, single-use `authorization code`.
+
+### 2. Backend (Cloudflare) Tokenization
+
+2.1 **Secret Provisioning:** 
+The Google OAuth `client_secret` is pre-stored securely in Cloudflare's encrypted environment secret storage (shared across all users, but isolated per client project):
+
+   ```bash
+   npx wrangler secret put GOOGLE_CLIENT_SECRET
+   ```
+
+2.2 **Code Handoff:** 
+The client app immediately sends the temporary authorization code and the PKCE `code_verifier` to the Cloudflare Worker endpoint (`POST /api/auth/exchange`).
+
+- [ ] src/infrastructure/auth/oauthSession.ts already calls /auth/exchange (line 41, via exchange() function) 
+- [ ] developer's response:  WHAT?!!!!
+- [ ] Worker stub written: src/backend/auth/worker.ts (copy to wrangler project)
+
+2.3 **Server-to-Server Exchange:** 
+The Cloudflare Worker combines the incoming code with the hidden `GOOGLE_CLIENT_SECRET` and the public `client_id`, executing a backend fetch request to Google's token endpoint (`https://oauth2.googleapis.com/token`).
+
+2.4 **Encrypted KV Persistence:** 
+Google returns both an `access_token` and a long-lived `refresh_token`. 
+The Cloudflare Worker encrypts the `refresh_token` using the Web Crypto API and stores it in Cloudflare KV, scoped strictly per user.
+
+- [ ] src/backend/auth/worker.ts has TODOs: implement refresh token encryption/storage in KV (for native platforms only, web has no refresh token) 
+
+2.5 **Handshake Completion:** 
+The Worker responds to the client app with only a short-lived `access_token` and its expiration timestamp. The client caches the access token in memory only (via React state), preventing persistent local token storage vulnerabilities.
+
+- [x] src/infrastructure/storage/storage.ts — stores sessionToken in sessionStorage (short-lived, memory only)
+- [x] src/backend/auth/worker.ts returns { sessionToken, accessToken, expiresIn } on successful exchange 
+
+
+
+### 3. **Subsequent API Calls & Expiration Management**
+
+3.1 **Direct REST Execution:** 
+Client apps (Web and Tauri) make direct REST calls to Google Sheets or Drive APIs using the Bearer token header: `Authorization: Bearer <access_token>`.
+
+- [x] src/infrastructure/sheet/sheet.ts — makes Sheets API calls
+- [x] src/infrastructure/storage/storage.ts — adds sessionToken to request headers (Authorization: Bearer)
+- [ ] Needs: Verify Bearer token is passed in all API requests 
+
+
+3.2 **Local Expiration Tracking:** 
+The client checks the access token's expiration timestamp locally in memory before making outgoing requests.
+
+- [ ] Needs: Store expiration timestamp with sessionToken, check before API calls in src/infrastructure/sheet/sheet.ts 
+
+3.3 **Seamless Token Refresh:** 
+When the access token expires (~1 hour later), the client calls the Cloudflare Worker refresh endpoint (`POST /api/auth/refresh`). 
+The Worker retrieves the user's encrypted `refresh_token` from Cloudflare KV, requests a brand-new access token from Google behind the scenes, 
+and returns it to the client 
+without forcing the user to see a login popup again.
+
+- [x] src/backend/auth/worker.ts has /api/auth/refresh endpoint (stub with TODO comments)
+- [ ] Option C: Lazy refresh on 401 errors (client detects 401, calls refresh, retries). Implementation: error handler in storage.ts fetch()
+
+## Entry after login
   
-      - Gemini API: `ai/geminiapi:*`.
-        - retrieved on login if available
-        - stored on ai setup save. 
+  - [ ] onLoginSuccess app entry : in App.tsx or main app entry
+  - [x] config.load 
+    - [x] on app entry config defaults were loaded (handled by config.ts, no changes needed)
+
+    - [ ] sheet.load using sheet.sheetId 
+          - from storage (KV via sessionToken)
+          - verify via Sheets API
+          - not verified or missing attempt folder and then file by name
+          - failed? warn and disable settings
+
+    - [ ] settings.aiKey load 
+        - from storage (KV)
+        - missing? - leave instruction 
+        - all ok?  enable Diary (Data Entry)
+        - [x] button/instruction text in src/infrastructure/texts.ts (formatter.settings.instruction.needAiKey, formatter.info.aiKey)
+
+- [x] Client auth flow: src/infrastructure/auth/auth.ts (dispatcher) → platform-specific oauth.web/tauri/android/ios → starter.ts/starter.dlg.tsx (confirmation popup)
+
+## Cloudflare Worker Code - Planned Implementation
+
+**Location:** Copy to wrangler project's src/index.ts or auth handler
+
+**File: src/backend/auth/worker.ts (pseudocode)**
+
+```typescript
+// OAuth token exchange and refresh endpoints
+export interface Env {
+  FOODLOG_SECURE_KV: KVNamespace
+  SESSION_SECRET: string
+  GOOGLE_CLIENT_SECRET: string
+  GOOGLE_CLIENT_ID: string
+}
+
+// Helper functions (reuse from storage/worker.ts):
+// - base64Url(), decodeBase64Url(), sign(), userId()
+// - createSessionToken(userId, secret, expiresInHours)
+
+async function exchangeAuthCode(request: Request, env: Env) {
+  // POST /api/auth/exchange
+  // Body: { code, clientId, redirectUri, codeVerifier, platform }
+  // 1. POST to https://oauth2.googleapis.com/token with Google credentials
+  // 2. Extract userId from id_token JWT
+  // 3. Store refresh_token in KV (only for native platforms)
+  // 4. Return { sessionToken, accessToken, expiresIn }
+}
+
+async function refreshAccessToken(request: Request, env: Env) {
+  // POST /api/auth/refresh with Bearer <sessionToken>
+  // 1. Validate sessionToken (extract userId)
+  // 2. Retrieve refresh_token from KV
+  // 3. POST to Google with refresh_token
+  // 4. Return { accessToken, expiresIn }
+  // On fail: return 401 (lazy refresh pattern)
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const path = new URL(request.url).pathname
+    if (path === '/api/auth/exchange' && request.method === 'POST') {
+      return exchangeAuthCode(request, env)
+    }
+    if (path === '/api/auth/refresh' && request.method === 'POST') {
+      return refreshAccessToken(request, env)
+    }
+    return json({ error: 'not_found' }, 404)
+  }
+}
+```
+
+**Key Implementation Details:**
+- Session tokens: HMAC-signed JWT-like format (reuse sign/userId pattern from storage/configuration workers)
+- Refresh token encryption: Use Web Crypto API (optional, for native platforms)
+- Client refresh flow: Option C - lazy 401 handling in storage.ts fetch() wrapper
+- Google endpoints:
+  - Exchange: POST https://oauth2.googleapis.com/token (code → accessToken + refreshToken)
+  - Refresh: POST https://oauth2.googleapis.com/token (refreshToken → accessToken) 
 
 
-
-## 6. login entry sequence
-Login entry sequence. 
-This worker.ts was supposed to be:
- workerConfig.ts  for the config vars (theme timezoneUtcShift and timezoneName and timezoneLocation  )  -  
-  and workerStorage for storage vars 
-  ((auth) token, usermail,  
-  aikey, drivekey, sheetskey, sheetid)
-
-config should have a default object 
-infrastructure/ app entry should 
-- call the config to load itself with its defaults 
-- screens/Setup and step us through settings: 
- - infrastructure/login. 
-- on successful login:  
-   - infrastructure / Login entry: 
-         - stores in secure storage current token 
-         - reads from storage usermail. If same as current
-                 goes to sheets.ts that
-                      soes to storage to read sheetid 
-                       then attempts loading itself
-                            (by id, or then  folder followed by sheetname)
-                              failure followed by attempt to write new 
-                                     using storage sheets and drive api keys
-    if there was no id in config for this user, 
+-------
 
 
-## 7. Confirm that the entry sequence is exactly the same in prototype calls to modules, and the branching is only somewhere late in code
+## The prototype setup should run a login e2e test 
+Look at this e2e test that it actually does stuff, and doesn't just skip. 
 
-## 8. The prototype setup should run a login e2e test 
-which checks the after login mock sequence succeeds. 
+The test should check the after login entry (setup) sequence of config, sheet load,  and api key succeeds and we can advance further to the diary. This should be the same order as what happens in the production, calling the same modules and elements. so if the login sequence changed for production we should see it in the mock as well.
 
-and that canceling the login stops with the correct warning in the settings instruction. 
 
-## 9. When ready to test production
+and that canceling the login stops with the correct warning in the settings instruction. (we changed the settings instruction warn to be a red card border with red font)
+
+## When ready to test production/web/develop
+
+Instruct the human developer: 
 
 1. Run `npm run web`.
 2. Open the app in the browser at the printed local URL.
 3. Click **Login with Google**.
-4. Approve only the `drive.file` scope.
+4. Approve the `drive.file` scope.
 5. Confirm the browser returns to `http://localhost:8081/auth` and then back into the app.
+6. Check the app. 
+
+## Code cleanup: 
+1. features and tests removal and fixing. 
+2. set fixture setup with human in the loop. (login)
+
+## Documentation cleanup
+
+## Entry testing with ai

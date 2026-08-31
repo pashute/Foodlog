@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import * as sheetMock from '../sheet.mock.ts'
 import { mockConstants } from '../../infrastructure/config/config.ts'
+import { report } from '../../infrastructure/log.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const HTML_PATH = path.join(__dirname, 'Foodlog.mock.html')
@@ -62,8 +63,14 @@ async function readBody(req) {
 }
 
 export function start() {
-  if (server) return server
+  report('debug', 'prototype/sheet', 'sheetServer', 'start', 'start() called, initializing server...')
+  if (server) {
+    report('debug', 'prototype/sheet', 'sheetServer', 'start', 'server already exists, returning existing instance')
+    return server
+  }
+  report('debug', 'prototype/sheet', 'sheetServer', 'start', 'creating new HTTP server')
   server = http.createServer(async (req, res) => {
+    report('debug', 'prototype/sheet', 'sheetServer', 'createServer', `request: ${req.method} ${req.url}`)
     // The browser (localhost:8081) posts here (localhost:3000) — a
     // cross-origin request that needs CORS headers, plus a preflight
     // OPTIONS response since Content-Type: application/json isn't a
@@ -98,7 +105,14 @@ export function start() {
       res.end('Not found')
     }
   })
-  server.listen(PORT)
+  report('debug', 'prototype/sheet', 'sheetServer', 'start', `server created, calling listen on PORT ${PORT}`)
+  server.listen(PORT, () => {
+    report('debug', 'prototype/sheet', 'sheetServer', 'listen', `server.listen() callback fired - port ${PORT} is ready`)
+  })
+  server.on('error', (err) => {
+    report('error', 'prototype/sheet', 'sheetServer', 'server', 'server error:', err)
+  })
+  report('debug', 'prototype/sheet', 'sheetServer', 'start', 'returning server instance')
   return server
 }
 
@@ -108,6 +122,9 @@ export function stop() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  report('debug', 'prototype/sheet', 'sheetServer', 'main', 'main entry: about to call start()')
   start()
+  report('debug', 'prototype/sheet', 'sheetServer', 'main', 'start() returned')
   console.log(`Mock sheet server running at ${mockConstants.urls.mockMyDrive}`)
+  report('debug', 'prototype/sheet', 'sheetServer', 'main', 'server ready')
 }
