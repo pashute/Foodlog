@@ -36,19 +36,19 @@ const HEADER = sheetHeaders
 
 // meal record structure. 
 export const MealRecordStructure = Object.freeze([
-  'item', // stable id within one analyzed meal
-  'name', // food name, e.g. "cucumber"
+  'item',   // stable id within one analyzed meal
+  'name',   // food name, e.g. "cucumber"
   'fguess', // was the food name itself a guess
-  'qty', // quantity, digits only, default "1", up to 2 digits
+  'qty',    // quantity, digits only, default "1", up to 2 digits
   'qguess', // was qty a guess
-  'unit', // short size/measure word, up to 3 letters, e.g. "med", "cup"
+  'unit',   // short size/measure word, up to 3 letters, e.g. "med", "cup"
   'uguess', // was unit a guess
-  'type', // optional qualifier, up to 9 letters, e.g. "heavy", "semisoft"
-  'tguess', // was type a guess
-  'wgt', // weight (g) for this item at this qty
-  'crb', // carbs (g) for this item at this qty
+  'type',   // optional qualifier, up to 9 letters, e.g. "heavy", "semisoft"
+  'tguess', // type a guess
+  'wgt',    // weight (g) for this item at this qty
+  'crb',    // carbs (g) for this item at this qty
   'crbPer100', // carbs (g) per 100g/100ml — nutritional density
-  'cal', // energy (kcal) for this item at this qty
+  'cal',       // energy (kcal) for this item at this qty
   'calPer100', // energy (kcal) per 100g/100ml
 ])
 
@@ -72,21 +72,25 @@ export function createMealRecord(partial = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Sheet.MealTextFormat — builds the telegraphic, re-editable string from a
-// list of MealRecordStructure records + totals (same text used for the Fix
-// button's re-editable meal input, and for the AI prompt asking for a
-// summary line). Format: "qty unit [type] foodname (wgt: Xg, crb: Xg,
-// nrg: Xkc)" — [type] present only when non-empty. Up to 3 "?" per record:
+// Sheet.MealTextFormat — builds the telegraphic, re-editable string 
+// from a list of MealRecordStructure records + totals 
+// (same text used for the Fix button's re-editable meal input, 
+// and for the AI prompt asking for a summary line). 
+// 
+// Format: "qty unit [type] foodName (wgt: Xg, crb: Xg, nrg: Xkc)" 
+// — [type] present only when non-empty. 
+// Up to 3 "?" per record:
 //   - qty/unit are mutually exclusive: unit's mark wins if both are guesses,
 //     qty only gets one if unit was NOT a guess (i.e. given).
 //   - type gets its own mark, independent of qty/unit.
-//   - the food name gets its own mark, independent of the others (reversed
-//     Aug 18 — earlier this session the rule was "never on the food name").
+//   - the food name gets its own mark, independent of the others 
 // ---------------------------------------------------------------------------
-// Records are joined with ",\n" (not just ", ") so the multiline meal
-// textbox naturally breaks onto a new line after each "kc)," — display only,
-// see analyze()'s whitespace normalization in ai.mock.ts/ai.ts: the AI still
-// treats the whole thing as one input string regardless of the line breaks.
+// Records are joined with ",\n" (not just ", ") 
+// so the multiline meal textbox naturally breaks onto a new line after each "kc)," 
+// — display only:
+//   See analyze()'s whitespace normalization in ai.mock.ts/ai.ts: 
+//   The AI still treats the whole thing as one input string 
+//   regardless of the line breaks.
 export function MealTextFormat(records, totalCarbs, totalEnergy) {
   const items = records
     .map((r) => {
@@ -101,12 +105,14 @@ export function MealTextFormat(records, totalCarbs, totalEnergy) {
   return `(${totalCarbs}g, ${totalEnergy}cals), ${items}`
 }
 
-// Sheet.MealTextRegex — validates a MealTextFormat string: well-formed
-// records, and never more than one "?" between a record's qty and unit
-// (the only mutually-exclusive pair — type and foodname marks are each
-// independent, no "never both" constraint on them). Unit/type/name exclude
-// "?" from their own character classes so a stray "?" is always captured
-// by its own mark group, never silently absorbed into the word next to it.
+// Sheet.MealTextRegex — validates a MealTextFormat string: 
+// well-formed records, 
+// and never more than one "?" between a record's qty and unit
+// (the only mutually-exclusive pair — type and foodName marks are each
+// independent, they can both have "?"). 
+// Unit/type/name exclude "?" from their own character classes 
+// so a stray "?" is always captured by its own mark group, 
+// never silently absorbed into the word next to it.
 const ONE_RECORD =
   '(\\d+)(\\??) ([^\\s?]*)(\\??)(?: ([^\\s?()]+)(\\??))? ([^(),?]+?)(\\??) \\(wgt: (\\d+)g, crb: (\\d+)g, nrg: (\\d+)kc\\)'
 const RECORD_RE = new RegExp(ONE_RECORD, 'g')

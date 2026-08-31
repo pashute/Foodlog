@@ -50,7 +50,7 @@ This section should be defined in the screens/layout and screens/interactions  f
     - Numbered steps, each paired with a screenshot (already in `src/imgs/aiKey`, each circling the relevant button): go to [Google AI Studio](https://aistudio.google.com/app/api-keys); click Create API Key in the top-left corner; use the default project; paste the key
     - A field to paste the key and a SAVE button, enabled only once the pasted key looks valid; an invalid save attempt shows "Invalid key, try again"
 
-(See Gemini key implementation under Technology section in this document)
+(See Gemini key implementation under Technology section devtech.md)
 
 - **Timezone:** Current user's timezone. Click to change. Info icon (ⓘ) after the Change button.
   - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app, but not the system settings.
@@ -196,118 +196,28 @@ Environment variables will be:
 1. Storage definition:  Anything needed to be stored between applications, or stored securely encrypted will use a tiny backend. 
 
 2. Privacy: No personal data entries are stored or collected by the app. 
-Stored are only keys needed to pass the data from the locally run app (a web client in the user's browser, or a phone or desktop app) to the user's owned drive data accessed only by them, and to the AI with its privacy terms. (Auth tokens, sheet id, and ai key)
-
-3. Implementation: Create Cloudfare code for: 
-
-Secure (encrypted KV):
-POST/GET  /token/store   /token/get      Google refresh token
-POST/GET  /key/store     /key/get        Gemini API key
-POST/GET  /sheet/store   /sheet/get      Google Sheet ID
-POST/GET  /user/mail     /usermail/get   Current user's mail
-
-Note: Mail for silent login
-
-Non-secure (plain KV, separate namespace):
-POST/GET  /config/store  /config/get     { theme }
+   
+3. The app stores only keys needed to pass the data from the locally run app (a web client in the user's browser, or a phone or desktop app) to the user's owned drive data accessed only by them, and to the AI with its privacy terms. (Auth tokens, sheet id, and ai key)
 
 4. Future planned keys are the "likes" shared store and the like user hash for determining if this user already liked once. 
 
 5. Non secure default data is loaded to config object on startup, 
-and then changed to user defined changes 
-
-
-~~Old feature definition:~~ 
-
-~~Storage (behind one shared interface, platform-branched):~~
-  - ~~Tauri desktop → Rust `keyring` command via `invoke` (DPAPI/Credential Manager).~~
-  - ~~Android → expo-secure-store (Keystore).~~
-  - ~~iphone → to be defined~~
-  - ~~ ~~
-- ~~Key-fetch browser step is platform-branched (few lines, not a second screen set):~~
-  - ~~Desktop → open system browser via Tauri opener.~~
-  - ~~Android → Chrome Custom Tab (expo-web-browser).~~
-
-### OAuth - implementation notes
-
-The OAuth basic code is in src/infrastructure/auth.   Prototype mockup is in src/prototype/oauth
-The feature definitions are in dev/features/infrastructure
-
-The OAuth will deal with the four stages of logging in
-- Checking for already logged in chrome. If not: 
-- Checking for multiple accounts and choosing the username's one
-- Login with drive.file scope
-- Log out if requested.
-
-The two client ids (One for Tauri desktop app, and one for the android one) will be stored in src/infrastructure/auth/authClientIds.js 
-
-Note: During prototype stage a mockup of the screens and their functionaly will be provided.
-
-#### Three login paths (branched by platform) and a mock
-The auth code for logging in is in: 
-`src/infrastructure/auth/`
-
-When calling the OAuth, where the code differs between platforms it should branch out to the three files: 
-- oauth.tauri.js - expo desktop web turned win exe with tauri
-- oauth.android.js - for android 
-- oauth.ios.js - for ios
-And a fourth path in the prototype/oauth folder
-- oauth.mock.js for a mock version 
-
-The oauth.mock version includes:
-- a mock session creation function 
-and
-- two mock popups: accountChoice.mock.dlg.jsx
-               and permitConsent.mock.dlg.jsx
-- both report to oauth.mock.onLogin with an OAuth object
-  - Deny   - gives error,  access denied.
-  - Cancel - gives error, popup closed by user.
-  - Continue / OK - gives refresh token  and drive.file scope
-
-On all branches:   
-- The token is verified to be refresh and with said scope
-- And its elements are stored in the local secure storage. 
+and then changed to user defined changes when saved after changes in app: settings screen, or currently disabled config screen.
 
 
 ### AI
 
-API key stored in secure storage:  
+API key stored in secure storage.  
 
-- One shared interface, platform-branched:
-  - Tauri desktop → Rust `keyring` command via `invoke` (DPAPI/Credential Manager).
-  - Android → expo-secure-store (Keystore).
-
-- Read Settings specifications in this document, and the technology section on key retrieval.
-
+Modules: 
 - AI.lang - reads meal text, disambiguates, marks questions (json result)
 - AI.carbs - estimates and sums. 
 
 ### Foodlog sheet
 
-- Reads/writes to Foodlog sheet by settings details.
-- Can check if the file exists and 
-Can write to row
+- Foodlog sheet id stored per user securely for access and link
+- App can check if the file exists, can read and write in it
 
-## UI behavior / interaction tests
-
-- Test behavior, not appearance (no pixel/visual checks).
-- Assert: correct text/labels/names; correct enabled/disabled and shown/hidden state per
-  app state (e.g. Sync disabled until logged in; key-paste field appears only after browser
-  return; results hidden until a response arrives); correct reactions to interaction
-  (press triggers the right action; errors show a message and don't crash).
-- Tools: React Native Testing Library (Android UI), React Testing Library or Playwright
-  (Tauri web UI).
-- Mock the auth/storage boundary; assert UI reacts correctly to logged-in / logged-out and
-  success / error states. Real Google login + real secure storage are verified manually
-  (or in the live tier), not here.
-- Runs deterministically in CI on every push (no device, no live API).
-
-## Architecture & Privacy
-
-- **Database:** None. Uses the user's own Google Sheet via Google OAuth 2.0.
-- **API Key:** "Bring Your Own Key" model where users input their personal Google AI Studio API key stored securely. See below.
-- 
-- ** Available for security of API key as android or web app. See below about development technology. 
 
 ## Monetization Model
 

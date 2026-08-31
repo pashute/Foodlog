@@ -1,7 +1,8 @@
-// Filename: auth.test.ts  Version 0.2.1
+// Filename: auth.test.ts
+// Version 0.2.1
+// Auth module unit tests (converted to Jest)
+// Runs after global login fixture (jest.setup.js)
 
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
 import * as auth from '../../../../src/infrastructure/auth/auth.ts'
 import { get as storageGet, KEYS } from '../../../../src/infrastructure/storage/storage.ts'
 
@@ -14,72 +15,67 @@ async function queueHappyPathLogin() {
   queueConsent({ accepted: true, scope: 'drive.file' })
 }
 
-test('auth module - full login flow, and logs out', async () => {
-  assert.strictEqual(await auth.isLoggedIn(), false)
+describe('auth module', () => {
+  test('full login flow, and logs out', async () => {
+    expect(await auth.isLoggedIn()).toBe(false)
 
-  await queueHappyPathLogin()
-  const result = await auth.login()
-  assert.strictEqual(result.success, true)
-  assert.strictEqual(result.usermail, 'user1@gmail.com')
-  assert.strictEqual(await auth.isLoggedIn(), true)
+    await queueHappyPathLogin()
+    const result = await auth.login()
+    expect(result.success).toBe(true)
+    expect(result.usermail).toBe('user1@gmail.com')
+    expect(await auth.isLoggedIn()).toBe(true)
 
-  assert.strictEqual(await Promise.resolve(storageGet(KEYS.authToken)), 'mock-refresh-token')
-  assert.strictEqual(await Promise.resolve(storageGet('usermail')), 'user1@gmail.com')
+    expect(await Promise.resolve(storageGet(KEYS.authToken))).toBe('mock-refresh-token')
+    expect(await Promise.resolve(storageGet('usermail'))).toBe('user1@gmail.com')
 
-  await auth.logout()
-  assert.strictEqual(await auth.isLoggedIn(), false)
-})
+    await auth.logout()
+    expect(await auth.isLoggedIn()).toBe(false)
+  })
 
-test('auth module - cancel at starter popup aborts login', async () => {
-  const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
-  _queueTestResponse(false)
+  test('cancel at starter popup aborts login', async () => {
+    const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
+    _queueTestResponse(false)
 
-  const result = await auth.login()
-  assert.strictEqual(result.success, false)
-  assert.strictEqual(result.error, 'popup_closed_by_user')
-  assert.strictEqual(await auth.isLoggedIn(), false)
-})
+    const result = await auth.login()
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('popup_closed_by_user')
+    expect(await auth.isLoggedIn()).toBe(false)
+  })
 
-test('auth module - cancel at account choice aborts login', async () => {
-  const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
-  _queueTestResponse(true)
-  const { _queueTestResponse: queueAccount } = await import('../../../../src/prototype/oauth/accountChoice.mock.ts')
-  queueAccount({ accepted: false })
+  test('cancel at account choice aborts login', async () => {
+    const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
+    _queueTestResponse(true)
+    const { _queueTestResponse: queueAccount } = await import('../../../../src/prototype/oauth/accountChoice.mock.ts')
+    queueAccount({ accepted: false })
 
-  const result = await auth.login()
-  assert.strictEqual(result.success, false)
-  assert.strictEqual(result.error, 'popup_closed_by_user')
-})
+    const result = await auth.login()
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('popup_closed_by_user')
+  })
 
-test('auth module - deny at permission consent aborts login', async () => {
-  const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
-  _queueTestResponse(true)
-  const { _queueTestResponse: queueAccount } = await import('../../../../src/prototype/oauth/accountChoice.mock.ts')
-  queueAccount({ accepted: true, username: 'user1', email: 'user1@gmail.com' })
-  const { _queueTestResponse: queueConsent } = await import('../../../../src/prototype/oauth/permitConsent.mock.ts')
-  queueConsent({ accepted: false })
+  test('deny at permission consent aborts login', async () => {
+    const { _queueTestResponse } = await import('../../../../src/infrastructure/auth/starter.ts')
+    _queueTestResponse(true)
+    const { _queueTestResponse: queueAccount } = await import('../../../../src/prototype/oauth/accountChoice.mock.ts')
+    queueAccount({ accepted: true, username: 'user1', email: 'user1@gmail.com' })
+    const { _queueTestResponse: queueConsent } = await import('../../../../src/prototype/oauth/permitConsent.mock.ts')
+    queueConsent({ accepted: false })
 
-  const result = await auth.login()
-  assert.strictEqual(result.success, false)
-  assert.strictEqual(result.error, 'access_denied')
-})
+    const result = await auth.login()
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('access_denied')
+  })
 
-test('auth module - exposes driveSafeUrl', () => {
-  assert.strictEqual(typeof auth.driveSafeUrl, 'string')
-  assert.ok(auth.driveSafeUrl.length > 0)
-})
+  test('exposes driveSafeUrl', () => {
+    expect(typeof auth.driveSafeUrl).toBe('string')
+    expect(auth.driveSafeUrl.length).toBeGreaterThan(0)
+  })
 
-// Web's real OAuth (oauth.web.ts) only ever returns an accessToken, never
-// a refreshToken (Google's Identity Services library doesn't hand refresh
-// tokens to browser JS) — _isFreshDriveFileToken must accept either shape.
-// The GIS calls themselves need a real browser (window.google, a rendered
-// consent popup) so oauth.web.ts's login()/trySilentLogin() aren't
-// exercised here — same boundary as the other real (non-prototype) OAuth
-// modules, which this tier only reaches through the prototype mock.
-test('auth module - _isFreshDriveFileToken accepts an accessToken (web) or a refreshToken (native)', () => {
-  assert.strictEqual(auth._isFreshDriveFileToken({ accessToken: 'abc', scope: 'drive.file' }), true)
-  assert.strictEqual(auth._isFreshDriveFileToken({ refreshToken: 'abc', scope: 'drive.file' }), true)
-  assert.strictEqual(auth._isFreshDriveFileToken({ scope: 'drive.file' }), false)
-  assert.strictEqual(auth._isFreshDriveFileToken({ accessToken: 'abc', scope: 'drive.readonly' }), false)
-  assert.strictEqual(auth._isFreshDriveFileToken(null), false)
+  test('_isFreshDriveFileToken accepts an accessToken (web) or a refreshToken (native)', () => {
+    expect(auth._isFreshDriveFileToken({ accessToken: 'abc', scope: 'drive.file' })).toBe(true)
+    expect(auth._isFreshDriveFileToken({ refreshToken: 'abc', scope: 'drive.file' })).toBe(true)
+    expect(auth._isFreshDriveFileToken({ scope: 'drive.file' })).toBe(false)
+    expect(auth._isFreshDriveFileToken({ accessToken: 'abc', scope: 'drive.readonly' })).toBe(false)
+    expect(auth._isFreshDriveFileToken(null)).toBe(false)
+  })
 })

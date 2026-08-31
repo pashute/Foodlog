@@ -1,41 +1,53 @@
 // Filename: log.ts
-// Version 0.1.0
+// Version 0.2.0
 // Centralized logging with level control via LOG_LEVEL env var
 
-type LogSeverity = 'debug' | 'warn' | 'error'
-type LogLevel = 'debug' | 'warn' | 'erroronly'
+export type LogSeverity = 'always' | 'error' | 'warn' | 'debug' | 'verbose'
+export type LogLevel = 'always' | 'error' | 'warn' | 'debug' | 'verbose'
 
-const LOG_LEVEL: LogLevel = (process.env.LOG_LEVEL || 'warn') as LogLevel
+const SEVERITY_HIERARCHY = { always: 0, error: 1, warn: 2, debug: 3, verbose: 4 }
+const LOG_LEVEL: LogLevel = (process.env.EXPO_PUBLIC_LOG_LEVEL || 'warn') as LogLevel
 
 function shouldLog(severity: LogSeverity): boolean {
-  if (LOG_LEVEL === 'debug') return true
-  if (LOG_LEVEL === 'warn') return severity !== 'debug'
-  if (LOG_LEVEL === 'erroronly') return severity === 'error'
-  return false
+  if (severity === 'always')return true
+  const severityRank = SEVERITY_HIERARCHY[severity]
+  const logLevelRank = SEVERITY_HIERARCHY[LOG_LEVEL]
+  return severityRank <= logLevelRank
 }
 
 function formatTimestamp(): string {
   const now = new Date()
-  return now.toISOString().split('T')[1].replace('Z', '') // HH:MM:SS.mmm
+  const iso = now.toISOString()
+  return iso // Full ISO timestamp: 2026-08-31T12:34:56.789Z
 }
 
 export function report(
   severity: LogSeverity,
-  srcFolder: string,
+  srcFolder: string, // format: `parent/folder`, not full path
   module: string,
   funcName: string,
   message: string,
   ...params: unknown[]
 ): void {
+  
   if (!shouldLog(severity)) return
-
+  console.log('hi there why is this not working?')
   const timestamp = formatTimestamp()
   const location = `[${srcFolder}/${module}:${funcName}]`
-  const prefix = `${timestamp} ${location}`
+  const severityTag = `[${severity.toUpperCase()}]`
+  const prefix = `${timestamp} ${severityTag} ${location}`
 
   if (params.length > 0) {
     console[severity === 'error' ? 'error' : 'log'](`${prefix} ${message}`, ...params)
   } else {
     console[severity === 'error' ? 'error' : 'log'](`${prefix} ${message}`)
   }
+}
+
+export function reportStartup(appName: string, developmentStage: string, targetPlatform: string, publishState: string): void {
+  report('always', 'infrastructure', 'log', 'startup', `${appName} starting`)
+  report('always', 'infrastructure', 'log', 'startup', `Report severity: ${LOG_LEVEL}`)
+  report('always', 'infrastructure', 'log', 'startup', `Development stage: ${developmentStage}`)
+  report('always', 'infrastructure', 'log', 'startup', `Target platform: ${targetPlatform}`)
+  report('always', 'infrastructure', 'log', 'startup', `Publish state: ${publishState}`)
 }

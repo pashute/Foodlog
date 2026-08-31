@@ -26,7 +26,7 @@
 - [ ] Set GOOGLE_CLIENT_ID in Cloudflare secrets
 - [ ] Verify both KV namespaces exist: foodlog_storage_kv, foodlog_config_kv
 - [ ] Export wrangler project location (if different from src/backend/)
-- [ ] Set CLOUDFLARE_STORAGE_URL env var in platform.env 
+- [ ] Set CLOUDFLARE_STORAGE_URL env var in .env 
 - [ ] Set CLOUDFLARE_CONFIGURATION_URL env var
 - [ ] 
 ## AI coding - Infrastructure & Logging

@@ -21,7 +21,7 @@ type DeepReadonly<T> = {
 
 export const appConstants = {
   appName: 'Foodlog',
-  appVersion: '0.2.2',
+  appVersion: '0.2.3',
 
   urls: {
     googlePrivacy: 'https://policies.google.com/privacy#intro',

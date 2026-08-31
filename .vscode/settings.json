@@ -6,6 +6,7 @@
         "npx tsc": true
     },
     "cSpell.words": [
+        "cals",
         "Foodlog"
     ]
 }

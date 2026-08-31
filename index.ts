@@ -4,5 +4,16 @@
 
 import { registerRootComponent } from 'expo'
 import App from './src/App.tsx'
+import { report, LogSeverity } from './src/infrastructure/log.ts'
+import { appConstants } from './src/infrastructure/config/config.ts'
 
+const devStage = process.env.EXPO_PUBLIC_STAGE || 'missing'
+const platform = process.env.EXPO_PUBLIC_TARGET || 'missing'
+const published = process.env.EXPO_PUBLIC_PUBLISHED  || 'missing'
+const appName = appConstants.appName
+const appVersion = appConstants.appVersion
+
+report('always', 'root', 'index', 'module-load', 
+    `${appName} v${appVersion} starting: ${devStage} (${platform} - ${published}) `)
+    
 registerRootComponent(App)

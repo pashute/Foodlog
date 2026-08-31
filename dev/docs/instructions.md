@@ -110,7 +110,7 @@ html files should have under the <html5> tags
 -->
 <head>  etc...
 
-Any change to the file changes the iteration number. 
+Any change to the file changes the patch number. 
 i.e.  0.1.2 -> 0.1.3,   and 0.2.0 -> 0.2.1. 
 
 The current major and minor version are as listed in the config. 
