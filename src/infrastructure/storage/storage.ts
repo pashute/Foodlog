@@ -7,6 +7,10 @@
 import { isPrototype } from '../environment'
 import * as storageMock from '../../prototype/storage.mock.ts'
 import { storageApiUrl } from '../config/config'
+import * as authServer from '../auth/auth.serverAccess'
+
+let _sessionToken: string | null = null
+let _refreshing: Promise<void> | null = null
 
 // constant key names
 export const KEYS = Object.freeze({
@@ -30,14 +34,42 @@ function routeFor(key) {
   return route
 }
 
-async function request(method, route, value) {
+export function setSessionToken(token: string | null) {
+  _sessionToken = token
+}
+
+async function request(method, route, value, retry = true) {
   if (!storageApiUrl) throw new Error('Cloudflare storage URL is not configured')
   const isConfigRequest = route.startsWith('config/')
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (_sessionToken) {
+    headers['Authorization'] = `Bearer ${_sessionToken}`
+  }
+
   const response = await fetch(`${storageApiUrl}/${route}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...(value === undefined ? {} : { body: JSON.stringify(isConfigRequest ? value : { value }) }),
   })
+
+  // Handle 401: sessionToken expired or invalid
+  if (response.status === 401 && retry && _sessionToken) {
+    // Wait if another refresh is in progress
+    if (_refreshing) {
+      await _refreshing
+      return request(method, route, value, false) // Retry without recursion guard
+    }
+
+    // Try to refresh accessToken (which doesn't help with sessionToken, but might help with Google API calls)
+    _refreshing = authServer.refreshAccessToken(_sessionToken, 'web').catch(() => {})
+    await _refreshing
+    _refreshing = null
+
+    // Retry the original request
+    return request(method, route, value, false)
+  }
+
   if (!response.ok) throw new Error(`Storage request failed: ${response.status}`)
   if (response.status === 204) return undefined
   const body = await response.json()
