@@ -80,18 +80,18 @@
 - [v] Replace refresh logic with `auth.serverAccess.refreshAccessToken()`
 - [v] Handle 401 errors properly (message to UI)
 
-### Integrate config.serverAccess.ts into configAccess.ts
+### Integrate config.serverAccess.ts into configAccess.ts - DONE
 
-- [ ] Load config from server via `config.serverAccess.getConfig()`
-- [ ] Save config changes via `config.serverAccess.setConfig()`
-- [ ] Handle offline (prototype mode) vs online (production)
+- [v] Load config from server via `config.serverAccess.getConfig()` — added loadConfigFromServer()
+- [v] Save config changes via `config.serverAccess.setConfig()` — added saveConfig()
+- [v] Handle offline (prototype mode) vs online (production)
 
-### Update storage.ts for 401 refresh
+### Update storage.ts for 401 refresh - DONE
 
-- [ ] Add 401 error detection in fetch() wrapper
-- [ ] Call auth.serverAccess.refreshAccessToken() on 401
-- [ ] Retry original request with new accessToken
-- [ ] Update sessionToken in sessionStorage after refresh
+- [v] Add 401 error detection in fetch() wrapper
+- [v] Call auth.serverAccess.refreshAccessToken() on 401
+- [v] Retry original request with new accessToken
+- [v] Add setSessionToken() to store token for Bearer auth
 
 ## AI coding - Post-login entry sequence
 
