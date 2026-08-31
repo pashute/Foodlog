@@ -36,9 +36,9 @@ This section should be defined in the screens/layout and screens/interactions  f
   - Info icon (ⓘ) at the end of the row. Pressing and holding it shows in the dedicated instruction card: Theme change not yet available.
 
 - Foodlog sheet  id and direct link.   
-  - Created in user's Google Sheets on login if not stored in local chrome.   
+  - Created in user's Google Sheets on login if not already persisted.   
   - Before creation searches for an existing Foodlog sheet.
-  - ID stored in user storage
+  - ID securely persisted per user
   - Error disables diary
   - During prototype stage this functionality and the sheet data itself are mocked. 
 
@@ -53,7 +53,9 @@ This section should be defined in the screens/layout and screens/interactions  f
 (See Gemini key implementation under Technology section in this document)
 
 - **Timezone:** Current user's timezone. Click to change. Info icon (ⓘ) after the Change button.
-  - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app, but not the system settings. Currently unchangeable from the default IDT UTC+3 Jerusalem, Israel.
+  - Pressing and holding the info icon shows in the dedicated instruction card: This changes the timezone in this app, but not the system settings.
+
+**Intentional implementation note:** The default will be IDT UTC+3 Jerusalem, Israel.
 
 - Only one instruction card exists, at the top of the whole Settings screen. It is idle by default and its text changes to match whichever info icon is currently pressed and held, reverting to the idle instruction on release — there are no separate per-card popups.
 
@@ -64,19 +66,6 @@ This section should be defined in the screens/layout and screens/interactions  f
 ---- AI key missing/invalid: "Press [Start AI] for AI key instructions"
 ---- no problem: "Press \"Go to Diary\" to use the app."
 
-##### Gemini key access implementation notes 
-
-User taps Get my Gemini API key.
-
-Expo sends to AI Studio in a **Chrome Custom Tab** (not a Webview)  for sharing chrome logged in session. 
-
-Note: The chrome login is accessed, not the app login. 
-
-User must copy, and a paste field is shown  pre-filled if matches api key regex. 
-
-Validate before saving 
-
-Store with secure android keystore.
 
 
 ### Diary page
