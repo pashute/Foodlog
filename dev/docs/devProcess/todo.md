@@ -4,6 +4,12 @@
  - AI must READ and FOLLOW todo.instructions.md
 --- Todo batches start below this line.  Do not erase it or above ---
 
+# Cloudflare Workers Created (DONE)
+
+- [v] src/backend/storage/storageWorker.ts — KV storage for auth tokens, AI keys, sheet IDs, user emails. Routes: /token, /aikey, /sheet, /usermail with per-user key scoping (prefix:userId format).
+- [v] src/backend/configuration/configWorker.ts — KV config storage (theme, timezone). Routes: /theme, /timezonehrs, /timezonename with Bearer token auth validation.
+- [ ] src/backend/auth/worker.ts — OAuth token exchange and refresh (NOT YET CREATED). Routes: /api/auth/exchange (Google code → sessionToken), /api/auth/refresh (validate sessionToken, refresh accessToken).
+
 # Batch cloud storage aug 31
 
 ## Developer todo list (oauth and storage overhaul)
