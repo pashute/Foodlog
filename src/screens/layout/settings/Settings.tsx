@@ -7,6 +7,7 @@ import { View, Text, Pressable, StyleSheet, Linking } from 'react-native'
 import { config } from '../../../infrastructure/config/configAccess'
 import { loadUserConfiguration, saveUserConfiguration } from '../../../infrastructure/config/configIo'
 import { get as storageGet, update as storageUpdate, KEYS } from '../../../infrastructure/storage/storage.ts'
+import { existsOrCreate } from '../../../infrastructure/sheet/sheet.ts'
 import { keyStatus } from '../../../infrastructure/ai/ai.ts'
 import { formatter, getText } from '../../../infrastructure/texts.ts'
 import AiKeyDlg from './aiKey.dlg.tsx'
@@ -39,11 +40,14 @@ function idleInstruction({ appError, loggedIn, aiKeyStatus }) {
   return getText(formatter.settings.instruction.setupOK)
 }
 
-export default function Settings({ loggedIn = false, usermail = '', appError = null, setupFailed = false, initialSheet = null, initialAiKeyStatus = 'missing', onGoToDiary = () => {} }) {
+export default function Settings({ loggedIn = false, usermail = '', appError = null, onGoToDiary = () => {} }) {
   const [pressText, setPressText] = useState('')
   const [showAiKeyDlg, setShowAiKeyDlg] = useState(false)
-  const [aiKeyStatus, setAiKeyStatus] = useState(initialAiKeyStatus)
-  const [sheet, setSheet] = useState(initialSheet)
+  // aiKeyStatus/sheet: get/existsOrCreate are always Promises now (both
+  // prototype and real stage, Aug 19 batch) — a render body can't await, so
+  // these live in state and get filled by the effects below.
+  const [aiKeyStatus, setAiKeyStatus] = useState('missing')
+  const [sheet, setSheet] = useState(null)
   const [loadError, setLoadError] = useState(null)
   const [showConfigDlg, setShowConfigDlg] = useState(false)
   const [, setConfigurationVersion] = useState(0)
@@ -55,14 +59,25 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
   }
 
   useEffect(() => {
-    setSheet(initialSheet)
-    setAiKeyStatus(initialAiKeyStatus)
-  }, [initialSheet, initialAiKeyStatus])
+    refreshAiKeyStatus()
+  }, [])
+
+  // Re-runs after login completes (existsOrCreate needs an auth token in
+  // storage — nothing to fetch before that, and no point trying).
+  useEffect(() => {
+    if (!loggedIn) {
+      setSheet(null)
+      return
+    }
+    Promise.resolve(existsOrCreate())
+      .then(setSheet)
+      .catch(() => setLoadError(getText(formatter.settings.error.sheet)))
+  }, [loggedIn])
 
   const theme = config().app.theme
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const gmtOffset = formatGmtOffset(-new Date().getTimezoneOffset())
-  const disabledUntilLogin = !loggedIn || setupFailed
+  const disabledUntilLogin = !loggedIn
   const goToAppDisabled = disabledUntilLogin || aiKeyStatus !== 'ok' || !sheet?.id
 
   const idleText = loadError || idleInstruction({ appError, loggedIn, aiKeyStatus })
@@ -94,11 +109,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
       </View>
 
       <View style={[styles.configRow, disabledUntilLogin && styles.cardDisabled]}>
-          <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => loadUserConfiguration(usermail).then(() => {
-            setConfigurationVersion((version) => version + 1)
-            setLoadError(null)
-            setShowConfigDlg(true)
-          }).catch(() => setLoadError(getText(formatter.settings.error.configurationLoad)))}>
+          <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => setShowConfigDlg(true)}>
             <Text style={styles.btnText}>Open configuration</Text>
           </Pressable>
           <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => loadUserConfiguration(usermail).then(() => {

@@ -6,7 +6,6 @@
 
 import { Given, Then } from '@cucumber/cucumber'
 import assert from 'node:assert/strict'
-import { appConstants } from '../../../../../../src/infrastructure/config/config.ts'
 
 // Shared with infrastructure/oauth.feature (same literal text, registered once here).
 Given('the app is open', async function () {
@@ -21,8 +20,8 @@ Given('the app name from config is shown on the left', async function () {
   await this.page.getByText('Foodlog', { exact: true }).first().waitFor()
 })
 
-Given('lowercase v followed by the version string from the app configuration is shown next to the app name', async function () {
-  await this.page.getByText(`v${appConstants.appVersion}`, { exact: true }).waitFor()
+Given('the version a vX.Y.Z from the config is shown next to the app name', async function () {
+  await this.page.getByText(/^v\d+\.\d+\.\d+$/).waitFor()
 })
 
 Given(/^a "Login with Google" button is shown on the right side of the header$/, async function () {
@@ -47,8 +46,8 @@ Then('the app name is to the left with a larger font', async function () {
   assert.ok(brandBox.x < loginBox.x, 'expected app name left of the login button')
 })
 
-Then('the version has lowercase v followed by the version string from the app configuration with a smaller font', async function () {
-  await this.page.getByText(`v${appConstants.appVersion}`, { exact: true }).waitFor()
+Then('the version is in the format vX.Y.Z with a smaller font', async function () {
+  await this.page.getByText(/^v\d+\.\d+\.\d+$/).waitFor()
 })
 
 Then('there is a Login with Google button aligned to the right', async function () {

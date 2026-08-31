@@ -4,7 +4,6 @@ import * as AuthSession from 'expo-auth-session'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { appConstants, authRedirectUrl, desktopAuthRedirectUrl, storageApiUrl } from '../config/config.ts'
-import { getSessionToken } from '../storage/storage.ts'
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -23,7 +22,7 @@ export async function authorize(clientId, platform) {
     clientId,
     redirectUri: redirect,
     responseType: AuthSession.ResponseType.Code,
-    scopes: [appConstants.urls.driveFileScope, 'openid', 'email'],
+    scopes: [appConstants.urls.driveFileScope],
     usePKCE: true,
     extraParams: { access_type: 'offline', prompt: 'consent' },
     state: btoa(JSON.stringify({ platform, nonce: crypto.randomUUID() })),
@@ -48,14 +47,14 @@ export async function authorize(clientId, platform) {
 }
 
 export async function refresh(refreshToken, platform) {
-  return exchange('/auth/refresh', { platform })
+  return exchange('/auth/refresh', { refreshToken, platform })
 }
 
 async function exchange(path, body) {
   if (!storageApiUrl) throw new Error('Cloudflare storage URL is not configured')
   const response = await fetch(`${storageApiUrl}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(getSessionToken() ? { Authorization: `Bearer ${getSessionToken()}` } : {}) },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
   if (!response.ok) throw new Error(`OAuth exchange failed: ${response.status}`)

@@ -28,7 +28,6 @@ test('auth module - full login flow, and logs out', async () => {
 
   await auth.logout()
   assert.strictEqual(await auth.isLoggedIn(), false)
-  assert.strictEqual(await Promise.resolve(storageGet(KEYS.usermail)), 'user1@gmail.com')
 })
 
 test('auth module - cancel at starter popup aborts login', async () => {

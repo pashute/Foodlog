@@ -2,14 +2,15 @@
 
 // Production iOS OAuth uses the shared Expo Auth Session flow.
 
-import { getSessionToken } from '../storage/storage.ts'
+import { get as storageGet, KEYS } from '../storage/storage.ts'
 import { client_id_ios } from './authClientIds.ts'
 import { authorize, refresh } from './oauthSession.ts'
 
 export const login = () => authorize(client_id_ios, 'ios')
 
 export const trySilentLogin = async () => {
-  if (!getSessionToken()) return null
+  const token = await Promise.resolve(storageGet(KEYS.authToken))
+  if (!token) return null
   try { return await refresh(token, 'ios') } catch { return null }
 }
 

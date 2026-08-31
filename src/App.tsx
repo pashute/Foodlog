@@ -16,9 +16,7 @@ import MockSheet from './prototype/sheet/MockSheet.tsx'
 import * as auth from './infrastructure/auth/auth.ts'
 import { isPrototype } from './infrastructure/environment'
 import { initializeConfiguration, loadUserConfiguration } from './infrastructure/config/configIo'
-import { get as storageGet, getSessionToken, KEYS } from './infrastructure/storage/storage.ts'
-import { existsOrCreate } from './infrastructure/sheet/sheet.ts'
-import { keyStatus } from './infrastructure/ai/ai.ts'
+import { get as storageGet, KEYS } from './infrastructure/storage/storage.ts'
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -26,19 +24,6 @@ export default function App() {
   const [usermail, setUsermail] = useState('')
   const [page, setPage] = useState('settings')
   const [appError, setAppError] = useState(null)
-  const [sheet, setSheet] = useState(null)
-  const [aiKeyStatus, setAiKeyStatus] = useState('missing')
-  const [setupFailed, setSetupFailed] = useState(false)
-
-  const prepareLoggedInApp = async (email) => {
-    await loadUserConfiguration(email)
-    const nextSheet = await existsOrCreate()
-    const apiKey = await Promise.resolve(storageGet(KEYS.aiApiKey))
-    setSheet(nextSheet)
-    setAiKeyStatus(keyStatus(apiKey))
-    setAppError(nextSheet.warning ?? null)
-    setSetupFailed(false)
-  }
 
   // Crash recovery (screens/interaction/entry.feature: "Continued log in
   // after crash"): the app was closed without logging out — an authToken
@@ -47,21 +32,15 @@ export default function App() {
   useEffect(() => {
     ;(async () => {
       await initializeConfiguration()
-      const session = getSessionToken()
-      const leftoverToken = session ?? (isPrototype() ? await Promise.resolve(storageGet(KEYS.authToken)) : undefined)
+      const leftoverToken = await Promise.resolve(storageGet(KEYS.authToken))
       if (!leftoverToken) return
       try {
         const result = await auth.trySilentLogin()
         if (result) {
+          await loadUserConfiguration(result.usermail)
           setLoggedIn(true)
           setUsermail(result.usermail ?? '')
           setUsername((result.usermail ?? '').split('@')[0])
-          try {
-            await prepareLoggedInApp(result.usermail)
-          } catch (error) {
-            setSetupFailed(true)
-            setAppError(error.message)
-          }
           return
         }
       } catch {
@@ -73,23 +52,13 @@ export default function App() {
   }, [])
 
   const handleLogin = async () => {
-    try {
-      const result = await auth.login()
-      if (result.success) {
-        setLoggedIn(true)
-        setUsermail(result.usermail)
-        setUsername(result.usermail.split('@')[0])
-        try {
-          await prepareLoggedInApp(result.usermail)
-        } catch (error) {
-          setSetupFailed(true)
-          setAppError(error.message)
-        }
-      } else {
-        setAppError(`Google login failed: ${result.error}`)
-      }
-    } catch (error) {
-      setAppError(`Google login failed: ${error.message}`)
+    const result = await auth.login()
+    if (result.success) {
+      await loadUserConfiguration(result.usermail)
+      setLoggedIn(true)
+      setUsermail(result.usermail)
+      setUsername(result.usermail.split('@')[0])
+      setAppError(null)
     }
   }
 
@@ -98,9 +67,6 @@ export default function App() {
     setLoggedIn(false)
     setUsername('')
     setUsermail('')
-    setSheet(null)
-    setAiKeyStatus('missing')
-    setSetupFailed(false)
     setPage('settings')
   }
 
@@ -125,7 +91,7 @@ export default function App() {
           {page === 'diary' && loggedIn ? (
             <Diary />
           ) : (
-            <Settings loggedIn={loggedIn} usermail={usermail} appError={appError} setupFailed={setupFailed} initialSheet={sheet} initialAiKeyStatus={aiKeyStatus} onGoToDiary={() => setPage('diary')} />
+            <Settings loggedIn={loggedIn} usermail={usermail} appError={appError} onGoToDiary={() => setPage('diary')} />
           )}
         </View>
       </PhonePanel>

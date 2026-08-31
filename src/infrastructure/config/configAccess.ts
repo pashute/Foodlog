@@ -8,6 +8,8 @@ import {
   type Configuration,
   type ReadonlyConfiguration,
 } from './config'
+import { isPrototype } from '../environment'
+import { prototypeConfiguration } from '../../prototype/config/config.mock'
 
 export type ConfigWarning = 'invalidConfiguration'
 
@@ -31,6 +33,11 @@ function isConfiguration(value: unknown): value is Configuration {
 }
 
 export function loadConfiguration(saved?: unknown): ConfigWarning[] {
+  if (isPrototype()) {
+    replaceConfiguration(copyConfiguration(prototypeConfiguration))
+    return []
+  }
+
   if (!saved) {
     replaceConfiguration(copyConfiguration(configDefaults))
     return []

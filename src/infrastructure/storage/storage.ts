@@ -1,28 +1,12 @@
-// Filename: storage.ts  
-// Version 0.2.2
+// Filename: storage.ts  Version 0.2.1
 
 // Storage module for the Cloudflare-backed secure and configuration stores.
-// Prototype stage delegates to storageMock, called from mock screens.
+// Prototype stage delegates to storageMock so tests and mock screens remain
+// local and deterministic.
 
 import { isPrototype } from '../environment'
 import * as storageMock from '../../prototype/storage.mock.ts'
-import { configurationApiUrl, storageApiUrl } from '../config/config'
-
-let sessionToken = 
-  typeof sessionStorage === 'undefined' ? undefined 
-                                        : sessionStorage.getItem('foodlog-session') 
-                                        ?? undefined
-
-export function setSessionToken(token: string | undefined): void {
-  sessionToken = token
-  if (typeof sessionStorage === 'undefined') return
-  if (token) sessionStorage.setItem('foodlog-session', token)
-  else sessionStorage.removeItem('foodlog-session')
-}
-
-export function getSessionToken(): string | undefined {
-  return sessionToken
-}
+import { storageApiUrl } from '../config/config'
 
 // constant key names
 export const KEYS = Object.freeze({
@@ -32,36 +16,27 @@ export const KEYS = Object.freeze({
   usermail: 'usermail',
 })
 
-export const CONFIG_KEYS = Object.freeze({
-  theme: 'theme', // Future Settings feature.
-  timezoneHours: 'timezonehrs',
-  timezoneName: 'timezonename', // Future Settings feature.
-})
-
 const secureRoutes = {
   authToken: 'token',
-  aiApiKey: 'aikey',
-  sheetId: 'sheetid',
-  usermail: 'usermail',
+  aiApiKey: 'key',
+  sheetId: 'sheet',
+  usermail: 'user/mail',
 }
 
 function routeFor(key) {
+  if (key.startsWith('configuration:')) return 'config'
   const route = secureRoutes[key]
   if (!route) throw new Error(`Unsupported storage key: ${key}`)
   return route
 }
 
-function configRouteFor(key) {
-  if (!(key in CONFIG_KEYS) && !Object.values(CONFIG_KEYS).includes(key)) throw new Error(`Unsupported configuration key: ${key}`)
-  return key
-}
-
-async function request(method, baseUrl, route, value) {
-  if (!baseUrl) throw new Error('Cloudflare worker URL is not configured')
-  const response = await fetch(`${baseUrl}/${route}`, {
+async function request(method, route, value) {
+  if (!storageApiUrl) throw new Error('Cloudflare storage URL is not configured')
+  const isConfigRequest = route.startsWith('config/')
+  const response = await fetch(`${storageApiUrl}/${route}`, {
     method,
-    headers: { 'Content-Type': 'application/json', ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}) },
-    ...(value === undefined ? {} : { body: JSON.stringify({ value }) }),
+    headers: { 'Content-Type': 'application/json' },
+    ...(value === undefined ? {} : { body: JSON.stringify(isConfigRequest ? value : { value }) }),
   })
   if (!response.ok) throw new Error(`Storage request failed: ${response.status}`)
   if (response.status === 204) return undefined
@@ -69,50 +44,43 @@ async function request(method, baseUrl, route, value) {
   return body.value
 }
 
-async function _get(key) {
-  return request('GET', storageApiUrl, `${routeFor(key)}/get`)
+async function _realGet(key) {
+  return request('GET', `${routeFor(key)}/get`)
 }
 
-async function _update(key, value) {
-  return request('POST', storageApiUrl, `${routeFor(key)}/store`, value)
+async function _realUpdate(key, value) {
+  return request('POST', `${routeFor(key)}/store`, value)
 }
 
-async function _remove(key) {
-  return request('POST', storageApiUrl, `${routeFor(key)}/store`, null)
-}
-
-export function getConfiguration(key) {
-  if (isPrototype()) return Promise.resolve(storageMock.get(`configuration:${key}`))
-  return request('GET', configurationApiUrl, `${configRouteFor(key)}/get`)
-}
-
-export function updateConfiguration(key, value) {
-  if (isPrototype()) return Promise.resolve(storageMock.update(`configuration:${key}`, value))
-  return request('POST', configurationApiUrl, `${configRouteFor(key)}/store`, value)
+async function _realRemove(key) {
+  return request('POST', `${routeFor(key)}/store`, null)
 }
 
 export function initialize() {
   if (isPrototype()) return storageMock.initialize()
 }
 
-
+// get/update/remove always return a Promise, in both stages (Aug 19 batch —
+// prototype branch wrapped here, real branch was already async by nature of
+// Tauri invoke / expo-secure-store) so callers never have to special-case
+// which stage they're in.
 export function get(key) {
   if (isPrototype()) {
     return Promise.resolve(storageMock.get(key))
   }
-  return _get(key)
+  return _realGet(key)
 }
 
 export function update(key, value) {
   if (isPrototype()) {
     return Promise.resolve(storageMock.update(key, value))
   }
-  return _update(key, value)
+  return _realUpdate(key, value)
 }
 
 export function remove(key) {
   if (isPrototype()) {
     return Promise.resolve(storageMock.remove(key))
   }
-  return _remove(key)
+  return _realRemove(key)
 }

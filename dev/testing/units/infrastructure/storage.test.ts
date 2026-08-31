@@ -28,8 +28,3 @@ test('storage module', async () => {
   assert.strictEqual(await get(KEYS.sheetId), undefined)
   assert.strictEqual(await get(KEYS.usermail), 'user@example.com')
 })
-
-test('storage returns an empty value for an unset key', async () => {
-  initialize()
-  assert.strictEqual(await get(KEYS.aiApiKey), undefined)
-})

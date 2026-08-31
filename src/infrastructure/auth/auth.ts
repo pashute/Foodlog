@@ -14,7 +14,7 @@
 
 import { isPrototype } from '../environment.ts'
 import { appConstants } from '../config/config.ts'
-import { get as storageGet, update as storageUpdate, remove as storageRemove, setSessionToken, getSessionToken, KEYS } from '../storage/storage.ts'
+import { get as storageGet, update as storageUpdate, remove as storageRemove, KEYS } from '../storage/storage.ts'
 
 // Now sourced from config (urls.drive-safe) instead of a locally duplicated
 // literal — was previously copy-pasted here and in starter.ts separately.
@@ -80,14 +80,13 @@ export async function login() {
     return { success: false, error: 'invalid_token' }
   }
 
-  setSessionToken(result.sessionToken)
-  await storageUpdate(KEYS.authToken, result.refreshToken ?? result.accessToken)
+  const token = result.refreshToken ?? result.accessToken
+  await storageUpdate(KEYS.authToken, token)
   if (result.usermail) await storageUpdate(KEYS.usermail, result.usermail)
   return { success: true, usermail: result.usermail ?? usermail }
 }
 
 export async function trySilentLogin() {
-  if (!isPrototype() && !getSessionToken()) return null
   const oauth = await _oauthModule()
   return oauth.trySilentLogin()
 }
@@ -108,5 +107,4 @@ export async function logout() {
     storageRemove(KEYS.aiApiKey),
     storageRemove(KEYS.sheetId),
   ])
-  setSessionToken(undefined)
 }

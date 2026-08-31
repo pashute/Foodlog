@@ -4,7 +4,11 @@
 import { loadConfiguration, type ConfigWarning } from './configAccess'
 import { configDefaults, type Configuration } from './config'
 import { setWarning } from '../warn'
-import { getConfiguration, updateConfiguration, CONFIG_KEYS } from '../storage/storage.ts'
+import { get as storageGet, update as storageUpdate } from '../storage/storage.ts'
+
+function storageKey(usermail: string): string {
+  return `configuration:${usermail}`
+}
 
 export function initializeConfiguration(): ConfigWarning[] {
   const warnings = loadConfiguration()
@@ -12,12 +16,11 @@ export function initializeConfiguration(): ConfigWarning[] {
   return warnings
 }
 
-export async function loadUserConfiguration(_usermail: string): Promise<ConfigWarning[]> {
-  const saved = await getConfiguration(CONFIG_KEYS.theme)
-  if (!saved) await updateConfiguration(CONFIG_KEYS.theme, configDefaults.app.theme)
+export async function loadUserConfiguration(usermail: string): Promise<ConfigWarning[]> {
+  const saved = await storageGet(storageKey(usermail))
   let parsed: unknown
   try {
-    parsed = saved ? { theme: saved } : { theme: configDefaults.app.theme }
+    parsed = saved ? JSON.parse(saved) : undefined
   } catch {
     parsed = saved
   }
@@ -33,7 +36,7 @@ export async function loadUserConfiguration(_usermail: string): Promise<ConfigWa
 }
 
 export async function saveUserConfiguration(usermail: string, configuration: Configuration): Promise<ConfigWarning[]> {
-  await updateConfiguration(CONFIG_KEYS.theme, configuration.app.theme)
+  await storageUpdate(storageKey(usermail), { theme: configuration.app.theme })
   return loadUserConfiguration(usermail)
 }
 

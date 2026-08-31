@@ -36,16 +36,7 @@ export const appConstants = {
 } as const
 
 export const storageApiUrl = process.env.CLOUDFLARE_STORAGE_URL ?? ''
-export const configurationApiUrl = process.env.CLOUDFLARE_CONFIGURATION_URL ?? storageApiUrl
-
-function buildAuthRedirectUrl(root: string, folder: string): string {
-  return `${root.replace(/\/+$/, '')}/${folder.replace(/^\/+|\/+$/g, '')}/`
-}
-
-export const authRedirectUrl = buildAuthRedirectUrl(
-  process.env.EXPO_PUBLIC_AUTH_REDIRECT_ROOT ?? 'https://pashute.github.io/foodlog',
-  process.env.EXPO_PUBLIC_AUTH_REDIRECT_FOLDER ?? 'auth',
-)
+export const authRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT ?? 'https://pashute.github.io/foodlog/auth/'
 export const desktopAuthRedirectUrl = process.env.EXPO_PUBLIC_DESKTOP_AUTH_REDIRECT ?? 'foodlog://auth/'
 
 

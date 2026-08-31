@@ -206,48 +206,25 @@ async function _createSheet(name, parentId, token) {
   return created.spreadsheetId
 }
 
-async function _readById(sheetId, token) {
-  await _authedFetch(`${SHEETS_API}/${sheetId}?fields=spreadsheetId`, token)
-  return sheetId
-}
-
-async function _findOrCreateSheet(folderName, sheetName, token) {
-  let folderId = await _findByName(folderName, null, token)
-  if (!folderId) folderId = await _createFolder(folderName, null, token)
-  let sheetId = await _findByName(sheetName, folderId, token)
-  if (!sheetId) sheetId = await _createSheet(sheetName, folderId, token)
-  return sheetId
-}
-
+// NOTE: no check for isLoggedIn(). Will fail if access to sheet denied. 
 async function _existsOrCreate() {
   const storedId = await Promise.resolve(storageGet(KEYS.sheetId))
   const link = (id) => `${appConstants.urls.myDrive}/${id}/edit`
+  if (storedId) {
+    return { id: storedId, name: 'Foodlog', link: link(storedId), header: HEADER, rows: [] }
+  }
+
   const token = await Promise.resolve(storageGet(KEYS.authToken))
   const { sheetFolder: folderName, sheetName } = configuration.sheets
-  if (!token) throw new Error('Cannot access Foodlog Sheet')
 
-  if (storedId) {
-    try {
-      await _readById(storedId, token)
-      return { id: storedId, name: sheetName, link: link(storedId), header: HEADER, rows: [] }
-    } catch {
-      try {
-        const sheetId = await _findOrCreateSheet(folderName, sheetName, token)
-        await storageUpdate(KEYS.sheetId, sheetId)
-        return { id: sheetId, name: sheetName, link: link(sheetId), header: HEADER, rows: [], warning: 'Recovered from wrong Sheet ID.' }
-      } catch {
-        throw new Error('Cannot access Foodlog Sheet')
-      }
-    }
-  }
+  let folderId = await _findByName(folderName, null, token)
+  if (!folderId) folderId = await _createFolder(folderName, null, token)
 
-  try {
-    const sheetId = await _findOrCreateSheet(folderName, sheetName, token)
-    await storageUpdate(KEYS.sheetId, sheetId)
-    return { id: sheetId, name: sheetName, link: link(sheetId), header: HEADER, rows: [] }
-  } catch {
-    throw new Error('Cannot access Foodlog Sheet')
-  }
+  let sheetId = await _findByName(sheetName, folderId, token)
+  if (!sheetId) sheetId = await _createSheet(sheetName, folderId, token)
+
+  await storageUpdate(KEYS.sheetId, sheetId)
+  return { id: sheetId, name: sheetName, link: link(sheetId), header: HEADER, rows: [] }
 }
 
 async function _save(mealData) {
@@ -264,7 +241,7 @@ async function _save(mealData) {
 
 // returns a promise
 export function existsOrCreate() {
-  if (!isPrototype()) return _existsOrCreate()
+  if (!isPrototype()) return _realExistsOrCreate()
   return Promise.resolve({
     ...sheetMock.existsOrCreate(),
     name: configuration.sheets.sheetName,
@@ -273,10 +250,10 @@ export function existsOrCreate() {
 }
 
 export function save(mealData) {
-  return isPrototype() ? Promise.resolve(sheetMock.log(mealData)) : _save(mealData)
+  return isPrototype() ? Promise.resolve(sheetMock.log(mealData)) : _realLog(mealData)
 }
 
 export function link() {
   if (isPrototype()) return Promise.resolve(sheetMock.link())
-  return _existsOrCreate().then((s) => s.link)
+  return _realExistsOrCreate().then((s) => s.link)
 }

@@ -1,4 +1,4 @@
-  // Filename cucumber.cjs  Version 0.2.1
+// Filename cucumber.cjs  Version 0.2.1
 
 module.exports = {
   default: {
