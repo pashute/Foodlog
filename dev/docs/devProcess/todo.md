@@ -9,12 +9,19 @@
 ## Developer todo list (oauth and storage overhaul)
 
 - [v] Cloudflare worker created: https://foodlog-storage.pashute.workers.dev/
-- [ ] Set CLOUDFLARE_STORAGE_URL env var in platform.env 
-- [ ] Set CLOUDFLARE_CONFIGURATION_URL env var
 - [ ] Set GOOGLE_CLIENT_SECRET in Cloudflare secrets (wrangler secret put)
 - [ ] Set GOOGLE_CLIENT_ID in Cloudflare secrets
 - [ ] Verify both KV namespaces exist: foodlog_storage_kv, foodlog_config_kv
 - [ ] Export wrangler project location (if different from src/backend/)
+- [ ] Set CLOUDFLARE_STORAGE_URL env var in platform.env 
+- [ ] Set CLOUDFLARE_CONFIGURATION_URL env var
+- [ ] 
+## AI coding - Infrastructure & Logging
+
+### Logging module (DONE)
+- [v] Create src/infrastructure/log.ts with report() function
+- [v] Add LOG_LEVEL env var to .env.local (debug/warn/erroronly)
+- [v] Update src/prototype/sheet/sheetServer.ts to use log.report() (DEV-ONLY mock server)
 
 ## AI coding - Storage overhaul
 
@@ -24,6 +31,8 @@
 
 ### Update storage worker (src/backend/storage/worker.ts)
 
+- [ ] create placeholder CLOUDFLARE_STORAGE_URL env var in platform.env 
+- [ ] create placeholder CLOUDFLARE_CONFIGURATION_URL env var
 - [ ] Add auth/token KV key and route (refresh token storage)
 - [ ] Verify token, aikey, sheetid, usermail routes all present
 - [ ] Ensure per-user key scoping (prefix:userId format)
@@ -154,8 +163,12 @@
 
 ## Discussion topics
 
-- Where should node code for Google token calls live? (shared utility in src/backend/?)
 - Should auth worker be separate file or merged with storage/config workers?
-- Deployment strategy: who runs `wrangler deploy`?
+- Deployment strategy: who runs `wrangler deploy` to Cloudflare?
 - How to mock Google OAuth in BDD tests without real network calls?
 - Error messages: where do they go when auth fails (storage, client, UI)?
+
+## Note: Backend is Cloudflare-only
+- No Node.js server in production
+- Google token calls happen in Cloudflare Workers (src/backend/auth/worker.ts)
+- sheetServer.ts is DEV-ONLY prototype mock for local testing
