@@ -4,11 +4,18 @@
  - AI must READ and FOLLOW todo.instructions.md
 --- Todo batches start below this line.  Do not erase it or above ---
 
-# Cloudflare Workers Created (DONE)
+# Cloudflare Architecture (DONE - Code Created)
 
-- [v] src/backend/storage/storageWorker.ts — KV storage for auth tokens, AI keys, sheet IDs, user emails. Routes: /token, /aikey, /sheet, /usermail with per-user key scoping (prefix:userId format).
-- [v] src/backend/configuration/configWorker.ts — KV config storage (theme, timezone). Routes: /theme, /timezonehrs, /timezonename with Bearer token auth validation.
-- [ ] src/backend/auth/worker.ts — OAuth token exchange and refresh (NOT YET CREATED). Routes: /api/auth/exchange (Google code → sessionToken), /api/auth/refresh (validate sessionToken, refresh accessToken).
+**Server code** (to deploy to Cloudflare with `wrangler deploy`):
+- [v] src/backend/storage/storage.servercode.ts — KV storage for auth tokens, AI keys, sheet IDs, user emails. Routes: /token, /aikey, /sheet, /usermail with per-user key scoping (prefix:userId format).
+- [v] src/backend/configuration/config.servercode.ts — KV config storage (theme, timezone). Routes: /theme, /timezonehrs, /timezonename with Bearer token auth validation.
+- [ ] src/backend/auth/auth.servercode.ts — OAuth token exchange and refresh (NOT YET CREATED). Routes: /api/auth/exchange, /api/auth/refresh.
+
+**Client-side serverAccess wrappers** (fetch calls to server):
+- [v] src/infrastructure/storage/storage.ts — calls storage server endpoints (get/update/remove)
+- [v] src/infrastructure/auth/auth.serverAccess.ts — calls auth server (exchangeAuthCode, refreshAccessToken)
+- [v] src/infrastructure/config/config.serverAccess.ts — calls config server (getConfig, setConfig)
+- [ ] src/infrastructure/config/configAccess.ts — integrate config.serverAccess.ts calls
 
 # Batch cloud storage aug 31
 
@@ -29,63 +36,62 @@
 - [v] Add LOG_LEVEL env var to .env.local (debug/warn/erroronly)
 - [v] Update src/prototype/sheet/sheetServer.ts to use log.report() (DEV-ONLY mock server)
 
-## AI coding - Storage overhaul
+## AI coding - Server code (Cloudflare Workers)
 
-**Discussion:** 
-- Are we extending src/backend/storage/worker.ts and src/backend/configuration/worker.ts, or creating new separate auth worker?
-- Who deploys to Cloudflare? AI writes code, developer deploys?
+**Decisions:**
+- Separate files per service (auth, storage, config) to limit requests
+- Developer deploys via `wrangler deploy`
+- Error handling: server logs to Cloudflare, returns JSON {error, status}
 
-### Update storage worker (src/backend/storage/worker.ts)
+### Verify storage.servercode.ts (src/backend/storage/)
 
-- [ ] create placeholder CLOUDFLARE_STORAGE_URL env var in platform.env 
-- [ ] create placeholder CLOUDFLARE_CONFIGURATION_URL env var
-- [ ] Add auth/token KV key and route (refresh token storage)
 - [ ] Verify token, aikey, sheetid, usermail routes all present
-- [ ] Ensure per-user key scoping (prefix:userId format)
-- [ ] Test KV read/write functions
+- [ ] Verify per-user key scoping (prefix:userId format)
+- [ ] Verify FOODLOG_SECURE_KV binding exists
 
-### Update configuration worker (src/backend/configuration/worker.ts)
+### Verify config.servercode.ts (src/backend/configuration/)
 
-- [ ] Verify theme, timezone routes present
+- [ ] Verify theme, timezonehrs, timezonename routes present
 - [ ] Add defaults on first access (if key missing)
-- [ ] Ensure configuration persists after login
+- [ ] Verify FOODLOG_CONFIG_KV binding exists
 
-### Create auth worker (src/backend/auth/worker.ts for wrangler)
+### Create auth.servercode.ts (src/backend/auth/)
 
 - [ ] Implement exchangeAuthCode endpoint (/api/auth/exchange)
   - [ ] Receive: code, clientId, redirectUri, codeVerifier, platform
   - [ ] Call Google token endpoint with client_secret
   - [ ] Decode id_token JWT to extract userId
-  - [ ] Store refresh_token in KV (native platforms only)
-  - [ ] Create session token (HMAC signed JWT)
-  - [ ] Return: sessionToken, accessToken, expiresIn
+  - [ ] Store refresh_token in KV (secure namespace, native platforms only)
+  - [ ] Create session token (HMAC signed JWT with 7-day expiry)
+  - [ ] Return: {sessionToken, accessToken, expiresIn}
 - [ ] Implement refreshAccessToken endpoint (/api/auth/refresh)
-  - [ ] Validate Bearer sessionToken
-  - [ ] Retrieve refresh_token from KV
+  - [ ] Validate Bearer sessionToken from Authorization header
+  - [ ] Extract userId from token payload
+  - [ ] Retrieve refresh_token from KV using userId
   - [ ] Call Google token endpoint
-  - [ ] Return: accessToken, expiresIn
+  - [ ] Return: {accessToken, expiresIn}
   - [ ] Return 401 if refresh fails (lazy pattern)
 
-## AI coding - Client-side auth flow
+## AI coding - Client-side integration
 
-### Update oauthSession.ts
+### Integrate auth.serverAccess.ts into oauthSession.ts
 
-- [ ] Verify authorize() passes codeVerifier to exchange endpoint
-- [ ] Verify refresh() sends sessionToken as Bearer token
-- [ ] Check error handling (401 trigger refresh)
+- [ ] Replace `exchange()` function with `auth.serverAccess.exchangeAuthCode()`
+- [ ] Replace refresh logic with `auth.serverAccess.refreshAccessToken()`
+- [ ] Handle 401 errors properly (message to UI)
 
-### Update oauth.web.ts
+### Integrate config.serverAccess.ts into configAccess.ts
 
-- [ ] Store sessionToken in sessionStorage
-- [ ] Store accessToken expiresIn (timestamp)
-- [ ] Implement lazy 401 refresh on API errors
+- [ ] Load config from server via `config.serverAccess.getConfig()`
+- [ ] Save config changes via `config.serverAccess.setConfig()`
+- [ ] Handle offline (prototype mode) vs online (production)
 
-### Update storage.ts
+### Update storage.ts for 401 refresh
 
 - [ ] Add 401 error detection in fetch() wrapper
-- [ ] Call /api/auth/refresh on 401
+- [ ] Call auth.serverAccess.refreshAccessToken() on 401
 - [ ] Retry original request with new accessToken
-- [ ] Update sessionToken after refresh
+- [ ] Update sessionToken in sessionStorage after refresh
 
 ## AI coding - Post-login entry sequence
 
@@ -140,11 +146,14 @@
 
 ### Test refresh flow
 
-- [ ] Mock Google returning 401 on expired token
-- [ ] Verify client calls refresh endpoint
-- [ ] Verify original request retried
+- callme.ps1
+- [ ] Discuss with developer testing auth refresh
+- WAIT FOR OK to continue
 
 ## AI coding - E2E test: login to diary
+- [ ] Discuss with developer test fixture setup with human in loop
+- WAIT FOR OK to continue 
+
 
 ### Create/update login e2e test
 
@@ -160,6 +169,8 @@
 - [ ] Verify Diary enabled
 - [ ] Test flow: config→sheet→ai key→diary (same as production)
 
+- beep.ps1
+
 ### Create/update cancel login test
 
 - [ ] Click "Let me in"
@@ -167,12 +178,7 @@
 - [ ] Check settings instruction shows login message (red card)
 - [ ] Verify Diary disabled
 
-## Discussion topics
-
-- Should auth worker be separate file or merged with storage/config workers?
-- Deployment strategy: who runs `wrangler deploy` to Cloudflare?
-- How to mock Google OAuth in BDD tests without real network calls?
-- Error messages: where do they go when auth fails (storage, client, UI)?
+- beep.ps1
 
 ## Note: Backend is Cloudflare-only
 - No Node.js server in production
