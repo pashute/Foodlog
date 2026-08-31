@@ -3,7 +3,8 @@
 import * as AuthSession from 'expo-auth-session'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
-import { appConstants, authRedirectUrl, desktopAuthRedirectUrl, storageApiUrl } from '../config/config.ts'
+import { appConstants, authRedirectUrl, desktopAuthRedirectUrl } from '../config/config.ts'
+import * as authServer from './auth.serverAccess'
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -37,7 +38,7 @@ export async function authorize(clientId, platform) {
     }
     code = result.params.code
   }
-  return exchange('/auth/exchange', {
+  return authServer.exchangeAuthCode({
     code,
     clientId,
     redirectUri: redirect,
@@ -46,19 +47,8 @@ export async function authorize(clientId, platform) {
   })
 }
 
-export async function refresh(refreshToken, platform) {
-  return exchange('/auth/refresh', { refreshToken, platform })
-}
-
-async function exchange(path, body) {
-  if (!storageApiUrl) throw new Error('Cloudflare storage URL is not configured')
-  const response = await fetch(`${storageApiUrl}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-  if (!response.ok) throw new Error(`OAuth exchange failed: ${response.status}`)
-  return response.json()
+export async function refresh(sessionToken: string, platform: string) {
+  return authServer.refreshAccessToken(sessionToken, platform)
 }
 
 async function authorizeDesktop(request) {

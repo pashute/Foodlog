@@ -20,12 +20,15 @@ export async function exchangeAuthCode(payload: {
   return response.json()
 }
 
-export async function refreshAccessToken(refreshToken: string, platform: string) {
+export async function refreshAccessToken(sessionToken: string, platform: string) {
   if (!storageApiUrl) throw new Error('Cloudflare auth URL is not configured')
   const response = await fetch(`${storageApiUrl}/api/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken, platform }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`,
+    },
+    body: JSON.stringify({ platform }),
   })
   if (!response.ok) throw new Error(`Auth refresh failed: ${response.status}`)
   return response.json()

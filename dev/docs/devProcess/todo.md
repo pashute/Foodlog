@@ -9,7 +9,7 @@
 **Server code** (to deploy to Cloudflare with `wrangler deploy`):
 - [v] src/backend/storage/storage.servercode.ts — KV storage for auth tokens, AI keys, sheet IDs, user emails. Routes: /token, /aikey, /sheet, /usermail with per-user key scoping (prefix:userId format).
 - [v] src/backend/configuration/config.servercode.ts — KV config storage (theme, timezone). Routes: /theme, /timezonehrs, /timezonename with Bearer token auth validation.
-- [ ] src/backend/auth/auth.servercode.ts — OAuth token exchange and refresh (NOT YET CREATED). Routes: /api/auth/exchange, /api/auth/refresh.
+- [v] src/backend/auth/auth.servercode.ts — OAuth token exchange and refresh. Routes: /api/auth/exchange, /api/auth/refresh.
 
 **Client-side serverAccess wrappers** (fetch calls to server):
 - [v] src/infrastructure/storage/storage.ts — calls storage server endpoints (get/update/remove)
@@ -182,5 +182,7 @@
 
 ## Note: Backend is Cloudflare-only
 - No Node.js server in production
-- Google token calls happen in Cloudflare Workers (src/backend/auth/worker.ts)
+- Google token calls happen in Cloudflare Workers (src/backend/auth/auth.servercode.ts)
 - sheetServer.ts is DEV-ONLY prototype mock for local testing
+
+- callme.ps1
