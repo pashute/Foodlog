@@ -14,7 +14,7 @@ export const formatter = {
   settings: {
     instruction: {
       setupOK: 'Go ahead, start logging meals!',
-      needLogin: 'Go ahead log in.\nIts free forever. No ads. No ties.',
+      needLogin: 'Go ahead, log in.\nIts free forever. No ads. No ties.',
       needAiKey: 'Enable AI to estimate carbs & energy.',
     },
     info: {
