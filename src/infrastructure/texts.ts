@@ -198,6 +198,10 @@ export const txt = {
       permission: 'For that you will be logging in with the drive.file permissions, allowing Foodlog to open only the Foodlog sheet it created.',
       readMore: 'See more on our website',
     },
+    link: {
+      privacy: '/privacy.html',
+      terms: '/terms.html',
+    },
     btn: {
       continueLogin: 'Continue Login with Google',
       cancel: 'Cancel',
