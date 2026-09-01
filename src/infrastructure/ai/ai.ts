@@ -31,7 +31,7 @@ async function _callGemini(prompt, apiKey) {
     throw Object.assign(new Error(`Gemini request failed: ${res.status}`), { type: 'ai' })
   }
   try {
-    const json = await res.tson()
+    const json = await res.json()
     return json.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
   } catch {
     throw Object.assign(new Error('Gemini request failed: bad response'), { type: 'ai' })
