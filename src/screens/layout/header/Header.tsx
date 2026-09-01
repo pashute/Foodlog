@@ -11,7 +11,6 @@ import { formatter, getText, txt } from '../../../infrastructure/texts.ts'
 // so Header stays a pure view (easy to test, easy to reuse).
 export default function Header({
   loggedIn = false,
-  username = '',
   currentPage = 'settings',
   onLoginPress = () => {},
   onNavigate = () => {},
@@ -43,14 +42,7 @@ export default function Header({
         <Text style={styles.version}>v{version}</Text>
       </View>
       <View style={styles.right}>
-        {loggedIn ? (
-          <View style={styles.userRow}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{username.charAt(0).toUpperCase()}</Text>
-            </View>
-            <Text style={styles.username}>{username}</Text>
-          </View>
-        ) : (
+        {!loggedIn && (
           <Pressable onPress={onLoginPress}>
             <Text style={styles.loginText}>Login with Google</Text>
           </Pressable>

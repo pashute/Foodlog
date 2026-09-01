@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet, Linking } from 'react-native'
 import { config } from '../../../infrastructure/config/configAccess'
-import { loadUserConfiguration, saveUserConfiguration } from '../../../infrastructure/config/configIo'
+import { saveUserConfiguration } from '../../../infrastructure/config/configIo'
 import { get as storageGet, update as storageUpdate, KEYS } from '../../../infrastructure/storage/storage.ts'
 import { existsOrCreate } from '../../../infrastructure/sheet/sheet.ts'
 import { keyStatus } from '../../../infrastructure/ai/ai.ts'
@@ -45,7 +45,6 @@ function idleInstruction({ appError, loggedIn, aiKeyStatus }) {
 
 export default function Settings({
   loggedIn = false,
-  usermail = '',
   appError = null,
   onGoToDiary = () => {},
   onSettingsStateChange = () => {},
@@ -136,10 +135,10 @@ export default function Settings({
           <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => setShowConfigDlg(true)}>
             <Text style={styles.btnText}>Open configuration</Text>
           </Pressable>
-          <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => loadUserConfiguration(usermail).then(() => {
+          <Pressable disabled={disabledUntilLogin} style={styles.configButton} onPress={() => {
             setConfigurationVersion((version) => version + 1)
             setLoadError(null)
-          }).catch(() => setLoadError(getText(formatter.settings.error.configurationLoad)))}>
+          }}>
             <Text style={styles.btnText}>Reload</Text>
           </Pressable>
       </View>
@@ -242,7 +241,7 @@ export default function Settings({
       <ConfigDlg
         visible={showConfigDlg}
         onClose={() => setShowConfigDlg(false)}
-        onSave={(next) => saveUserConfiguration(usermail, next).then(() => {
+        onSave={(next) => saveUserConfiguration(next).then(() => {
           setConfigurationVersion((version) => version + 1)
           setShowConfigDlg(false)
           setLoadError(null)

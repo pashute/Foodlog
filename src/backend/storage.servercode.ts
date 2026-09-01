@@ -7,7 +7,6 @@ const securePrefixes = {
   token: 'token:',
   aikey: 'aikey:',
   sheetid: 'sheetid:',
-  usermail: 'usermail:',
 } as const
 
 type SecureName = keyof typeof securePrefixes

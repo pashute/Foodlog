@@ -1,7 +1,7 @@
 {
   "name": "foodlog",
   "private": true,
-  "version": "0.2.4",
+  "version": "0.2.8",
   "type": "module",
   "main": "index.ts",
   "scripts": {

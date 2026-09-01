@@ -1,8 +1,6 @@
 // Shared production OAuth Session flow for web, desktop, Android, and iOS.
 
 import * as AuthSession from 'expo-auth-session'
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
 import { appConstants, authRedirectUrl, desktopAuthRedirectUrl } from '../config/config.ts'
 import * as authServer from './auth.serverAccess'
 
@@ -54,19 +52,23 @@ export async function refresh(sessionToken: string, platform: string) {
 async function authorizeDesktop(request) {
   const state = request.state
   return new Promise(async (resolve, reject) => {
-    const unlisten = await listen('oauth-callback', (event) => {
-      const url = new URL(event.payload)
-      if (url.searchParams.get('state') !== state) return
-      unlisten()
-      const error = url.searchParams.get('error')
-      if (error) reject(new Error(error))
-      else resolve(url.searchParams.get('code'))
-    })
     try {
+      // Dynamically import Tauri APIs only on desktop
+      const { invoke } = await import('@tauri-apps/api/core')
+      const { listen } = await import('@tauri-apps/api/event')
+
+      const unlisten = await listen('oauth-callback', (event) => {
+        const url = new URL(event.payload)
+        if (url.searchParams.get('state') !== state) return
+        unlisten()
+        const error = url.searchParams.get('error')
+        if (error) reject(new Error(error))
+        else resolve(url.searchParams.get('code'))
+      })
+
       const authUrl = await request.makeAuthUrlAsync(discovery)
       await invoke('oauth_start', { authUrl })
     } catch (error) {
-      unlisten()
       reject(error)
     }
   })

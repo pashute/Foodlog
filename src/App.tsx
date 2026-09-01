@@ -15,14 +15,13 @@ import PermitConsentDlg from './prototype/oauth/permitConsent.mock.dlg.tsx'
 import MockSheet from './prototype/sheet/MockSheet.tsx'
 import * as auth from './infrastructure/auth/auth.ts'
 import { isPrototype, devStage, platform } from './infrastructure/environment'
-import { initializeConfiguration, loadUserConfiguration } from './infrastructure/config/configIo'
+import { initializeConfiguration } from './infrastructure/config/configIo'
 import { get as storageGet, KEYS } from './infrastructure/storage/storage.ts'
 import { appConstants } from './infrastructure/config/config.ts'
+import { report } from './infrastructure/log.ts'
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
-  const [username, setUsername] = useState('')
-  const [usermail, setUsermail] = useState('')
   const [page, setPage] = useState('settings')
   const [appError, setAppError] = useState(null)
   const [allSettingsOK, setAllSettingsOK] = useState(false)
@@ -36,15 +35,18 @@ export default function App() {
   useEffect(() => {
     ;(async () => {
       await initializeConfiguration()
-      const leftoverToken = await Promise.resolve(storageGet(KEYS.authToken))
+      let leftoverToken
+      try {
+        leftoverToken = await Promise.resolve(storageGet(KEYS.authToken))
+      } catch {
+        report('debug', 'App startup: no stored token (first load), proceeding to login')
+        return
+      }
       if (!leftoverToken) return
       try {
         const result = await auth.trySilentLogin()
         if (result) {
-          await loadUserConfiguration(result.usermail)
           setLoggedIn(true)
-          setUsermail(result.usermail ?? '')
-          setUsername((result.usermail ?? '').split('@')[0])
           return
         }
       } catch {
@@ -58,10 +60,7 @@ export default function App() {
   const handleLogin = async () => {
     const result = await auth.login()
     if (result.success) {
-      await loadUserConfiguration(result.usermail)
       setLoggedIn(true)
-      setUsermail(result.usermail)
-      setUsername(result.usermail.split('@')[0])
       setAppError(null)
     }
   }
@@ -69,8 +68,6 @@ export default function App() {
   const handleLogout = async () => {
     await auth.logout()
     setLoggedIn(false)
-    setUsername('')
-    setUsermail('')
     setPage('settings')
   }
 
@@ -86,7 +83,6 @@ export default function App() {
         <View style={styles.app}>
           <Header
             loggedIn={loggedIn}
-            username={username}
             currentPage={page}
             onLoginPress={handleLogin}
             onNavigate={setPage}
@@ -100,7 +96,6 @@ export default function App() {
           ) : (
             <Settings
               loggedIn={loggedIn}
-              usermail={usermail}
               appError={appError}
               onGoToDiary={() => setPage('diary')}
               onSettingsStateChange={setAllSettingsOK}

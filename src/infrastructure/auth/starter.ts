@@ -8,13 +8,13 @@
 // import this plain module when they only need popup()/test hooks.
 
 import { appConstants } from '../config/config.ts'
-import { formatter } from '../texts.ts'
+import { txt } from '../texts.ts'
 
-export const title = formatter.starter.title
-export const messageText1 = formatter.starter.message1
-export const messageText2 = formatter.starter.message2
-export const messageText3 = formatter.starter.message3
-export const readFurtherLabel = formatter.starter.readMore
+export const title = txt.starter.lbl.title
+export const messageText1 = txt.starter.msg.yourOwn
+export const messageText2 = txt.starter.msg.noTouch
+export const messageText3 = txt.starter.msg.permission
+export const readFurtherLabel = txt.starter.msg.readMore
 
 // Now sourced from config (urls.drive-safe) — was previously a literal
 // duplicated here and in auth.ts separately (config.ts has no dependency

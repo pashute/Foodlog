@@ -66,7 +66,6 @@ retrieved through env.FOODLOG_CLIENT_SECRET
 - `/token`: refresh_token (OAuth refresh token, encrypted in KV)
 - `/aikey`: User's Gemini API key (encrypted in KV)
 - `/sheetid`: Google Sheets ID for user's Foodlog sheet (encrypted in KV)
-- `/usermail`: User's email address (encrypted in KV)
 
 Operations: GET retrieves value, POST updates/deletes (POST with value=null deletes).
 

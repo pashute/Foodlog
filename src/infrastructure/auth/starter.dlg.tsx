@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react'
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { config } from '../config/configAccess.ts'
-import { formatter, txt } from '../texts.ts'
+import { txt } from '../texts.ts'
 import {
   title,
   messageText1,
@@ -109,10 +109,10 @@ export default function StarterDlg() {
             <Text style={styles.link}>{readFurtherLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => finish(true)}>
-            <Text style={styles.buttonText}>{formatter.starter.button}</Text>
+            <Text style={styles.buttonText}>{txt.starter.btn.continueLogin}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={() => finish(false)}>
-            <Text style={styles.cancelButtonText}>{formatter.starter.cancel}</Text>
+            <Text style={styles.cancelButtonText}>{txt.starter.btn.cancel}</Text>
           </TouchableOpacity>
         </View>
       </View>

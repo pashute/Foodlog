@@ -17,14 +17,12 @@ export const KEYS = Object.freeze({
   authToken: 'authToken',
   aiApiKey: 'aiApiKey',
   sheetId: 'sheetId',
-  usermail: 'usermail',
 })
 
 const secureRoutes = {
   authToken: 'token',
-  aiApiKey: 'key',
-  sheetId: 'sheet',
-  usermail: 'user/mail',
+  aiApiKey: 'aikey',
+  sheetId: 'sheetid',
 }
 
 function routeFor(key) {
@@ -77,15 +75,15 @@ async function request(method, route, value, retry = true) {
 }
 
 async function _realGet(key) {
-  return request('GET', `${routeFor(key)}/get`)
+  return request('GET', routeFor(key))
 }
 
 async function _realUpdate(key, value) {
-  return request('POST', `${routeFor(key)}/store`, value)
+  return request('POST', routeFor(key), value)
 }
 
 async function _realRemove(key) {
-  return request('POST', `${routeFor(key)}/store`, null)
+  return request('POST', routeFor(key), null)
 }
 
 export function initialize() {

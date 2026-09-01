@@ -6,7 +6,7 @@ export type OptDevStage = 'prototype' | 'production'
 export type OptPlatform = 'desktop' | 'android' | 'ios' | 'web'
 
 function readDevStage(): OptDevStage {
-  return process.env.DEVSTAGE === 'production' ? 'production' : 'prototype'
+  return process.env.EXPO_PUBLIC_STAGE === 'production' ? 'production' : 'prototype'
 }
 
 function readPlatform(): OptPlatform {

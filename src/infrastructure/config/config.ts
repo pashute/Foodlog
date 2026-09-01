@@ -21,9 +21,14 @@ type DeepReadonly<T> = {
   readonly [Key in keyof T]: T[Key] extends object ? DeepReadonly<T[Key]> : T[Key]
 }
 
-export const storageApiUrl = process.env.CLOUDFLARE_STORAGE_URL ?? ''
-export const authRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT ?? 'https://pashute.github.io/foodlog/auth/'
+export const storageApiUrl = process.env.EXPO_PUBLIC_CLOUDFLARE_STORAGE_URL ?? ''
+export const authRedirectUrl = process.env.EXPO_PUBLIC_LOCAL_AUTH_REDIRECT ?? 'https://pashute.github.io/foodlog/auth/'
 export const desktopAuthRedirectUrl = process.env.EXPO_PUBLIC_DESKTOP_AUTH_REDIRECT ?? 'foodlog://auth/'
+
+if (typeof window !== 'undefined') {
+  console.log('[config] storageApiUrl:', storageApiUrl)
+  console.log('[config] EXPO_PUBLIC_CLOUDFLARE_STORAGE_URL:', process.env.EXPO_PUBLIC_CLOUDFLARE_STORAGE_URL)
+}
 
 
 // == mock constants ==
