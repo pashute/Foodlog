@@ -48,3 +48,11 @@ Access the settings view by clicking the settings hamburger icon on the top righ
 * **Google Sheet:** See your Foodlog sheet
   
 * **Donations:** Use the Github Support button in the settings panel if you would like to make a voluntary contribution ([link-to-be-given-here]).
+
+---
+
+## Special Thanks
+
+Built by Claude Code, consulting with Gemini Flash-Lite and Claude Haiku 4.5.
+
+I would never have been able to make this without them.
