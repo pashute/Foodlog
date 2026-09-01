@@ -209,7 +209,7 @@ export default function Settings({
           <Text style={styles.instructionIcon}>ⓘ</Text>
         </View>
         <Text style={styles.instructionText}>
-          {getText(formatter.instruction.settings)}
+          {idleText}
         </Text>
       </View>
 
