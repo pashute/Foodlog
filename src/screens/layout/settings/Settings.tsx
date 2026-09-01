@@ -72,8 +72,12 @@ export default function Settings({
   }
 
   useEffect(() => {
+    if (!loggedIn) {
+      setAiKeyStatus('missing')
+      return
+    }
     refreshAiKeyStatus()
-  }, [])
+  }, [loggedIn])
 
   // Re-runs after login completes (existsOrCreate needs an auth token in
   // storage — nothing to fetch before that, and no point trying).
