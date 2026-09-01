@@ -4,7 +4,7 @@
 
 export const appConstants = {
   appName: 'Foodlog',
-  appVersion: '0.2.7',
+  appVersion: '0.2.8',
 
   urls: {
     googlePrivacy: 'https://policies.google.com/privacy#intro',

@@ -16,6 +16,7 @@ import MockSheet from './prototype/sheet/MockSheet.tsx'
 import * as auth from './infrastructure/auth/auth.ts'
 import { isPrototype, devStage, platform } from './infrastructure/environment'
 import { initializeConfiguration } from './infrastructure/config/configIo'
+import { loadConfigFromServer } from './infrastructure/config/configAccess'
 import { get as storageGet, KEYS } from './infrastructure/storage/storage.ts'
 import { appConstants } from './infrastructure/config/config.ts'
 import { report } from './infrastructure/log.ts'
@@ -62,6 +63,11 @@ export default function App() {
     if (result.success) {
       setLoggedIn(true)
       setAppError(null)
+      try {
+        await loadConfigFromServer()
+      } catch (err) {
+        report('warn', 'handleLogin', 'loadConfigFromServer failed:', String(err))
+      }
     }
   }
 

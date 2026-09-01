@@ -29,6 +29,8 @@ export async function authorize(clientId, platform) {
   let code
   if (platform === 'desktop') {
     code = await authorizeDesktop(request)
+  } else if (platform === 'web') {
+    code = await authorizeWeb(request, redirect)
   } else {
     const result = await request.promptAsync(discovery)
     if (result.type !== 'success' || !result.params?.code) {
@@ -47,6 +49,51 @@ export async function authorize(clientId, platform) {
 
 export async function refresh(sessionToken: string, platform: string) {
   return authServer.refreshAccessToken(sessionToken, platform)
+}
+
+async function authorizeWeb(request, redirectUri) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const authUrl = await request.makeAuthUrlAsync(discovery)
+      const popup = window.open(authUrl, 'foodlog-oauth', 'width=600,height=700')
+
+      if (!popup) {
+        reject(new Error('popup_blocked'))
+        return
+      }
+
+      const handleMessage = (event) => {
+        if (event.data?.type === 'oauth-callback') {
+          window.removeEventListener('message', handleMessage)
+          clearTimeout(timeoutId)
+
+          if (event.data.error) {
+            reject(new Error(event.data.error))
+          } else if (event.data.code) {
+            resolve(event.data.code)
+          } else {
+            reject(new Error('no_code_received'))
+          }
+
+          try {
+            popup?.close()
+          } catch (e) {
+            // Ignore errors closing popup
+          }
+        }
+      }
+
+      window.addEventListener('message', handleMessage)
+
+      // Timeout after 5 minutes
+      const timeoutId = setTimeout(() => {
+        window.removeEventListener('message', handleMessage)
+        reject(new Error('authorization_timeout'))
+      }, 300000)
+    } catch (error) {
+      reject(error)
+    }
+  })
 }
 
 async function authorizeDesktop(request) {

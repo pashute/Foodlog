@@ -6,7 +6,8 @@
     "scheme": "com.foodlog",
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "publicPath": "./public"
     },
     "android": {
       "package": "com.foodlog.foodlog"

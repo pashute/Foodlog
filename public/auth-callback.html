@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Foodlog - OAuth Callback</title>
+  <script>
+    // Parse URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const error = params.get('error');
+    const state = params.get('state');
+
+    // Send result back to opener window via postMessage
+    if (window.opener) {
+      window.opener.postMessage({
+        type: 'oauth-callback',
+        code,
+        error,
+        state,
+      }, '*');
+      // Close this window
+      window.close();
+    } else {
+      // No opener, show error
+      document.body.innerHTML = '<h1>OAuth Callback</h1><p>This page should only be opened by the Foodlog app.</p>';
+    }
+  </script>
+</head>
+<body>
+  Processing OAuth callback...
+</body>
+</html>

@@ -16,13 +16,13 @@
 ## Developer todo list (oauth and storage overhaul)
 
 - [v] Cloudflare worker created: https://foodlog-storage.pashute.workers.dev/
-- [ ] Set GOOGLE_CLIENT_SECRET in Cloudflare secrets (wrangler secret put)
-- [ ] Set GOOGLE_CLIENT_ID in Cloudflare secrets
-- [ ] Verify both KV namespaces exist: foodlog_storage_kv, foodlog_config_kv
-- [ ] Export wrangler project location (if different from src/backend/)
-- [ ] Set CLOUDFLARE_STORAGE_URL env var in .env 
-- [ ] Set CLOUDFLARE_CONFIGURATION_URL env var
-- [ ] 
+- [v] Set GOOGLE_CLIENT_SECRET in Cloudflare secrets (wrangler secret put)
+- [v] Set GOOGLE_CLIENT_ID in Cloudflare secrets
+- [v] Verify both KV namespaces exist: foodlog_storage_kv, foodlog_config_kv
+- [v] Export wrangler project location (if different from src/backend/)
+- [v] Set CLOUDFLARE_STORAGE_URL env var in .env 
+- [v] Set CLOUDFLARE_CONFIGURATION_URL env var
+ 
 ## AI coding - Infrastructure & Logging
 
 ### Logging module (DONE)
@@ -39,15 +39,15 @@
 
 ### Verify storage.servercode.ts (src/backend/storage/)
 
-- [ ] Verify token, aikey, sheetid, usermail routes all present
-- [ ] Verify per-user key scoping (prefix:userId format)
-- [ ] Verify FOODLOG_SECURE_KV binding exists
+- [v] Verify token, aikey, sheetid, usermail routes all present
+- [v] Verify per-user key scoping (prefix:userId format)
+- [v] Verify FOODLOG_SECURE_KV binding exists
 
 ### Verify config.servercode.ts (src/backend/configuration/)
 
-  - [ ] Verify theme, timezoneOffset, timezoneAbbrev, timezoneLocation routes present
-- [ ] Add defaults on first access (if key missing)
-- [ ] Verify FOODLOG_CONFIG_KV binding exists
+- [v] Verify theme, timezoneOffset, timezoneAbbrev, timezoneLocation routes present
+- [v] Add defaults on first access (if key missing)
+- [v] Verify FOODLOG_CONFIG_KV binding exists
 
 ### Create auth.servercode.ts (src/backend/auth/) - DONE
 
