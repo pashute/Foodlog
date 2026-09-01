@@ -48,6 +48,11 @@ export default function App() {
         const result = await auth.trySilentLogin()
         if (result) {
           setLoggedIn(true)
+          try {
+            await loadConfigFromServer()
+          } catch (err) {
+            report('warn', 'App startup silent login', 'loadConfigFromServer failed:', String(err))
+          }
           return
         }
       } catch {
