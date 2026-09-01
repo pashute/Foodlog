@@ -13,9 +13,9 @@ export const formatter = {
   },
   settings: {
     instruction: {
-      setupOK: 'Press "Go to Diary" to use the app.',
-      needLogin: 'Press "Login with Google" to use the app.',
-      needAiKey: 'Press [Start AI] for AI key instructions',
+      setupOK: 'Go ahead, start logging meals!',
+      needLogin: 'Go ahead log in.\nIts free forever. No ads. No ties.',
+      needAiKey: 'Enable AI to estimate carbs & energy.',
     },
     info: {
       aiKey: 'Press "Start AI" to see how & why',
