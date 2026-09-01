@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react'
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { config } from '../config/configAccess.ts'
-import { formatter } from '../texts.ts'
+import { formatter, txt } from '../texts.ts'
 import {
   title,
   messageText1,

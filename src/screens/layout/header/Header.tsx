@@ -1,10 +1,11 @@
 // Filename: Header.tsx
-// Version: 0.2.1
+// Version: 0.2.2
 // App header (screens/layout/header): brand + login/avatar + hamburger menu
 
 import { useState } from 'react'
 import { Text, View, Pressable, StyleSheet } from 'react-native'
 import { appConstants } from '../../../infrastructure/config/config.ts'
+import { formatter, getText, txt } from '../../../infrastructure/texts.ts'
 
 // Controlled component — App entry owns login/page state and passes it in,
 // so Header stays a pure view (easy to test, easy to reuse).
@@ -15,6 +16,9 @@ export default function Header({
   onLoginPress = () => {},
   onNavigate = () => {},
   onLogout = () => {},
+  onLikeThis = () => {},
+  onTalkToUs = () => {},
+  allSettingsOK = false,
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const appname = appConstants.appName
@@ -23,11 +27,13 @@ export default function Header({
   // Items hide themselves when not relevant (already on that page, or not
   // logged in for logout) rather than showing disabled. `enabled` only
   // applies to "Enter meal", which stays visible on the settings page but
-  // is greyed out until logged in.
+  // is greyed out until all settings are OK.
   const menuItems = [
-    { name: 'settings', label: 'Settings', action: () => onNavigate('settings'), shown: currentPage !== 'settings' },
-    { name: 'diary', label: 'Enter meal', action: () => onNavigate('diary'), shown: currentPage !== 'diary', enabled: loggedIn },
-    { name: 'logout', label: 'Log out', action: onLogout, shown: loggedIn },
+    { name: 'settings', label: txt.header.msg.settings, action: () => onNavigate('settings'), shown: currentPage !== 'settings' },
+    { name: 'diary', label: txt.header.msg.enterMeal, action: () => onNavigate('diary'), shown: currentPage !== 'diary' && loggedIn, enabled: allSettingsOK },
+    { name: 'likeThis', label: getText(formatter.menu.likeThis), action: onLikeThis, shown: loggedIn },
+    { name: 'talkToUs', label: getText(formatter.menu.talkToUs), action: onTalkToUs, shown: loggedIn },
+    { name: 'logout', label: txt.header.msg.logout, action: onLogout, shown: loggedIn },
   ].filter((item) => item.shown)
 
   return (
@@ -126,5 +132,5 @@ const styles = StyleSheet.create({
   },
   menuItem: { paddingVertical: 10, paddingHorizontal: 14 },
   menuItemText: { color: '#f3f4f6', fontSize: 14 },
-  menuItemDisabled: { color: '#4b4d58' },
+  menuItemDisabled: { color: '#6b7280', opacity: 0.5 },
 })

@@ -1,0 +1,11 @@
+name = "foodlog-storage"
+main = "server.ts"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "FOODLOG_SECURE_KV"
+id = "159705e0801347aa97108e885091a335"
+
+[[kv_namespaces]]
+binding = "FOODLOG_CONFIG_KV"
+id = "f8a7f95a85454f9f810a605b05d4744d"

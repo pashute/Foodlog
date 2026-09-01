@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { config } from '../../../infrastructure/config/configAccess'
 import { restoreDefaults } from '../../../infrastructure/config/configIo'
+import { txt } from '../../../infrastructure/texts.ts'
 
 export default function ConfigDlg({ visible, onSave, onClose }) {
   const [theme, setTheme] = useState('dark')
@@ -32,7 +33,7 @@ export default function ConfigDlg({ visible, onSave, onClose }) {
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.dialog}>
-          <Text style={styles.title}>Configuration</Text>
+          <Text style={styles.title}>{txt.config.lbl.title}</Text>
           <Pressable onPress={handleRestoreDefaults} style={styles.restoreButton}><Text style={styles.buttonText}>Restore defaults</Text></Pressable>
           <Text style={styles.sectionTitle}>UI</Text>
           <Text style={styles.label}>Theme</Text>

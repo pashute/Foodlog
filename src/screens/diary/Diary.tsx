@@ -1,5 +1,5 @@
 // Filename: Diary.tsx
-// Version: 0.2.1
+// Version: 0.2.4
 // Diary screen (screens/diary, was screens/layout/diary — restructured Aug
 // 17): log a meal, see the AI carb/energy estimate, tick/untick items to
 // accept or flag as a guess, fix guesses, and save the entry to the Foodlog
@@ -19,6 +19,7 @@
 
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { txt } from '../../infrastructure/texts.ts'
 import {
   formatTime,
   nforceQtyDigits,
@@ -292,6 +293,16 @@ export default function Diary() {
         </View>
       </View>
 
+      <View style={styles.instructionBox}>
+        <View style={styles.instructionHeader}>
+          <Text style={styles.instructionLabel}>{txt.diary.lbl.infoTag}</Text>
+          <Text style={styles.instructionIcon}>ⓘ</Text>
+        </View>
+        <Text style={styles.instructionText}>
+          {txt.diary.msg.aiTitle}
+        </Text>
+      </View>
+
       <Text style={styles.foodLogLink}>Food log &#8599;</Text>
     </View>
   )
@@ -413,8 +424,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     color: '#f3f4f6',
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: 'left',
     paddingVertical: 2,
+    paddingHorizontal: 6,
   },
   itemName: { color: '#f3f4f6', fontSize: 14.5 },
   itemMacro: { color: '#9ca3af', fontSize: 14.5 },
@@ -430,5 +442,10 @@ const styles = StyleSheet.create({
   },
   btnPrimary: { fontWeight: '600' },
   btnText: { color: '#f3f4f6', fontSize: 14 },
+  instructionBox: { backgroundColor: '#1a1a1a', borderRadius: 0, padding: 12, marginBottom: 14, borderLeftWidth: 3, borderLeftColor: '#dc2626' },
+  instructionHeader: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 8 },
+  instructionLabel: { fontSize: 9, fontWeight: '700', color: '#fca5a5' },
+  instructionIcon: { color: '#fca5a5', fontSize: 11 },
+  instructionText: { color: '#fca5a5', fontSize: 14, fontFamily: 'monospace', lineHeight: 18, textAlign: 'left' },
   foodLogLink: { color: '#7aa2ff', fontSize: 14, textAlign: 'center', marginTop: 16 },
 })

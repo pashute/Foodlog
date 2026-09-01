@@ -37,10 +37,7 @@ const styles = StyleSheet.create({
     borderWidth: 10,
     borderColor: '#000',
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.5,
-    shadowRadius: 60,
+    boxShadow: '0px 20px 60px rgba(0, 0, 0, 0.5)',  
   },
   notch: {
     width: 100,

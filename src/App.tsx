@@ -1,5 +1,5 @@
 // Filename: App.tsx
-// Version: 0.2.1
+// Version: 0.2.2
 // App root (screens/interaction/entry): wires Header + Settings/Diary and
 // owns login/page state.
 
@@ -25,6 +25,9 @@ export default function App() {
   const [usermail, setUsermail] = useState('')
   const [page, setPage] = useState('settings')
   const [appError, setAppError] = useState(null)
+  const [allSettingsOK, setAllSettingsOK] = useState(false)
+  const [showDonatePopup, setShowDonatePopup] = useState(false)
+  const [showContactPopup, setShowContactPopup] = useState(false)
 
   // Crash recovery (screens/interaction/entry.feature: "Continued log in
   // after crash"): the app was closed without logging out — an authToken
@@ -88,11 +91,24 @@ export default function App() {
             onLoginPress={handleLogin}
             onNavigate={setPage}
             onLogout={handleLogout}
+            onLikeThis={() => setShowDonatePopup(true)}
+            onTalkToUs={() => setShowContactPopup(true)}
+            allSettingsOK={allSettingsOK}
           />
-          {page === 'diary' && loggedIn ? (
+          {page === 'diary' && allSettingsOK ? (
             <Diary />
           ) : (
-            <Settings loggedIn={loggedIn} usermail={usermail} appError={appError} onGoToDiary={() => setPage('diary')} />
+            <Settings
+              loggedIn={loggedIn}
+              usermail={usermail}
+              appError={appError}
+              onGoToDiary={() => setPage('diary')}
+              onSettingsStateChange={setAllSettingsOK}
+              showDonatePopup={showDonatePopup}
+              onCloseDonatePopup={() => setShowDonatePopup(false)}
+              showContactPopup={showContactPopup}
+              onCloseContactPopup={() => setShowContactPopup(false)}
+            />
           )}
         </View>
       </PhonePanel>

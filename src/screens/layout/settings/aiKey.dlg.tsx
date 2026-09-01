@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { Modal, View, Text, TextInput, Image, Pressable, ScrollView, StyleSheet, Linking } from 'react-native'
 import { keyStatus } from '../../../infrastructure/ai/ai.ts'
 import { appConstants } from '../../../infrastructure/config/config.ts'
+import { txt } from '../../../infrastructure/texts.ts'
 import aiKeyGetImg from '../../../imgs/aiKey/aiKeyGet.png'
 import aiKeyCreateImg from '../../../imgs/aiKey/aiKeyCreate.png'
 
@@ -53,7 +54,7 @@ export default function AiKeyDlg({ visible, onSave = () => {}, onClose = () => {
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-          <Text style={styles.title}>Gemini key</Text>
+          <Text style={styles.title}>{txt.aiKey.lbl.title}</Text>
 
           <Text style={styles.text}>
             For the AI to estimate the carbs and calories{'\n'}

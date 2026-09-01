@@ -1,5 +1,5 @@
 // Filename: sheetAPI.ts
-// version 0.2.1
+// version 0.2.2
 
 // Sheet module to access and retrieve data from the Foodlog sheet on Google Drive.
 // See dev/docs/issues.md (Aug 17 sheet/meal-schema discussion) for the design
@@ -8,7 +8,6 @@
 import { isPrototype } from '../environment.ts'
 import { appConstants, configuration } from '../config/config.ts'
 import { get as storageGet, update as storageUpdate, KEYS } from '../storage/storage.ts'
-import * as sheetMock from '../../prototype/sheet.mock.ts'
 
 export const sheetHeaders = ['date', 'dow', 'time', 'carbs', 'calories', 'status', 'meal'] as const
 
@@ -246,8 +245,9 @@ async function _save(mealData) {
 }
 
 // returns a promise
-export function existsOrCreate() {
-  if (!isPrototype()) return _realExistsOrCreate()
+export async function existsOrCreate() {
+  if (!isPrototype()) return _existsOrCreate()
+  const sheetMock = await import('../../prototype/sheet.mock.ts')
   return Promise.resolve({
     ...sheetMock.existsOrCreate(),
     name: configuration.sheets.sheetName,
@@ -255,11 +255,14 @@ export function existsOrCreate() {
   })
 }
 
-export function save(mealData) {
-  return isPrototype() ? Promise.resolve(sheetMock.log(mealData)) : _realLog(mealData)
+export async function save(mealData) {
+  if (!isPrototype()) return _save(mealData)
+  const sheetMock = await import('../../prototype/sheet.mock.ts')
+  return Promise.resolve(sheetMock.log(mealData))
 }
 
-export function link() {
-  if (isPrototype()) return Promise.resolve(sheetMock.link())
-  return _realExistsOrCreate().then((s) => s.link)
+export async function link() {
+  if (!isPrototype()) return _realExistsOrCreate().then((s) => s.link)
+  const sheetMock = await import('../../prototype/sheet.mock.ts')
+  return Promise.resolve(sheetMock.link())
 }

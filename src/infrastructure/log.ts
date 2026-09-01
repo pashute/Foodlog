@@ -31,7 +31,6 @@ export function report(
 ): void {
   
   if (!shouldLog(severity)) return
-  console.log('hi there why is this not working?')
   const timestamp = formatTimestamp()
   const location = `[${srcFolder}/${module}:${funcName}]`
   const severityTag = `[${severity.toUpperCase()}]`
@@ -42,12 +41,4 @@ export function report(
   } else {
     console[severity === 'error' ? 'error' : 'log'](`${prefix} ${message}`)
   }
-}
-
-export function reportStartup(appName: string, developmentStage: string, targetPlatform: string, publishState: string): void {
-  report('always', 'infrastructure', 'log', 'startup', `${appName} starting`)
-  report('always', 'infrastructure', 'log', 'startup', `Report severity: ${LOG_LEVEL}`)
-  report('always', 'infrastructure', 'log', 'startup', `Development stage: ${developmentStage}`)
-  report('always', 'infrastructure', 'log', 'startup', `Target platform: ${targetPlatform}`)
-  report('always', 'infrastructure', 'log', 'startup', `Publish state: ${publishState}`)
 }

@@ -9,11 +9,11 @@ import { appConstants } from './src/infrastructure/config/config.ts'
 
 const devStage = process.env.EXPO_PUBLIC_STAGE || 'missing'
 const platform = process.env.EXPO_PUBLIC_TARGET || 'missing'
-const published = process.env.EXPO_PUBLIC_PUBLISHED  || 'missing'
+const release = process.env.EXPO_PUBLIC_RELEASE  || 'missing'
 const appName = appConstants.appName
 const appVersion = appConstants.appVersion
 
 report('always', 'root', 'index', 'module-load', 
-    `${appName} v${appVersion} starting: ${devStage} (${platform} - ${published}) `)
+    `${appName} v${appVersion} starting: ${devStage} (${platform} - ${release}) `)
     
 registerRootComponent(App)

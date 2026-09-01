@@ -3,7 +3,7 @@
 
 import { storageApiUrl } from '../config/config.ts'
 
-export async function getConfig(key: 'theme' | 'timezonehrs' | 'timezonename') {
+export async function getConfig(key: 'theme' | 'timezoneOffset' | 'timezoneAbbrev' | 'timezoneLocation') {
   if (!storageApiUrl) throw new Error('Cloudflare config URL is not configured')
   const response = await fetch(`${storageApiUrl}/${key}`, {
     method: 'GET',
@@ -14,7 +14,7 @@ export async function getConfig(key: 'theme' | 'timezonehrs' | 'timezonename') {
   return body.value
 }
 
-export async function setConfig(key: 'theme' | 'timezonehrs' | 'timezonename', value: string) {
+export async function setConfig(key: 'theme' | 'timezoneOffset' | 'timezoneAbbrev' | 'timezoneLocation', value: string) {
   if (!storageApiUrl) throw new Error('Cloudflare config URL is not configured')
   const response = await fetch(`${storageApiUrl}/${key}`, {
     method: 'POST',

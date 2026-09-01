@@ -1,7 +1,7 @@
 {
   "name": "foodlog",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.2.4",
   "type": "module",
   "main": "index.ts",
   "scripts": {
@@ -31,8 +31,11 @@
       "<rootDir>/dev/testing/units/**/*.test.ts?(x)"
     ],
     "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
+      "<rootDir>/jest.setup.cjs"
     ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "babel-jest"
+    },
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
       "\\.(png|jpg|jpeg|gif)$": "<rootDir>/dev/testing/fileMock.ts"

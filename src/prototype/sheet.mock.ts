@@ -1,4 +1,4 @@
-// Filename sheet.mock.ts  Version 0.2.1
+// Filename sheet.mock.ts  Version 0.2.2
 
 // Mock Foodlog sheet (prototype stage). In-memory spreadsheet object.
 // Mirrors the real branch's contract: sheet id lives in secure storage
@@ -7,11 +7,11 @@
 // @sheets.idLifecycle scenario.
 
 import { mockConstants } from '../infrastructure/config/config.ts'
-import { sheetHeaders } from '../infrastructure/sheet/sheet.ts'
 
 const MOCK_BASE = mockConstants.urls.mockMyDrive
+const sheetHeaders = ['date', 'dow', 'time', 'carbs', 'calories', 'status', 'meal'] as const
 
-let sheet: { id: string; header: readonly string[]; rows: unknown[] } | null = null
+let sheet: { id: string; header: readonly (typeof sheetHeaders)[number][]; rows: unknown[] } | null = null
 let sheetId: string | undefined
 
 export function existsOrCreate() {

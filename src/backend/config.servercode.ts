@@ -5,8 +5,9 @@ export interface Env {
 
 const prefixes = {
   theme: 'theme:',
-  timezonehrs: 'timezonehrs:',
-  timezonename: 'timezonename:',
+  timezoneAbbrev: 'timezoneAbbrev:',
+  timezoneOffset: 'timezoneOffset:',
+  timezoneLocation: 'timezoneLocation:',
 } as const
 
 const encoder = new TextEncoder()

@@ -1,5 +1,5 @@
 // Filename: Settings.tsx
-// Version: 0.2.1
+// Version: 0.2.4
 // Settings screen (screens/layout/settings + screens/interaction/setup)
 
 import { useState, useEffect } from 'react'
@@ -9,9 +9,12 @@ import { loadUserConfiguration, saveUserConfiguration } from '../../../infrastru
 import { get as storageGet, update as storageUpdate, KEYS } from '../../../infrastructure/storage/storage.ts'
 import { existsOrCreate } from '../../../infrastructure/sheet/sheet.ts'
 import { keyStatus } from '../../../infrastructure/ai/ai.ts'
-import { formatter, getText } from '../../../infrastructure/texts.ts'
+import { formatter, getText, txt } from '../../../infrastructure/texts.ts'
+import { formatTimezoneDisplay } from '../../../infrastructure/time/timezone.ts'
 import AiKeyDlg from './aiKey.dlg.tsx'
 import ConfigDlg from './config.dlg.tsx'
+import DonatePopup from './donatePopup.tsx'
+import ContactPopup from './contactPopup.tsx'
 
 const AI_KEY_LABEL = { missing: 'AI Key Missing', invalid: 'AI Key Invalid', ok: 'AI Key OK' }
 const AI_KEY_LED = { missing: 'ledRed', invalid: 'ledAmber', ok: 'ledGreen' }
@@ -40,7 +43,17 @@ function idleInstruction({ appError, loggedIn, aiKeyStatus }) {
   return getText(formatter.settings.instruction.setupOK)
 }
 
-export default function Settings({ loggedIn = false, usermail = '', appError = null, onGoToDiary = () => {} }) {
+export default function Settings({
+  loggedIn = false,
+  usermail = '',
+  appError = null,
+  onGoToDiary = () => {},
+  onSettingsStateChange = () => {},
+  showDonatePopup = false,
+  onCloseDonatePopup = () => {},
+  showContactPopup = false,
+  onCloseContactPopup = () => {},
+}) {
   const [pressText, setPressText] = useState('')
   const [showAiKeyDlg, setShowAiKeyDlg] = useState(false)
   // aiKeyStatus/sheet: get/existsOrCreate are always Promises now (both
@@ -51,6 +64,7 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
   const [loadError, setLoadError] = useState(null)
   const [showConfigDlg, setShowConfigDlg] = useState(false)
   const [, setConfigurationVersion] = useState(0)
+  const [timezoneDisplay, setTimezoneDisplay] = useState('')
 
   const refreshAiKeyStatus = () => {
     Promise.resolve(storageGet(KEYS.aiApiKey))
@@ -75,22 +89,32 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
   }, [loggedIn])
 
   const theme = config().app.theme
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const gmtOffset = formatGmtOffset(-new Date().getTimezoneOffset())
+  const cfg = config().timezone || {}
+  const hasTimezoneConfig = cfg.location && cfg.abbrev !== undefined && cfg.offset !== undefined
   const disabledUntilLogin = !loggedIn
-  const goToAppDisabled = disabledUntilLogin || aiKeyStatus !== 'ok' || !sheet?.id
+  const allSettingsOK = loggedIn && aiKeyStatus === 'ok' && sheet?.id
+  const goToAppDisabled = !allSettingsOK
+
+  useEffect(() => {
+    if (hasTimezoneConfig) {
+      setTimezoneDisplay(formatTimezoneDisplay(cfg.location, cfg.abbrev, cfg.offset))
+    } else {
+      // Fallback to system timezone if not configured
+      const systemTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const gmtOffset = -new Date().getTimezoneOffset()
+      setTimezoneDisplay(systemTz)
+    }
+  }, [hasTimezoneConfig, cfg.location, cfg.abbrev, cfg.offset])
+
+  useEffect(() => {
+    onSettingsStateChange(Boolean(allSettingsOK))
+  }, [allSettingsOK, onSettingsStateChange])
 
   const idleText = loadError || idleInstruction({ appError, loggedIn, aiKeyStatus })
   const showingError = !pressText && Boolean(appError || loadError)
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={[styles.instruction, showingError && styles.instructionError]}>
-          {pressText || idleText}
-        </Text>
-      </View>
-
       <View style={[styles.card, disabledUntilLogin && styles.cardDisabled]}>
         <View style={styles.row}>
           <Text style={styles.label}>Theme</Text>
@@ -150,9 +174,8 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
         <View style={styles.row}>
           <View style={styles.timezoneValue}>
             <Text style={styles.value} numberOfLines={1} ellipsizeMode="tail">
-              {timezone}
+              {timezoneDisplay}
             </Text>
-            <Text style={styles.gmtBadge}> ({gmtOffset})</Text>
           </View>
           <View style={styles.rowRight}>
             <View style={[styles.btn, styles.btnDisabled]}>
@@ -180,6 +203,17 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
           </Pressable>
         </View>
       </View>
+
+      <View style={styles.instructionBox}>
+        <View style={styles.instructionHeader}>
+          <Text style={styles.instructionLabel}>{txt.settings.lbl.infoTag}</Text>
+          <Text style={styles.instructionIcon}>ⓘ</Text>
+        </View>
+        <Text style={styles.instructionText}>
+          {getText(formatter.instruction.settings)}
+        </Text>
+      </View>
+
 
       <Pressable
         style={[styles.goBtn, goToAppDisabled && styles.goBtnDisabled]}
@@ -214,6 +248,15 @@ export default function Settings({ loggedIn = false, usermail = '', appError = n
           setLoadError(null)
         }).catch(() => setLoadError(getText(formatter.settings.error.configurationSave)))}
       />
+      <DonatePopup
+        visible={showDonatePopup}
+        onClose={onCloseDonatePopup}
+        onOpenContact={() => {
+          onCloseDonatePopup()
+          // Note: App level manages opening contact popup via menu callback
+        }}
+      />
+      <ContactPopup visible={showContactPopup} onClose={onCloseContactPopup} />
     </View>
   )
 }
@@ -256,6 +299,14 @@ const styles = StyleSheet.create({
   link: { color: '#7aa2ff', fontSize: 14 },
   configRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
   configButton: { backgroundColor: '#26272f', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 9 },
+  instructionBox: { backgroundColor: '#1a1a1a', borderRadius: 0, padding: 12, marginBottom: 14, borderLeftWidth: 3, borderLeftColor: '#2d2d2d' },
+  instructionHeader: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 8 },
+  instructionLabel: { fontSize: 9, fontWeight: '700', color: '#ffeb3b' },
+  instructionIcon: { color: '#ffeb3b', fontSize: 11 },
+  instructionText: { color: '#4ade80', fontSize: 14, fontFamily: 'monospace', lineHeight: 18, textAlign: 'left', whiteSpace: 'pre-wrap' },
+  instructionBold: { fontWeight: '700' },
+  enjoyedBtn: { backgroundColor: '#c084fc', borderRadius: 14, paddingVertical: 12, alignItems: 'center', marginBottom: 14 },
+  enjoyedBtnText: { color: '#1a0f27', fontSize: 15, fontWeight: '700' },
   goBtn: {
     backgroundColor: '#c084fc',
     borderRadius: 14,
@@ -263,7 +314,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  goBtnDisabled: { opacity: 0.5 },
+  goBtnDisabled: { opacity: 0.4, backgroundColor: '#4b5563' },
   goBtnText: { color: '#1a0f27', fontSize: 16, fontWeight: '700' },
   instruction: { color: '#f3f4f6', fontSize: 14, fontWeight: '400', textAlign: 'center', minHeight: 20 },
   instructionError: { color: '#f87171', fontWeight: '700' },

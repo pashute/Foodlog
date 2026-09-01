@@ -1,10 +1,10 @@
 // Filename: appConstants.ts
-// Version 0.2.2
+// Version 0.2.4
 // Private: import only via infrastructure/config/config.ts, not directly
 
 export const appConstants = {
   appName: 'Foodlog',
-  appVersion: '0.2.2',
+  appVersion: '0.2.5',
 
   urls: {
     googlePrivacy: 'https://policies.google.com/privacy#intro',

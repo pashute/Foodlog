@@ -67,8 +67,9 @@ export async function loadConfigFromServer(): Promise<ConfigWarning[]> {
   try {
     // Load theme from server
     const theme = (await configServer.getConfig('theme')) || configDefaults.app.theme
-    const timezonehrs = (await configServer.getConfig('timezonehrs')) || undefined
-    const timezonename = (await configServer.getConfig('timezonename')) || undefined
+    const timezoneOffset = (await configServer.getConfig('timezoneOffset')) || undefined
+    const timezoneAbbrev = (await configServer.getConfig('timezoneAbbrev')) || undefined
+    const timezoneLocation = (await configServer.getConfig('timezoneLocation')) || undefined
 
     // Build config from server values, falling back to defaults
     const config: Configuration = {
@@ -88,7 +89,7 @@ export async function loadConfigFromServer(): Promise<ConfigWarning[]> {
   }
 }
 
-export async function saveConfig(key: 'theme' | 'timezonehrs' | 'timezonename', value: string): Promise<boolean> {
+export async function saveConfig(key: 'theme' | 'timezoneOffset' | 'timezoneAbbrev' | 'timezoneLocation', value: string): Promise<boolean> {
   if (isPrototype()) {
     return false // Can't save in prototype mode
   }
