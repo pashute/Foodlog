@@ -5,7 +5,6 @@ import { storageApiUrl } from '../config/config.ts'
 
 export async function exchangeAuthCode(payload: {
   code: string
-  clientId: string
   redirectUri: string
   codeVerifier: string
   platform: string

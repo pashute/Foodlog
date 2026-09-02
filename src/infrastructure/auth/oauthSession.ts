@@ -40,7 +40,6 @@ export async function authorize(clientId, platform) {
   }
   return authServer.exchangeAuthCode({
     code,
-    clientId,
     redirectUri: redirect,
     codeVerifier: request.codeVerifier,
     platform,

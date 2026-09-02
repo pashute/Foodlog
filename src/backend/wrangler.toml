@@ -12,11 +12,16 @@ id = "f8a7f95a85454f9f810a605b05d4744d"
 
 [observability]
 enabled = true
+head_sampling_rate = 1
+redact_query_string = false
 
 [observability.logs]
 enabled = true
+head_sampling_rate = 1
 persist = true
 invocation_logs = true
 
 [observability.traces]
-enabled = false
+enabled = true
+persist = true
+head_sampling_rate = 1

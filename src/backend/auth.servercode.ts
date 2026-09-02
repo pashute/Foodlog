@@ -50,7 +50,9 @@ async function decodeJwt(jwt: string): Promise<any> {
   }
 }
 
-async function exchangeGoogleCode(code: string, clientId: string, redirectUri: string, clientSecret: string): Promise<any> {
+async function exchangeGoogleCode(code: string, clientId: string, redirectUri: string, clientSecret: string, codeVerifier: string): Promise<any> {
+  console.log('[exchangeGoogleCode] Sending to Google:', { code: code.substring(0, 20) + '...', clientId, redirectUri, grant_type: 'authorization_code' })
+
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -59,12 +61,14 @@ async function exchangeGoogleCode(code: string, clientId: string, redirectUri: s
       client_id: clientId,
       client_secret: clientSecret,
       redirect_uri: redirectUri,
+      code_verifier: codeVerifier,
       grant_type: 'authorization_code',
     }).toString(),
   })
 
   if (!response.ok) {
     const error = await response.text()
+    console.error('[exchangeGoogleCode] Google error:', { status: response.status, error, body: error.substring(0, 500) })
     throw new Error(`Google token exchange failed: ${response.status} ${error}`)
   }
 
@@ -92,14 +96,27 @@ async function refreshGoogleToken(refreshToken: string, clientId: string, client
 
 async function handleExchange(request: Request, env: Env): Promise<Response> {
   try {
-    const { code, clientId, redirectUri, codeVerifier, platform } = (await request.json()) as any
-
-    if (!code || !clientId || !redirectUri || !codeVerifier || !platform) {
-      return json({ error: 'missing_params' }, 400)
+    // Check if secrets are loaded
+    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.SESSION_SECRET) {
+      console.error('Missing env config:', { hasClientId: !!env.GOOGLE_CLIENT_ID, hasClientSecret: !!env.GOOGLE_CLIENT_SECRET, hasSessionSecret: !!env.SESSION_SECRET })
+      return json({ error: 'server_misconfigured' }, 500)
     }
 
-    // Exchange code for tokens via Google
-    const googleResponse = await exchangeGoogleCode(code, clientId, redirectUri, env.GOOGLE_CLIENT_SECRET)
+    console.log('[handleExchange] Request received')
+    const body = await request.json()
+    console.log('[handleExchange] Request body:', { code: body.code ? body.code.substring(0, 20) + '...' : 'missing', redirectUri: body.redirectUri, codeVerifier: body.codeVerifier ? body.codeVerifier.substring(0, 20) + '...' : 'MISSING', platform: body.platform })
+
+    const { code, redirectUri, codeVerifier, platform } = body as any
+
+    console.log('[handleExchange] Parsed values:', { code: !!code, redirectUri: !!redirectUri, codeVerifier: !!codeVerifier, platform: !!platform })
+
+    if (!code || !redirectUri || !codeVerifier || !platform) {
+      console.error('[handleExchange] Missing params:', { code: !code, redirectUri: !redirectUri, codeVerifier: !codeVerifier, platform: !platform })
+      return json({ error: 'missing_params', missing: { code: !code, redirectUri: !redirectUri, codeVerifier: !codeVerifier, platform: !platform } }, 400)
+    }
+
+    // Exchange code for tokens via Google (using server's credentials)
+    const googleResponse = await exchangeGoogleCode(code, env.GOOGLE_CLIENT_ID, redirectUri, env.GOOGLE_CLIENT_SECRET, codeVerifier)
     if (!googleResponse.access_token || !googleResponse.id_token) {
       return json({ error: 'google_token_invalid' }, 400)
     }
@@ -127,6 +144,22 @@ async function handleExchange(request: Request, env: Env): Promise<Response> {
     })
   } catch (error) {
     return json({ error: (error as Error).message || 'exchange_failed' }, 500)
+  }
+}
+
+async function handleVerify(env: Env): Promise<Response> {
+  try {
+    const clientSecretHash = base64Url(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(env.GOOGLE_CLIENT_SECRET))))
+    const sessionSecretHash = base64Url(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(env.SESSION_SECRET))))
+
+    return json({
+      googleClientId: env.GOOGLE_CLIENT_ID,
+      clientSecretHash,
+      sessionSecretHash,
+      configured: !!env.GOOGLE_CLIENT_ID && !!env.GOOGLE_CLIENT_SECRET && !!env.SESSION_SECRET,
+    })
+  } catch (error) {
+    return json({ error: String(error) }, 500)
   }
 }
 
@@ -181,16 +214,25 @@ async function handleRefresh(request: Request, env: Env): Promise<Response> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url)
+    try {
+      const url = new URL(request.url)
 
-    if (request.method === 'POST' && url.pathname === '/api/auth/exchange') {
-      return handleExchange(request, env)
+      if (request.method === 'GET' && url.pathname === '/api/auth/verify') {
+        return await handleVerify(env)
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/auth/exchange') {
+        return await handleExchange(request, env)
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/auth/refresh') {
+        return await handleRefresh(request, env)
+      }
+
+      return json({ error: 'not_found' }, 404)
+    } catch (error) {
+      console.error('Top-level error:', error)
+      return json({ error: String(error) }, 500)
     }
-
-    if (request.method === 'POST' && url.pathname === '/api/auth/refresh') {
-      return handleRefresh(request, env)
-    }
-
-    return json({ error: 'not_found' }, 404)
   },
 }
