@@ -66,13 +66,17 @@ async function exchangeGoogleCode(code: string, clientId: string, redirectUri: s
     }).toString(),
   })
 
+  console.log('[exchangeGoogleCode] Google response:', { status: response.status, ok: response.ok })
+
   if (!response.ok) {
     const error = await response.text()
     console.error('[exchangeGoogleCode] Google error:', { status: response.status, error, body: error.substring(0, 500) })
     throw new Error(`Google token exchange failed: ${response.status} ${error}`)
   }
 
-  return response.json()
+  const tokens = await response.json()
+  console.log('[exchangeGoogleCode] Google success:', { hasAccessToken: !!tokens.access_token, hasIdToken: !!tokens.id_token })
+  return tokens
 }
 
 async function refreshGoogleToken(refreshToken: string, clientId: string, clientSecret: string): Promise<any> {
@@ -96,13 +100,14 @@ async function refreshGoogleToken(refreshToken: string, clientId: string, client
 
 async function handleExchange(request: Request, env: Env): Promise<Response> {
   try {
+    const timestamp = new Date().toISOString()
+    console.log(`[${timestamp}] [handleExchange] Request received`)
+
     // Check if secrets are loaded
     if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.SESSION_SECRET) {
       console.error('Missing env config:', { hasClientId: !!env.GOOGLE_CLIENT_ID, hasClientSecret: !!env.GOOGLE_CLIENT_SECRET, hasSessionSecret: !!env.SESSION_SECRET })
       return json({ error: 'server_misconfigured' }, 500)
     }
-
-    console.log('[handleExchange] Request received')
     const body = await request.json()
     console.log('[handleExchange] Request body:', { code: body.code ? body.code.substring(0, 20) + '...' : 'missing', redirectUri: body.redirectUri, codeVerifier: body.codeVerifier ? body.codeVerifier.substring(0, 20) + '...' : 'MISSING', platform: body.platform })
 
@@ -122,24 +127,32 @@ async function handleExchange(request: Request, env: Env): Promise<Response> {
     }
 
     // Decode id_token to extract userId
+    console.log('[handleExchange] Decoding id_token')
     const idTokenPayload = await decodeJwt(googleResponse.id_token)
+    console.log('[handleExchange] id_token decoded:', { hasSub: !!idTokenPayload?.sub })
     if (!idTokenPayload?.sub) {
+      console.error('[handleExchange] Invalid id_token: no sub claim')
       return json({ error: 'invalid_id_token' }, 400)
     }
 
     const userId = idTokenPayload.sub
+    console.log('[handleExchange] userId extracted:', userId.substring(0, 20) + '...')
 
     // Store refresh_token in KV (for native platforms that have offline access)
     if (googleResponse.refresh_token) {
+      console.log('[handleExchange] Storing refresh_token in KV')
       await env.FOODLOG_SECURE_KV.put(`token:${userId}`, googleResponse.refresh_token)
     }
 
     // Create session token (HMAC-signed JWT)
+    console.log('[handleExchange] Creating session token')
     const sessionToken = await createSessionToken(userId, env.SESSION_SECRET)
 
+    console.log('[handleExchange] Success! Returning tokens')
     return json({
       sessionToken,
       accessToken: googleResponse.access_token,
+      scope: 'drive.file',
       expiresIn: googleResponse.expires_in || 3600,
     })
   } catch (error) {
